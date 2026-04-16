@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'My Drive')
-@section('page-title', 'My Drive')
+@section('title', 'Dokumen Saya')
+@section('page-title', 'Dokumen Saya')
 
 @section('content')
     @php
@@ -13,7 +13,7 @@
     {{-- ── Header Row ─────────────────────────────── --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-2xl font-extrabold text-gray-900">My Drive</h1>
+            <h1 class="text-2xl font-extrabold text-gray-900">Dokumen Saya</h1>
             <p class="mt-1 text-sm text-gray-500">Dokumen Anda tersimpan aman di Google Drive.</p>
         </div>
         <div class="flex items-center gap-3">

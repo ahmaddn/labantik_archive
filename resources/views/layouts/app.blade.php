@@ -125,12 +125,8 @@
         {{-- Brand + Close Button --}}
         <div class="flex items-center justify-between  px-6 py-5">
             <div class="flex items-center gap-3">
-                <div
-                    class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#1b84ff] shadow-lg shadow-blue-500/40">
-                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                    </svg>
+                <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl">
+                    <img src="https://smkn1talaga.sch.id/assets/images/logosmk.png" alt="Portofolio Digital" class="h-full w-full object-contain">
                 </div>
                 <span class="text-lg font-extrabold tracking-tight text-gray-900">Portofolio Digital</span>
             </div>
@@ -225,11 +221,8 @@
         class="fixed left-0 top-0 z-50 flex h-full w-64 -translate-x-full flex-col border-r border-gray-200 bg-white lg:hidden">
         <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
             <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#1b84ff] shadow-lg shadow-blue-500/40">
-                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                    </svg>
+                <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl">
+                    <img src="https://smkn1talaga.sch.id/assets/images/logosmk.png" alt="Portofolio Digital" class="h-full w-full object-contain">
                 </div>
                 <span class="text-lg font-extrabold tracking-tight text-gray-900">Portofolio Digital</span>
             </div>

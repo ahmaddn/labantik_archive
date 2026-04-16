@@ -16,9 +16,9 @@
             {{-- Logo --}}
             <div class="mb-8 text-center">
                 <div
-                    class="mx-auto mb-4 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg">
+                    class="mx-auto mb-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white">
                     <img src="https://smkn1talaga.sch.id/assets/images/logosmk.png" alt="Portofolio Digital"
-                        class="h-full w-full object-contain p-1">
+                        class="h-full w-full object-contain">
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900">Portofolio Digital</h1>
                 <p class="mt-1 text-sm text-gray-500">Masuk untuk melanjutkan</p>
