@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ExpertiseConcentration;
+use App\Models\GoogleDriveCategory;
 use App\Models\GoogleDriveFile;
 use App\Models\GoogleToken;
 use App\Services\GoogleDriveAdminService;
@@ -15,33 +17,81 @@ class DriveFileController extends Controller
         protected GoogleDriveAdminService $driveService
     ) {}
 
-    public function index(): View
+    public function index()
     {
-        $userId = auth()->id();
+        $user = auth()->user();
 
-        $files = GoogleDriveFile::where('user_id', $userId)
+        // Ambil semua file milik user, eager load relasi
+        $allFiles = GoogleDriveFile::where('user_id', $user->id)
+            ->with(['category', 'expertise'])
             ->latest()
-            ->paginate(10);
+            ->get();
 
+        // Kelompokkan per kategori
+        $filesByCategory = $allFiles
+            ->groupBy(fn($f) => $f->google_category_id ?? 'uncategorized')
+            ->map(function ($files, $catId) {
+                $category = $files->first()->category
+                    ?? (object)['id' => null, 'name' => 'Tanpa Kategori', 'slug' => 'uncategorized'];
+                return [
+                    'category' => $category,
+                    'files'    => $files,
+                ];
+            })
+            ->values(); // reset keys jadi 0,1,2,...
+
+        // Tetap kirim $files (paginasi) jika diperlukan fallback
+        $files = GoogleDriveFile::where('user_id', $user->id)
+            ->with(['category', 'expertise'])
+            ->latest()
+            ->paginate(15);
+
+        // Cek koneksi Google Drive
         $isConnected = GoogleToken::where('type', 'admin')->exists();
-
+        
         // Kuota: 5MB per user
         $quotaLimit = 5 * 1024 * 1024;
-        $usedBytes = (int) GoogleDriveFile::where('user_id', $userId)->sum('size');
+        $usedBytes = (int) GoogleDriveFile::where('user_id', $user->id)->sum('size');
         $remainingBytes = max(0, $quotaLimit - $usedBytes);
 
-        return view('drive.index', compact('files', 'isConnected', 'quotaLimit', 'usedBytes', 'remainingBytes'));
+        return view('drive.index', compact(
+            'files',
+            'filesByCategory',
+            'isConnected',
+            'quotaLimit',
+            'remainingBytes'
+        ));
     }
 
-    public function upload(Request $request): RedirectResponse
+    public function create(): View
+    {
+        $categories = GoogleDriveCategory::orderBy('name')->get();
+        $expertises = ExpertiseConcentration::orderBy('name')->get();
+        $isConnected = GoogleToken::where('type', 'admin')->exists();
+
+        // Kuota
+        $quotaLimit = 5 * 1024 * 1024;
+        $usedBytes = (int) GoogleDriveFile::where('user_id', auth()->id())->sum('size');
+        $remainingBytes = max(0, $quotaLimit - $usedBytes);
+
+        return view('drive.create', compact('categories', 'expertises', 'isConnected', 'remainingBytes'));
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            // Hanya PDF, maksimal 1MB per file
-            'file' => 'required|file|mimes:pdf|max:1024', // 1MB (1024 KB)
+            'document_name' => 'required|string|max:255',
+            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:1024', // 1MB
+            'google_category_id' => 'required|exists:google_drive_categories,id',
+            'expertise_id' => 'nullable|exists:core_expertise_concentrations,id',
         ], [
+            'document_name.required' => 'Nama dokumen wajib diisi.',
             'file.required' => 'File wajib diunggah.',
-            'file.mimes'    => 'Hanya file PDF yang diperbolehkan.',
-            'file.max'      => 'Ukuran file tidak boleh lebih dari 1 MB.',
+            'file.mimes' => 'Hanya file PDF atau gambar yang diperbolehkan.',
+            'file.max' => 'Ukuran file tidak boleh lebih dari 1 MB.',
+            'google_category_id.required' => 'Kategori wajib dipilih.',
+            'google_category_id.exists' => 'Kategori tidak valid.',
+            'expertise_id.exists' => 'Keahlian tidak valid.',
         ]);
 
         if (!GoogleToken::where('type', 'admin')->exists()) {
@@ -51,7 +101,7 @@ class DriveFileController extends Controller
         try {
             $uploadedFile = $request->file('file');
 
-            // Cek kuota per-user: maksimal total 5MB (5 * 1024 * 1024 bytes)
+            // Cek kuota per-user: maksimal total 5MB
             $currentTotal = (int) GoogleDriveFile::where('user_id', auth()->id())->sum('size');
             $newSize = (int) ($uploadedFile->getSize() ?? 0);
             $quotaLimit = 5 * 1024 * 1024;
@@ -62,36 +112,37 @@ class DriveFileController extends Controller
                 return back()->with('error', 'Kuota upload Anda melebihi batas 5 MB. Sisa kuota: ' . $remainingMb . ' MB. Hapus file lama atau hubungi admin.');
             }
 
-            // Build filename: {user}_{year}_#{sym}_{originalName}
+            // Build filename untuk Google Drive: {username}_{tahun}_{original_filename}
             $user = auth()->user();
             $originalName = $uploadedFile->getClientOriginalName();
 
-            // Sanitize user name and original file name to safe characters
             $sanitizedUser = preg_replace('/[^A-Za-z0-9-_]/', '_', $user->name ?: 'user');
             $sanitizedOriginal = preg_replace('/[^A-Za-z0-9._-]/', '_', $originalName);
 
             $year = date('Y');
+            $fileName = sprintf($sanitizedOriginal);
 
-            $fileName = sprintf('%s_%s_#%s', $sanitizedUser, $sanitizedOriginal, $year);
-
-            // Pastikan folder tahun ada, lalu upload ke folder tersebut
+            // Pastikan folder tahun ada, lalu upload
             $folderId = $this->driveService->ensureYearFolder($year);
             $uploaded = $this->driveService->uploadFile($uploadedFile, $fileName, $folderId);
 
             // Simpan metadata ke database
             GoogleDriveFile::create([
-                'user_id'          => auth()->id(),
-                'google_file_id'   => $uploaded['google_file_id'],
-                'name'             => $uploaded['name'],
-                'mime_type'        => $uploaded['mime_type'],
-                'size'             => $uploaded['size'],
-                'web_view_link'    => $uploaded['web_view_link'],
+                'user_id' => auth()->id(),
+                'document_name' => $request->document_name,
+                'google_category_id' => $request->google_category_id,
+                'expertise_id' => $request->expertise_id,
+                'google_file_id' => $uploaded['google_file_id'],
+                'name' => $uploaded['name'], // Nama file di Google Drive
+                'mime_type' => $uploaded['mime_type'],
+                'size' => $uploaded['size'],
+                'web_view_link' => $uploaded['web_view_link'],
                 'web_content_link' => $uploaded['web_content_link'],
             ]);
 
-            return back()->with('success', '✅ File "' . $uploaded['name'] . '" berhasil diupload!');
+            return redirect()->route('drive.index')->with('success', 'File "' . $request->document_name . '" berhasil diupload!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Upload gagal: ' . $e->getMessage());
+            return back()->with('error', 'Upload gagal: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -105,9 +156,8 @@ class DriveFileController extends Controller
             $this->driveService->deleteFile($file->google_file_id);
             $file->delete();
 
-            return back()->with('success', 'File "' . $file->name . '" berhasil dihapus.');
+            return back()->with('success', 'File "' . $file->document_name . '" berhasil dihapus.');
         } catch (\Exception $e) {
-            // Tetap hapus dari DB meski gagal di Drive
             $file->delete();
             return back()->with('warning', 'File dihapus dari database, tapi gagal dihapus di Drive: ' . $e->getMessage());
         }

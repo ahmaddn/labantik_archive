@@ -11,7 +11,7 @@ class SuperAdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            abort(403, 'Akses ditolak. Hanya Super Admin yang dapat mengakses halaman ini.');
+            abort(404);
         }
 
         return $next($request);

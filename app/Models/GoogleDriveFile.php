@@ -17,6 +17,9 @@ class GoogleDriveFile extends Model
 
     protected $fillable = [
         'user_id',
+        'document_name',
+        'google_category_id',
+        'expertise_id',
         'google_file_id',
         'name',
         'mime_type',
@@ -47,17 +50,21 @@ class GoogleDriveFile extends Model
         });
     }
 
-    /**
-     * Relationship dengan User
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Format ukuran file
-     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(GoogleDriveCategory::class, 'google_category_id');
+    }
+
+    public function expertise(): BelongsTo
+    {
+        return $this->belongsTo(ExpertiseConcentration::class, 'expertise_id');
+    }
+
     public function getFormattedSizeAttribute(): string
     {
         $bytes = $this->size;
