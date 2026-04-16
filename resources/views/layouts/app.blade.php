@@ -123,10 +123,11 @@
         class="fixed left-0 top-0 z-30 hidden h-full w-64 flex-col border-r border-gray-200 bg-white lg:flex">
 
         {{-- Brand + Close Button --}}
-        <div class="flex items-center justify-between  px-6 py-5">
+        <div class="flex items-center justify-between px-6 py-5">
             <div class="flex items-center gap-3">
                 <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl">
-                    <img src="https://smkn1talaga.sch.id/assets/images/logosmk.png" alt="Portofolio Digital" class="h-full w-full object-contain">
+                    <img src="https://smkn1talaga.sch.id/assets/images/logosmk.png" alt="Portofolio Digital"
+                        class="h-full w-full object-contain">
                 </div>
                 <span class="text-lg font-extrabold tracking-tight text-gray-900">Portofolio Digital</span>
             </div>
@@ -222,11 +223,13 @@
         <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
             <div class="flex items-center gap-3">
                 <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl">
-                    <img src="https://smkn1talaga.sch.id/assets/images/logosmk.png" alt="Portofolio Digital" class="h-full w-full object-contain">
+                    <img src="https://smkn1talaga.sch.id/assets/images/logosmk.png" alt="Portofolio Digital"
+                        class="h-full w-full object-contain">
                 </div>
                 <span class="text-lg font-extrabold tracking-tight text-gray-900">Portofolio Digital</span>
             </div>
-            <button onclick="closeSidebar()" class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+            <button onclick="closeSidebar()"
+                class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
                 title="Tutup sidebar">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
