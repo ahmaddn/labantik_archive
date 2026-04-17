@@ -49,8 +49,8 @@ class DriveFileController extends Controller
         // Cek koneksi Google Drive
         $isConnected = GoogleToken::where('type', 'admin')->exists();
 
-        // Kuota: 5MB per user
-        $quotaLimit = 5 * 1024 * 1024;
+        // Kuota: 100MB per user
+        $quotaLimit = 100 * 1024 * 1024;
         $usedBytes = (int) GoogleDriveFile::where('user_id', $user->id)->sum('size');
         $remainingBytes = max(0, $quotaLimit - $usedBytes);
 
@@ -70,7 +70,7 @@ class DriveFileController extends Controller
         $isConnected = GoogleToken::where('type', 'admin')->exists();
 
         // Kuota
-        $quotaLimit = 5 * 1024 * 1024;
+        $quotaLimit = 100 * 1024 * 1024;
         $usedBytes = (int) GoogleDriveFile::where('user_id', auth()->id())->sum('size');
         $remainingBytes = max(0, $quotaLimit - $usedBytes);
 
