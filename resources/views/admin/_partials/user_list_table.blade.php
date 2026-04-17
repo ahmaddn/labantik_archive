@@ -13,46 +13,44 @@
 
 @php
     // Load ALL users dengan role code tertentu
-    $allUsersData = \App\Models\User::whereHas('roles', 
-        fn($q) => $q->where('code', $roleCode ?? 'siswa')
-    )->get()->toArray();
+    $allUsersData = \App\Models\User::whereHas('roles', fn($q) => $q->where('code', $roleCode ?? 'siswa'))
+        ->get()
+        ->toArray();
 @endphp
 
-<div class="user-table-container" 
-     data-all-users="{{ json_encode($allUsersData) }}"
-     data-identifier="{{ $identifier }}"
-     data-ident-label="{{ $identLabel }}"
-     data-route-show="{{ route($routeShow, ['id' => ':id']) }}"
-     data-extra-col="{{ $extraCol }}"
-     data-extra-label="{{ $extraLabel }}">
+<div class="user-table-container" data-all-users="{{ json_encode($allUsersData) }}" data-identifier="{{ $identifier }}"
+    data-ident-label="{{ $identLabel }}" data-route-show="{{ route($routeShow, ['id' => ':id']) }}"
+    data-extra-col="{{ $extraCol }}" data-extra-label="{{ $extraLabel }}">
 
     {{-- Search + Per-page bar --}}
     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-2 flex-1 max-w-sm">
+        <div class="flex max-w-sm flex-1 items-center gap-2">
             <div class="relative flex-1">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input type="text" id="searchInput" placeholder="Cari nama atau {{ $identLabel }}..."
-                       class="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-700 shadow-sm placeholder-gray-400 focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
+                    class="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
             </div>
             <button id="clearSearch" style="display:none;"
-                    class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 transition-colors">✕</button>
+                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-50">✕</button>
         </div>
 
         {{-- Total count --}}
-        <p class="text-sm text-gray-500 flex-shrink-0">
+        <p class="flex-shrink-0 text-sm text-gray-500">
             <span class="font-semibold text-gray-700" id="totalCount">{{ $users->total() }}</span> data ditemukan
         </p>
     </div>
 
-{{-- Table --}}
-<div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    {{-- Table --}}
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div id="emptyState" style="display:none;" class="py-20 text-center text-gray-400">
             <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50">
                 <svg class="h-7 w-7 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
             <p class="text-sm" id="emptyMessage">Belum ada data.</p>
@@ -64,8 +62,10 @@
                     <tr>
                         <th class="px-6 py-3 text-left font-semibold">#</th>
                         <th class="px-6 py-3 text-left font-semibold">Nama</th>
-                        <th class="hidden px-6 py-3 text-left font-semibold sm:table-cell" id="identHeader">{{ $identLabel }}</th>
-                        <th id="extraHeader" class="hidden px-6 py-3 text-left font-semibold md:table-cell" style="display:{{ $extraCol ? 'table-cell' : 'none' }}">{{ $extraLabel }}</th>
+                        <th class="hidden px-6 py-3 text-left font-semibold sm:table-cell" id="identHeader">
+                            {{ $identLabel }}</th>
+                        <th id="extraHeader" class="hidden px-6 py-3 text-left font-semibold md:table-cell"
+                            style="display:{{ $extraCol ? 'table-cell' : 'none' }}">{{ $extraLabel }}</th>
                         <th class="hidden px-6 py-3 text-left font-semibold lg:table-cell">Terdaftar</th>
                         <th class="px-6 py-3 text-center font-semibold">Aksi</th>
                     </tr>
@@ -76,12 +76,13 @@
         </div>
 
         {{-- ── Custom Pagination ── --}}
-        <div id="paginationContainer" style="display:none;" class="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-6 py-4 sm:flex-row">
+        <div id="paginationContainer" style="display:none;"
+            class="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-6 py-4 sm:flex-row">
 
             {{-- Per-page selector --}}
             <div class="flex items-center gap-2">
                 <select id="perPageSelect"
-                        class="rounded-xl border border-gray-200 bg-white py-1.5 pl-3 pr-8 text-sm font-medium text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff] cursor-pointer">
+                    class="cursor-pointer rounded-xl border border-gray-200 bg-white py-1.5 pl-3 pr-8 text-sm font-medium text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -104,104 +105,104 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const container = document.querySelector('.user-table-container');
-    const allUsersData = JSON.parse(container.dataset.allUsers);
-    const identifier = container.dataset.identifier;
-    const identLabel = container.dataset.identLabel;
-    const routeShow = container.dataset.routeShow;
-    const extraCol = container.dataset.extraCol;
-    const extraLabel = container.dataset.extraLabel;
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.user-table-container');
+        const allUsersData = JSON.parse(container.dataset.allUsers);
+        const identifier = container.dataset.identifier;
+        const identLabel = container.dataset.identLabel;
+        const routeShow = container.dataset.routeShow;
+        const extraCol = container.dataset.extraCol;
+        const extraLabel = container.dataset.extraLabel;
 
-    let searchInput = document.getElementById('searchInput');
-    let clearSearchBtn = document.getElementById('clearSearch');
-    let perPageSelect = document.getElementById('perPageSelect');
-    let tableBody = document.getElementById('tableBody');
-    let emptyState = document.getElementById('emptyState');
-    let tableContainer = document.getElementById('tableContainer');
-    let paginationContainer = document.getElementById('paginationContainer');
-    let totalCountSpan = document.getElementById('totalCount');
-    let totalDataSpan = document.getElementById('totalData');
-    let rangeStartSpan = document.getElementById('rangeStart');
-    let rangeEndSpan = document.getElementById('rangeEnd');
-    let paginationButtons = document.getElementById('paginationButtons');
+        let searchInput = document.getElementById('searchInput');
+        let clearSearchBtn = document.getElementById('clearSearch');
+        let perPageSelect = document.getElementById('perPageSelect');
+        let tableBody = document.getElementById('tableBody');
+        let emptyState = document.getElementById('emptyState');
+        let tableContainer = document.getElementById('tableContainer');
+        let paginationContainer = document.getElementById('paginationContainer');
+        let totalCountSpan = document.getElementById('totalCount');
+        let totalDataSpan = document.getElementById('totalData');
+        let rangeStartSpan = document.getElementById('rangeStart');
+        let rangeEndSpan = document.getElementById('rangeEnd');
+        let paginationButtons = document.getElementById('paginationButtons');
 
-    let currentPage = 1;
-    let perPage = 10;
-    let filteredData = [...allUsersData];
+        let currentPage = 1;
+        let perPage = 10;
+        let filteredData = [...allUsersData];
 
-    // Restore URL params if present
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('search')) searchInput.value = urlParams.get('search');
-    if (urlParams.has('per_page')) perPage = parseInt(urlParams.get('per_page'));
-    
-    perPageSelect.value = perPage;
+        // Restore URL params if present
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('search')) searchInput.value = urlParams.get('search');
+        if (urlParams.has('per_page')) perPage = parseInt(urlParams.get('per_page'));
 
-    function filterData() {
-        const search = searchInput.value.toLowerCase().trim();
-        filteredData = allUsersData.filter(user => {
-            const name = (user.name || '').toLowerCase();
-            const identValue = (user[identifier] || '').toLowerCase();
-            return name.includes(search) || identValue.includes(search);
-        });
-        currentPage = 1;
-        updateDisplay();
-        clearSearchBtn.style.display = search ? 'block' : 'none';
-    }
+        perPageSelect.value = perPage;
 
-    function updateDisplay() {
-        const totalFiltered = filteredData.length;
-        totalCountSpan.textContent = totalFiltered;
-        totalDataSpan.textContent = totalFiltered;
-
-        if (totalFiltered === 0) {
-            emptyState.style.display = 'block';
-            tableContainer.style.display = 'none';
-            paginationContainer.style.display = 'none';
-        } else {
-            emptyState.style.display = 'none';
-            tableContainer.style.display = 'block';
-            paginationContainer.style.display = filteredData.length > 0 ? 'flex' : 'none';
-            renderTable();
-            renderPagination();
+        function filterData() {
+            const search = searchInput.value.toLowerCase().trim();
+            filteredData = allUsersData.filter(user => {
+                const name = (user.name || '').toLowerCase();
+                const identValue = (user[identifier] || '').toLowerCase();
+                return name.includes(search) || identValue.includes(search);
+            });
+            currentPage = 1;
+            updateDisplay();
+            clearSearchBtn.style.display = search ? 'block' : 'none';
         }
-    }
 
-    function renderTable() {
-        tableBody.innerHTML = '';
-        const start = (currentPage - 1) * perPage;
-        const end = start + perPage;
-        const pageData = filteredData.slice(start, end);
+        function updateDisplay() {
+            const totalFiltered = filteredData.length;
+            totalCountSpan.textContent = totalFiltered;
+            totalDataSpan.textContent = totalFiltered;
 
-        rangeStartSpan.textContent = start + 1;
-        rangeEndSpan.textContent = Math.min(end, filteredData.length);
+            if (totalFiltered === 0) {
+                emptyState.style.display = 'block';
+                tableContainer.style.display = 'none';
+                paginationContainer.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                tableContainer.style.display = 'block';
+                paginationContainer.style.display = filteredData.length > 0 ? 'flex' : 'none';
+                renderTable();
+                renderPagination();
+            }
+        }
 
-        pageData.forEach((user, idx) => {
-            const rowNum = start + idx + 1;
-            const row = document.createElement('tr');
-            row.className = 'transition-colors hover:bg-gray-50';
+        function renderTable() {
+            tableBody.innerHTML = '';
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const pageData = filteredData.slice(start, end);
 
-            let extraColHtml = '';
-            if (extraCol) {
-                extraColHtml = `
+            rangeStartSpan.textContent = start + 1;
+            rangeEndSpan.textContent = Math.min(end, filteredData.length);
+
+            pageData.forEach((user, idx) => {
+                const rowNum = start + idx + 1;
+                const row = document.createElement('tr');
+                row.className = 'transition-colors hover:bg-gray-50';
+
+                let extraColHtml = '';
+                if (extraCol) {
+                    extraColHtml = `
                     <td class="hidden px-6 py-4 text-gray-500 md:table-cell">
                         ${user[extraCol] ?? '—'}
                     </td>
                 `;
-            }
+                }
 
-            const createdAt = new Date(user.created_at);
-            const formattedDate = createdAt.toLocaleDateString('id-ID', { 
-                day: '2-digit', 
-                month: 'short', 
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+                const createdAt = new Date(user.created_at);
+                const formattedDate = createdAt.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
-            const detailUrl = routeShow.replace(':id', user.id);
+                const detailUrl = routeShow.replace(':id', user.id);
 
-            row.innerHTML = `
+                row.innerHTML = `
                 <td class="px-6 py-4 text-gray-400 font-medium">${rowNum}</td>
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
@@ -236,93 +237,113 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </td>
             `;
-            tableBody.appendChild(row);
-        });
-    }
-
-    function renderPagination() {
-        paginationButtons.innerHTML = '';
-        const lastPage = Math.ceil(filteredData.length / perPage);
-
-        // Prev button
-        if (currentPage === 1) {
-            const prevBtn = document.createElement('span');
-            prevBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg text-gray-300';
-            prevBtn.innerHTML = '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>';
-            paginationButtons.appendChild(prevBtn);
-        } else {
-            const prevBtn = document.createElement('button');
-            prevBtn.type = 'button';
-            prevBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-50';
-            prevBtn.innerHTML = '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>';
-            prevBtn.addEventListener('click', () => { currentPage--; renderTable(); renderPagination(); });
-            paginationButtons.appendChild(prevBtn);
+                tableBody.appendChild(row);
+            });
         }
 
-        // Page numbers
-        const window = 2;
-        const pages = [];
-        for (let i = 1; i <= lastPage; i++) {
-            if (i === 1 || i === lastPage || (i >= currentPage - window && i <= currentPage + window)) {
-                pages.push(i);
-            }
-        }
+        function renderPagination() {
+            paginationButtons.innerHTML = '';
+            const lastPage = Math.ceil(filteredData.length / perPage);
 
-        let prevPage = null;
-        pages.forEach(page => {
-            if (prevPage && page - prevPage > 1) {
-                const dots = document.createElement('span');
-                dots.className = 'flex h-8 items-center px-1 text-gray-400 text-xs';
-                dots.textContent = '…';
-                paginationButtons.appendChild(dots);
-            }
-
-            if (page === currentPage) {
-                const activeBtn = document.createElement('span');
-                activeBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg bg-[#1b84ff] text-xs font-bold text-white';
-                activeBtn.textContent = page;
-                paginationButtons.appendChild(activeBtn);
+            // Prev button
+            if (currentPage === 1) {
+                const prevBtn = document.createElement('span');
+                prevBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg text-gray-300';
+                prevBtn.innerHTML =
+                    '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>';
+                paginationButtons.appendChild(prevBtn);
             } else {
-                const pageBtn = document.createElement('button');
-                pageBtn.type = 'button';
-                pageBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-[#1b84ff] hover:border-blue-200';
-                pageBtn.textContent = page;
-                pageBtn.addEventListener('click', () => { currentPage = page; renderTable(); renderPagination(); });
-                paginationButtons.appendChild(pageBtn);
+                const prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className =
+                    'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-50';
+                prevBtn.innerHTML =
+                    '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>';
+                prevBtn.addEventListener('click', () => {
+                    currentPage--;
+                    renderTable();
+                    renderPagination();
+                });
+                paginationButtons.appendChild(prevBtn);
             }
-            prevPage = page;
+
+            // Page numbers
+            const window = 2;
+            const pages = [];
+            for (let i = 1; i <= lastPage; i++) {
+                if (i === 1 || i === lastPage || (i >= currentPage - window && i <= currentPage + window)) {
+                    pages.push(i);
+                }
+            }
+
+            let prevPage = null;
+            pages.forEach(page => {
+                if (prevPage && page - prevPage > 1) {
+                    const dots = document.createElement('span');
+                    dots.className = 'flex h-8 items-center px-1 text-gray-400 text-xs';
+                    dots.textContent = '…';
+                    paginationButtons.appendChild(dots);
+                }
+
+                if (page === currentPage) {
+                    const activeBtn = document.createElement('span');
+                    activeBtn.className =
+                        'flex h-8 w-8 items-center justify-center rounded-lg bg-[#1b84ff] text-xs font-bold text-white';
+                    activeBtn.textContent = page;
+                    paginationButtons.appendChild(activeBtn);
+                } else {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.type = 'button';
+                    pageBtn.className =
+                        'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-[#1b84ff] hover:border-blue-200';
+                    pageBtn.textContent = page;
+                    pageBtn.addEventListener('click', () => {
+                        currentPage = page;
+                        renderTable();
+                        renderPagination();
+                    });
+                    paginationButtons.appendChild(pageBtn);
+                }
+                prevPage = page;
+            });
+
+            // Next button
+            if (currentPage === lastPage) {
+                const nextBtn = document.createElement('span');
+                nextBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg text-gray-300';
+                nextBtn.innerHTML =
+                    '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
+                paginationButtons.appendChild(nextBtn);
+            } else {
+                const nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className =
+                    'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-50';
+                nextBtn.innerHTML =
+                    '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
+                nextBtn.addEventListener('click', () => {
+                    currentPage++;
+                    renderTable();
+                    renderPagination();
+                });
+                paginationButtons.appendChild(nextBtn);
+            }
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', filterData);
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filterData();
         });
 
-        // Next button
-        if (currentPage === lastPage) {
-            const nextBtn = document.createElement('span');
-            nextBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg text-gray-300';
-            nextBtn.innerHTML = '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
-            paginationButtons.appendChild(nextBtn);
-        } else {
-            const nextBtn = document.createElement('button');
-            nextBtn.type = 'button';
-            nextBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-50';
-            nextBtn.innerHTML = '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
-            nextBtn.addEventListener('click', () => { currentPage++; renderTable(); renderPagination(); });
-            paginationButtons.appendChild(nextBtn);
-        }
-    }
+        perPageSelect.addEventListener('change', (e) => {
+            perPage = parseInt(e.target.value);
+            currentPage = 1;
+            updateDisplay();
+        });
 
-    // Event listeners
-    searchInput.addEventListener('input', filterData);
-    clearSearchBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        filterData();
-    });
-
-    perPageSelect.addEventListener('change', (e) => {
-        perPage = parseInt(e.target.value);
-        currentPage = 1;
+        // Initial render
         updateDisplay();
     });
-
-    // Initial render
-    updateDisplay();
-});
 </script>
