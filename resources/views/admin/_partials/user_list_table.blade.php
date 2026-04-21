@@ -12,9 +12,19 @@
 --}}
 
 @php
-    // Load ALL users dengan role code tertentu
+    // Load ALL users dengan role code tertentu + eager load relasi untuk NIP/NIS/kelas
     $allUsersData = \App\Models\User::whereHas('roles', fn($q) => $q->where('code', $roleCode ?? 'siswa'))
+        ->with(['employee', 'latestStudentAcademicYear.refClass', 'refClass'])
         ->get()
+        ->map(function ($user) {
+            $arr = $user->toArray();
+            // Tambahkan field yang dibutuhkan dari relasi
+            // Use model accessors so we pick up fallbacks (ref_students.student_number, ref_classes, etc.)
+            $arr['nip']        = $user->nip ?? null;
+            $arr['nis']        = $user->nis ?? null;
+            $arr['class_name'] = $user->class_name ?? null;
+            return $arr;
+        })
         ->toArray();
 @endphp
 
@@ -65,7 +75,7 @@
                         <th class="hidden px-6 py-3 text-left font-semibold sm:table-cell" id="identHeader">
                             {{ $identLabel }}</th>
                         <th id="extraHeader" class="hidden px-6 py-3 text-left font-semibold md:table-cell"
-                            style="display:{{ $extraCol ? 'table-cell' : 'none' }}">{{ $extraLabel }}</th>
+                            style="{{ $extraCol ? '' : 'display:none;' }}">{{ $extraLabel }}</th>
                         <th class="hidden px-6 py-3 text-left font-semibold lg:table-cell">Terdaftar</th>
                         <th class="px-6 py-3 text-center font-semibold">Aksi</th>
                     </tr>
@@ -143,7 +153,8 @@
             filteredData = allUsersData.filter(user => {
                 const name = (user.name || '').toLowerCase();
                 const identValue = (user[identifier] || '').toLowerCase();
-                return name.includes(search) || identValue.includes(search);
+                const classVal  = (user['class_name'] || '').toLowerCase();
+                return name.includes(search) || identValue.includes(search) || classVal.includes(search);
             });
             currentPage = 1;
             updateDisplay();
@@ -184,9 +195,10 @@
 
                 let extraColHtml = '';
                 if (extraCol) {
+                    const extraVal = user[extraCol] ?? '—';
                     extraColHtml = `
                     <td class="hidden px-6 py-4 text-gray-500 md:table-cell">
-                        ${user[extraCol] ?? '—'}
+                        <span class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600">${extraVal}</span>
                     </td>
                 `;
                 }
@@ -196,9 +208,12 @@
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
                 });
+
+                const identVal = user[identifier] ?? null;
+                const identDisplay = identVal
+                    ? `<code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600">${identVal}</code>`
+                    : `<span class="text-xs text-gray-400 italic">—</span>`;
 
                 const detailUrl = routeShow.replace(':id', user.id);
 
@@ -216,9 +231,7 @@
                     </div>
                 </td>
                 <td class="hidden px-6 py-4 text-gray-500 sm:table-cell">
-                    <code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600">
-                        ${user[identifier] ?? '—'}
-                    </code>
+                    ${identDisplay}
                 </td>
                 ${extraColHtml}
                 <td class="hidden px-6 py-4 text-xs text-gray-500 lg:table-cell">
@@ -268,10 +281,10 @@
             }
 
             // Page numbers
-            const window = 2;
+            const windowSize = 2;
             const pages = [];
             for (let i = 1; i <= lastPage; i++) {
-                if (i === 1 || i === lastPage || (i >= currentPage - window && i <= currentPage + window)) {
+                if (i === 1 || i === lastPage || (i >= currentPage - windowSize && i <= currentPage + windowSize)) {
                     pages.push(i);
                 }
             }

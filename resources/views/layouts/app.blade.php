@@ -219,18 +219,9 @@
 
                         </div>
                     </div>
-                    <div class="pt-4">
-                        <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gray-400">Admin</p>
-                    </div>
 
-                    <a href="{{ route('admin.google.connect') }}"
-                        class="sidebar-link {{ request()->routeIs('admin.google.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600">
-                        <svg class="icon h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
-                        </svg>
-                        Google Drive
-                    </a>
+
+
 
                     <a href="{{ route('admin.categories.index') }}"
                         class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600">
@@ -240,6 +231,24 @@
                                 d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
                         Kategori
+                    </a>
+
+                    <a href="{{ route('admin.history.index') }}"
+                        class="sidebar-link {{ request()->routeIs('admin.history.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600">
+                        <svg class="icon h-5 w-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        History Upload
+                    </a>
+                    <a href="{{ route('admin.google.connect') }}"
+                        class="sidebar-link {{ request()->routeIs('admin.google.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600">
+                        <svg class="icon h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
+                        </svg>
+                        Google Drive
                     </a>
                 @endif
             @endauth
@@ -393,6 +402,17 @@
                                 d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
                         Kategori
+                    </a>
+
+                    <a href="{{ route('admin.history.index') }}"
+                        class="sidebar-link {{ request()->routeIs('admin.history.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600"
+                        onclick="closeSidebar()">
+                        <svg class="icon h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        History Upload
                     </a>
                 @endif
             @endauth

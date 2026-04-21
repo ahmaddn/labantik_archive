@@ -45,9 +45,9 @@ Route::middleware('auth')->prefix('profile')->name('profile.')->group(function (
 Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Google Drive OAuth
-    Route::get('/google',           [AdminGoogleController::class, 'showConnect'])->name('google.connect');
-    Route::get('/google/redirect',  [AdminGoogleController::class, 'redirectToGoogle'])->name('google.redirect');
-    Route::get('/google/callback',  [AdminGoogleController::class, 'handleCallback'])->name('google.callback');
+    Route::get('/google',               [AdminGoogleController::class, 'showConnect'])->name('google.connect');
+    Route::get('/google/redirect',      [AdminGoogleController::class, 'redirectToGoogle'])->name('google.redirect');
+    Route::get('/google/callback',      [AdminGoogleController::class, 'handleCallback'])->name('google.callback');
     Route::delete('/google/disconnect', [AdminGoogleController::class, 'disconnect'])->name('google.disconnect');
 
     // Categories CRUD
@@ -57,15 +57,19 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::get('/categories/{id}/edit',   [CategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{id}',        [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}',     [CategoryController::class, 'destroy'])->name('categories.destroy');
-    // ─── Data Siswa ───────────────────────────────────────────
+
+    // ─── History Upload ───────────────────────────────────────────────
+    Route::get('/history', [AdminUserController::class, 'history'])->name('history.index');
+
+    // ─── Data Siswa ───────────────────────────────────────────────────
     Route::get('/students',          [AdminUserController::class, 'students'])->name('students.index');
     Route::get('/students/{id}',     [AdminUserController::class, 'studentShow'])->name('students.show');
 
-    // ─── Data Guru ────────────────────────────────────────────
+    // ─── Data Guru ────────────────────────────────────────────────────
     Route::get('/teachers',          [AdminUserController::class, 'teachers'])->name('teachers.index');
     Route::get('/teachers/{id}',     [AdminUserController::class, 'teacherShow'])->name('teachers.show');
 
-    // ─── Data Guru TU (Guru Piket) ────────────────────────────
+    // ─── Data Guru TU (Guru Piket) ────────────────────────────────────
     Route::get('/piket',             [AdminUserController::class, 'piket'])->name('piket.index');
     Route::get('/piket/{id}',        [AdminUserController::class, 'piketShow'])->name('piket.show');
 });

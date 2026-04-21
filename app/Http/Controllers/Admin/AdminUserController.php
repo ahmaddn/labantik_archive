@@ -13,9 +13,7 @@ class AdminUserController extends Controller
     // ─── Helpers ────────────────────────────────────────────────────────
 
     /**
-     * Ambil users berdasarkan kode role.
-     * Asumsi: User::role($code) pakai Spatie / relasi roles.
-     * Sesuaikan query ini dengan relasi yang ada di project kamu.
+     * Ambil users berdasarkan kode role dengan eager load data tambahan.
      */
     private function getUsersByRole(string $roleCode, Request $request)
     {
@@ -24,11 +22,11 @@ class AdminUserController extends Controller
         $search  = trim($request->get('search', ''));
 
         $query = User::whereHas('roles', fn($q) => $q->where('code', $roleCode))
+            ->with(['employee', 'latestStudentAcademicYear.refClass', 'refClass'])
             ->when($search, fn($q) => $q->where(function ($q2) use ($search) {
                 $q2->where('name', 'like', "%{$search}%")
-                    ->orWhere('username', 'like', "%{$search}%")
-                    ->orWhere('nis', 'like', "%{$search}%")
-                    ->orWhere('nip', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('employee', fn($eq) => $eq->where('nip', 'like', "%{$search}%"));
             }))
             ->latest();
 
@@ -52,6 +50,41 @@ class AdminUserController extends Controller
             ->values();
     }
 
+    // ─── History ─────────────────────────────────────────────────────────
+
+    public function history(Request $request): View
+    {
+        $perPage    = (int) $request->get('per_page', 15);
+        $perPage    = in_array($perPage, [10, 15, 25, 50, 100]) ? $perPage : 15;
+        $search     = trim($request->get('search', ''));
+        $roleFilter = trim($request->get('role', ''));
+
+        $query = GoogleDriveFile::with(['user.roles', 'category'])
+            ->when($search, fn($q) => $q->where(function ($q2) use ($search) {
+                $q2->where('document_name', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhereHas('user', fn($uq) => $uq->where('name', 'like', "%{$search}%"));
+            }))
+            ->when($roleFilter, fn($q) => $q->whereHas('user.roles', fn($rq) => $rq->where('code', $roleFilter)))
+            ->latest();
+
+        $files = $query->paginate($perPage)->withQueryString();
+
+        $totalUploads   = GoogleDriveFile::count();
+        $totalSize      = (int) GoogleDriveFile::sum('size');
+        $totalUploaders = GoogleDriveFile::distinct('user_id')->count('user_id');
+
+        return view('admin.history.index', compact(
+            'files',
+            'search',
+            'perPage',
+            'roleFilter',
+            'totalUploads',
+            'totalSize',
+            'totalUploaders'
+        ));
+    }
+
     // ─── Siswa ──────────────────────────────────────────────────────────
 
     public function students(Request $request): View
@@ -66,14 +99,23 @@ class AdminUserController extends Controller
 
     public function studentShow(string $id): View
     {
-        $user          = User::whereHas('roles', fn($q) => $q->where('code', 'siswa'))->findOrFail($id);
+        $user            = User::whereHas('roles', fn($q) => $q->where('code', 'siswa'))
+            ->with(['refClass', 'latestStudentAcademicYear.refClass'])
+            ->findOrFail($id);
         $filesByCategory = $this->getFilesByCategory($user->id);
-        $totalFiles    = GoogleDriveFile::where('user_id', $user->id)->count();
-        $usedBytes     = (int) GoogleDriveFile::where('user_id', $user->id)->sum('size');
-        $quotaLimit    = 5 * 1024 * 1024;
-        $remainingBytes = max(0, $quotaLimit - $usedBytes);
+        $totalFiles      = GoogleDriveFile::where('user_id', $user->id)->count();
+        $usedBytes       = (int) GoogleDriveFile::where('user_id', $user->id)->sum('size');
+        $quotaLimit      = 100 * 1024 * 1024;
+        $remainingBytes  = max(0, $quotaLimit - $usedBytes);
 
-        return view('admin.students.show', compact('user', 'filesByCategory', 'totalFiles', 'usedBytes', 'quotaLimit', 'remainingBytes'));
+        return view('admin.students.show', compact(
+            'user',
+            'filesByCategory',
+            'totalFiles',
+            'usedBytes',
+            'quotaLimit',
+            'remainingBytes'
+        ));
     }
 
     // ─── Guru ────────────────────────────────────────────────────────────
@@ -90,14 +132,23 @@ class AdminUserController extends Controller
 
     public function teacherShow(string $id): View
     {
-        $user           = User::whereHas('roles', fn($q) => $q->where('code', 'guru'))->findOrFail($id);
+        $user            = User::whereHas('roles', fn($q) => $q->where('code', 'guru'))
+            ->with(['employee'])
+            ->findOrFail($id);
         $filesByCategory = $this->getFilesByCategory($user->id);
-        $totalFiles     = GoogleDriveFile::where('user_id', $user->id)->count();
-        $usedBytes      = (int) GoogleDriveFile::where('user_id', $user->id)->sum('size');
-        $quotaLimit     = 5 * 1024 * 1024;
-        $remainingBytes = max(0, $quotaLimit - $usedBytes);
+        $totalFiles      = GoogleDriveFile::where('user_id', $user->id)->count();
+        $usedBytes       = (int) GoogleDriveFile::where('user_id', $user->id)->sum('size');
+        $quotaLimit      = 100 * 1024 * 1024;
+        $remainingBytes  = max(0, $quotaLimit - $usedBytes);
 
-        return view('admin.teachers.show', compact('user', 'filesByCategory', 'totalFiles', 'usedBytes', 'quotaLimit', 'remainingBytes'));
+        return view('admin.teachers.show', compact(
+            'user',
+            'filesByCategory',
+            'totalFiles',
+            'usedBytes',
+            'quotaLimit',
+            'remainingBytes'
+        ));
     }
 
     // ─── Guru Piket (TU) ─────────────────────────────────────────────────
@@ -114,13 +165,22 @@ class AdminUserController extends Controller
 
     public function piketShow(string $id): View
     {
-        $user           = User::whereHas('roles', fn($q) => $q->where('code', 'guru-piket'))->findOrFail($id);
+        $user            = User::whereHas('roles', fn($q) => $q->where('code', 'guru-piket'))
+            ->with(['employee'])
+            ->findOrFail($id);
         $filesByCategory = $this->getFilesByCategory($user->id);
-        $totalFiles     = GoogleDriveFile::where('user_id', $user->id)->count();
-        $usedBytes      = (int) GoogleDriveFile::where('user_id', $user->id)->sum('size');
-        $quotaLimit     = 5 * 1024 * 1024;
-        $remainingBytes = max(0, $quotaLimit - $usedBytes);
+        $totalFiles      = GoogleDriveFile::where('user_id', $user->id)->count();
+        $usedBytes       = (int) GoogleDriveFile::where('user_id', $user->id)->sum('size');
+        $quotaLimit      = 100 * 1024 * 1024;
+        $remainingBytes  = max(0, $quotaLimit - $usedBytes);
 
-        return view('admin.piket.show', compact('user', 'filesByCategory', 'totalFiles', 'usedBytes', 'quotaLimit', 'remainingBytes'));
+        return view('admin.piket.show', compact(
+            'user',
+            'filesByCategory',
+            'totalFiles',
+            'usedBytes',
+            'quotaLimit',
+            'remainingBytes'
+        ));
     }
 }
