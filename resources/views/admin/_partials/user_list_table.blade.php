@@ -20,8 +20,8 @@
             $arr = $user->toArray();
             // Tambahkan field yang dibutuhkan dari relasi
             // Use model accessors so we pick up fallbacks (ref_students.student_number, ref_classes, etc.)
-            $arr['nip']        = $user->nip ?? null;
-            $arr['nis']        = $user->nis ?? null;
+            $arr['nip'] = $user->nip ?? null;
+            $arr['nis'] = $user->nis ?? null;
             $arr['class_name'] = $user->class_name ?? null;
             return $arr;
         })
@@ -153,8 +153,9 @@
             filteredData = allUsersData.filter(user => {
                 const name = (user.name || '').toLowerCase();
                 const identValue = (user[identifier] || '').toLowerCase();
-                const classVal  = (user['class_name'] || '').toLowerCase();
-                return name.includes(search) || identValue.includes(search) || classVal.includes(search);
+                const classVal = (user['class_name'] || '').toLowerCase();
+                return name.includes(search) || identValue.includes(search) || classVal.includes(
+                search);
             });
             currentPage = 1;
             updateDisplay();
@@ -211,9 +212,9 @@
                 });
 
                 const identVal = user[identifier] ?? null;
-                const identDisplay = identVal
-                    ? `<code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600">${identVal}</code>`
-                    : `<span class="text-xs text-gray-400 italic">—</span>`;
+                const identDisplay = identVal ?
+                    `<code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600">${identVal}</code>` :
+                    `<span class="text-xs text-gray-400 italic">—</span>`;
 
                 const detailUrl = routeShow.replace(':id', user.id);
 
@@ -284,7 +285,8 @@
             const windowSize = 2;
             const pages = [];
             for (let i = 1; i <= lastPage; i++) {
-                if (i === 1 || i === lastPage || (i >= currentPage - windowSize && i <= currentPage + windowSize)) {
+                if (i === 1 || i === lastPage || (i >= currentPage - windowSize && i <= currentPage +
+                        windowSize)) {
                     pages.push(i);
                 }
             }
