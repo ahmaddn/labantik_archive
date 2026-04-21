@@ -222,9 +222,6 @@
                         </div>
                     </div>
 
-
-
-
                     <a href="{{ route('admin.categories.index') }}"
                         class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600">
                         <svg class="icon h-5 w-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor"
