@@ -139,8 +139,9 @@
                         <tr>
                             <th class="text-left px-6 py-3 font-semibold">#</th>
                             <th class="text-left px-6 py-3 font-semibold">Pengguna</th>
-                            <th class="text-left px-6 py-3 font-semibold hidden sm:table-cell">Nama Dokumen</th>
-                            <th class="text-left px-6 py-3 font-semibold hidden md:table-cell">Kategori</th>
+                            <th class="text-left px-6 py-3 font-semibold">Nama Dokumen</th>
+                            <th class="text-left px-6 py-3 font-semibold">Kategori</th>
+                            <th class="text-left px-6 py-3 font-semibold">Tanggal Upload</th>
                             <th class="text-center px-6 py-3 font-semibold">Aksi</th>
                         </tr>
                     </thead>
@@ -195,7 +196,7 @@
                                 </td>
 
                                 {{-- Nama Dokumen --}}
-                                <td class="px-6 py-4 hidden sm:table-cell">
+                                <td class="px-6 py-4">
                                     <div class="flex items-center gap-2.5">
                                         <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
                                             @if(str_contains($file->mime_type ?? '', 'pdf'))
@@ -216,7 +217,7 @@
                                 </td>
 
                                 {{-- Kategori --}}
-                                <td class="px-6 py-4 hidden md:table-cell">
+                                <td class="px-6 py-4">
                                     @if($file->category)
                                         <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
                                             <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -230,7 +231,10 @@
                                     @endif
                                 </td>
 
-                                
+                                {{-- Tanggal Upload --}}
+                                <td class="px-6 py-4">
+                                    <span class="text-xs text-gray-400">{{ $file->created_at->format('d M Y') }}</span>
+                                </td>
 
                                 {{-- Aksi --}}
                                 <td class="px-6 py-4">
