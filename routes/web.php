@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\AdminGoogleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DriveFileController;
@@ -57,6 +58,14 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::get('/categories/{id}/edit',   [CategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{id}',        [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}',     [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Sub-Categories CRUD
+    Route::get('/sub-categories',             [SubCategoryController::class, 'index'])->name('sub-categories.index');
+    Route::get('/sub-categories/create',      [SubCategoryController::class, 'create'])->name('sub-categories.create');
+    Route::post('/sub-categories',            [SubCategoryController::class, 'store'])->name('sub-categories.store');
+    Route::get('/sub-categories/{id}/edit',   [SubCategoryController::class, 'edit'])->name('sub-categories.edit');
+    Route::put('/sub-categories/{id}',        [SubCategoryController::class, 'update'])->name('sub-categories.update');
+    Route::delete('/sub-categories/{id}',     [SubCategoryController::class, 'destroy'])->name('sub-categories.destroy');
 
     // ─── History Upload ───────────────────────────────────────────────
     Route::get('/history', [AdminUserController::class, 'history'])->name('history.index');

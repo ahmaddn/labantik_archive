@@ -65,7 +65,7 @@ class DriveFileController extends Controller
 
     public function create(): View
     {
-        $categories = GoogleDriveCategory::orderBy('name')->get();
+        $categories = GoogleDriveCategory::with('subCategories.options')->orderBy('name')->get();
         $expertises = ExpertiseConcentration::orderBy('name')->get();
         $isConnected = GoogleToken::where('type', 'admin')->exists();
 
@@ -74,7 +74,10 @@ class DriveFileController extends Controller
         $usedBytes = (int) GoogleDriveFile::where('user_id', auth()->id())->sum('size');
         $remainingBytes = max(0, $quotaLimit - $usedBytes);
 
-        return view('drive.create', compact('categories', 'expertises', 'isConnected', 'remainingBytes'));
+        $currentYear = date('Y');
+        $yearRange = range($currentYear - 50, $currentYear + 1);
+
+        return view('drive.create', compact('categories', 'expertises', 'isConnected', 'remainingBytes', 'yearRange', 'currentYear'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -83,7 +86,9 @@ class DriveFileController extends Controller
             'document_name' => 'required|string|max:255',
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:1024', // 1MB
             'google_category_id' => 'required|exists:google_drive_categories,id',
+            'google_drive_sub_category_id' => 'nullable|exists:google_drive_sub_categories,id',
             'expertise_id' => 'nullable|exists:core_expertise_concentrations,id',
+            'year' => 'nullable|numeric|digits:4|min:1900|max:' . (date('Y') + 1),
         ], [
             'document_name.required' => 'Nama dokumen wajib diisi.',
             'file.required' => 'File wajib diunggah.',
@@ -91,7 +96,12 @@ class DriveFileController extends Controller
             'file.max' => 'Ukuran file tidak boleh lebih dari 1 MB.',
             'google_category_id.required' => 'Kategori wajib dipilih.',
             'google_category_id.exists' => 'Kategori tidak valid.',
+            'google_drive_sub_category_id.exists' => 'Sub-kategori tidak valid.',
             'expertise_id.exists' => 'Keahlian tidak valid.',
+            'year.numeric' => 'Tahun harus berupa angka.',
+            'year.digits' => 'Tahun harus terdiri dari 4 digit.',
+            'year.min' => 'Tahun tidak boleh lebih kecil dari 1900.',
+            'year.max' => 'Tahun tidak boleh melebihi ' . (date('Y') + 1) . '.',
         ]);
 
         if (!GoogleToken::where('type', 'admin')->exists()) {
@@ -131,7 +141,9 @@ class DriveFileController extends Controller
                 'user_id' => auth()->id(),
                 'document_name' => $request->document_name,
                 'google_category_id' => $request->google_category_id,
+                'google_drive_sub_category_id' => $request->google_drive_sub_category_id,
                 'expertise_id' => $request->expertise_id,
+                'year' => $request->year,
                 'google_file_id' => $uploaded['google_file_id'],
                 'name' => $uploaded['name'], // Nama file di Google Drive
                 'mime_type' => $uploaded['mime_type'],

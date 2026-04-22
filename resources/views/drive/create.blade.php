@@ -101,7 +101,8 @@
                     <label for="google_category_id" class="mb-2 block text-sm font-semibold text-gray-700">
                         Kategori <span class="text-red-500">*</span>
                     </label>
-                    <select id="google_category_id" name="google_category_id" onchange="toggleExpertiseField()"
+                    <select id="google_category_id" name="google_category_id"
+                        onchange="updateSubCategories(); toggleExpertiseField()"
                         class="@error('google_category_id') border-red-400 @enderror w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm transition-colors focus:border-[#1b84ff] focus:ring-2 focus:ring-[#1b84ff]/30"
                         required>
                         <option value="">— Pilih Kategori —</option>
@@ -113,6 +114,43 @@
                         @endforeach
                     </select>
                     @error('google_category_id')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Hidden input untuk sub-category ID --}}
+                <input type="hidden" id="google_drive_sub_category_id" name="google_drive_sub_category_id"
+                    value="{{ old('google_drive_sub_category_id') }}">
+
+                {{-- Sub-Kategori Options — label dinamis dari nama sub-kategori di DB --}}
+                <div id="subCategoryOptionsField" class="hidden">
+                    <label for="sub_category_option" class="mb-2 block text-sm font-semibold text-gray-700">
+                        <span id="subCategoryOptionsLabel"></span>
+                    </label>
+                    <select id="sub_category_option" name="sub_category_option"
+                        class="@error('sub_category_option') border-red-400 @enderror w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm transition-colors focus:border-[#1b84ff] focus:ring-2 focus:ring-[#1b84ff]/30">
+                        <option value="">— Pilih Pilihan —</option>
+                    </select>
+                    @error('sub_category_option')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Tahun --}}
+                <div>
+                    <label for="year" class="mb-2 block text-sm font-semibold text-gray-700">
+                        Tahun
+                    </label>
+                    <select id="year" name="year"
+                        class="@error('year') border-red-400 @enderror w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm transition-colors focus:border-[#1b84ff] focus:ring-2 focus:ring-[#1b84ff]/30">
+                        <option value="">— Pilih Tahun (Opsional) —</option>
+                        @foreach (array_reverse($yearRange) as $y)
+                            <option value="{{ $y }}"
+                                {{ old('year') == $y || $y == $currentYear ? 'selected' : '' }}>{{ $y }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('year')
                         <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                     @enderror
                 </div>
@@ -158,6 +196,21 @@
     </div>
 
     <script>
+        const categoriesData = {!! json_encode(
+            $categories->map(
+                    fn($c) => [
+                        'id' => $c->id,
+                        'subCategories' => $c->subCategories->map(
+                                fn($sc) => [
+                                    'id' => $sc->id,
+                                    'name' => $sc->name,
+                                    'options' => $sc->options->map(fn($o) => ['id' => $o->id, 'name' => $o->name])->toArray(),
+                                ],
+                            )->toArray(),
+                    ],
+                )->toArray(),
+        ) !!};
+
         function showFileName(input) {
             if (input.files[0]) {
                 document.getElementById('fileLabel').textContent = '✓ ' + input.files[0].name;
@@ -176,6 +229,43 @@
             }
         }
 
+        function updateSubCategories() {
+            const categoryId = document.getElementById('google_category_id').value;
+            const hiddenSubCat = document.getElementById('google_drive_sub_category_id');
+            const optionsSelect = document.getElementById('sub_category_option');
+            const optionsField = document.getElementById('subCategoryOptionsField');
+            const optionsLabel = document.getElementById('subCategoryOptionsLabel');
+
+            // Reset
+            hiddenSubCat.value = '';
+            optionsSelect.innerHTML = '<option value="">— Pilih Pilihan —</option>';
+            optionsField.classList.add('hidden');
+
+            if (!categoryId) return;
+
+            const category = categoriesData.find(c => c.id == categoryId);
+            if (!category || !category.subCategories.length) return;
+
+            // Jika kategori punya beberapa sub-kategori, pakai yang pertama punya options
+            // atau bisa di-loop jika perlu multiple groups
+            const subCat = category.subCategories[0];
+            hiddenSubCat.value = subCat.id;
+            optionsLabel.textContent = subCat.name; // label = nama sub-kategori dari DB (e.g. "Tingkat")
+
+            subCat.options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.name;
+                option.textContent = opt.name;
+                optionsSelect.appendChild(option);
+            });
+
+            optionsField.classList.remove('hidden');
+
+            // Restore old value saat validasi gagal
+            const oldVal = "{{ old('sub_category_option') }}";
+            if (oldVal) optionsSelect.value = oldVal;
+        }
+
         function toggleExpertiseField() {
             const sel = document.getElementById('google_category_id');
             const slug = sel.options[sel.selectedIndex].getAttribute('data-slug');
@@ -191,7 +281,10 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', toggleExpertiseField);
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleExpertiseField();
+            updateSubCategories();
+        });
 
         document.getElementById('uploadForm').addEventListener('submit', function() {
             const btn = document.getElementById('submitBtn');

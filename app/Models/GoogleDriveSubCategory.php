@@ -3,19 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-class GoogleDriveCategory extends Model
+class GoogleDriveSubCategory extends Model
 {
-    use HasFactory, HasUuids;
-
-    protected $keyType = 'string';
-    public $incrementing = false;
+    use HasUuids;
 
     protected $fillable = [
+        'google_category_id',
         'name',
         'slug',
         'created_by',
@@ -27,9 +25,6 @@ class GoogleDriveCategory extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = (string) Str::uuid();
-            }
             if (empty($model->slug)) {
                 $model->slug = Str::slug($model->name);
             }
@@ -42,13 +37,27 @@ class GoogleDriveCategory extends Model
         });
     }
 
-    public function files(): HasMany
+    /**
+     * Get the category that owns the sub-category.
+     */
+    public function category(): BelongsTo
     {
-        return $this->hasMany(GoogleDriveFile::class, 'google_category_id');
+        return $this->belongsTo(GoogleDriveCategory::class, 'google_category_id');
     }
 
-    public function subCategories(): HasMany
+    /**
+     * Get the options for this sub-category.
+     */
+    public function options(): HasMany
     {
-        return $this->hasMany(GoogleDriveSubCategory::class, 'google_category_id');
+        return $this->hasMany(GoogleDriveSubCategoryOption::class)->orderBy('order');
+    }
+
+    /**
+     * Get the files that belong to this sub-category.
+     */
+    public function files(): HasMany
+    {
+        return $this->hasMany(GoogleDriveFile::class, 'google_drive_sub_category_id');
     }
 }
