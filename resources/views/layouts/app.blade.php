@@ -116,6 +116,9 @@
             border-radius: 10px;
         }
     </style>
+
+    {{-- ✅ FIX: Yield styles from child views --}}
+    @yield('styles')
 </head>
 
 <body class="min-h-screen bg-[#f1f5f9]">
@@ -656,6 +659,9 @@
             }
         });
     </script>
+
+    {{-- ✅ FIX: Yield scripts from child views (enables @section('scripts') to work) --}}
+    @yield('scripts')
 </body>
 
 </html>

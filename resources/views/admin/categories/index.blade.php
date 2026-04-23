@@ -5,10 +5,21 @@
 @section('content')
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-extrabold text-gray-900">Manajemen Kategori</h1>
-            <p class="text-gray-500 text-sm mt-1">Kelola kategori untuk pengelompokan dokumen.</p>
-        </div>
+    <div>
+        <h1 class="text-2xl font-extrabold text-gray-900">Manajemen Kategori</h1>
+        <p class="text-gray-500 text-sm mt-1">Kelola kategori untuk pengelompokan dokumen.</p>
+    </div>
+
+    <div class="flex items-center gap-2">
+        <a href="{{ route('admin.sub-categories.index') }}"
+           class="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-colors text-sm shadow-sm border border-gray-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h10M4 18h7"/>
+            </svg>
+            Sub-Kategori
+        </a>
+
         <a href="{{ route('admin.categories.create') }}"
            class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1b84ff] hover:bg-[#1570e0] text-white font-semibold rounded-xl transition-colors text-sm shadow-sm shadow-blue-200">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,6 +28,7 @@
             Tambah Kategori
         </a>
     </div>
+</div>
 
     {{-- Stats --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

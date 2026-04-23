@@ -118,22 +118,9 @@
                     @enderror
                 </div>
 
-                {{-- Hidden input untuk sub-category ID --}}
-                <input type="hidden" id="google_drive_sub_category_id" name="google_drive_sub_category_id"
-                    value="{{ old('google_drive_sub_category_id') }}">
-
-                {{-- Sub-Kategori Options — label dinamis dari nama sub-kategori di DB --}}
-                <div id="subCategoryOptionsField" class="hidden">
-                    <label for="sub_category_option" class="mb-2 block text-sm font-semibold text-gray-700">
-                        <span id="subCategoryOptionsLabel"></span>
-                    </label>
-                    <select id="sub_category_option" name="sub_category_option"
-                        class="@error('sub_category_option') border-red-400 @enderror w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm transition-colors focus:border-[#1b84ff] focus:ring-2 focus:ring-[#1b84ff]/30">
-                        <option value="">— Pilih Pilihan —</option>
-                    </select>
-                    @error('sub_category_option')
-                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                    @enderror
+                {{-- Sub-Kategori: semua sub-kategori dari kategori yang dipilih akan muncul di sini --}}
+                <div id="subCategoriesContainer" class="hidden space-y-4">
+                    {{-- Diisi dinamis oleh JS --}}
                 </div>
 
                 {{-- Tahun --}}
@@ -196,20 +183,24 @@
     </div>
 
     <script>
+        // Data semua kategori beserta sub-kategori dan options-nya
         const categoriesData = {!! json_encode(
             $categories->map(
-                    fn($c) => [
-                        'id' => $c->id,
-                        'subCategories' => $c->subCategories->map(
-                                fn($sc) => [
-                                    'id' => $sc->id,
-                                    'name' => $sc->name,
-                                    'options' => $sc->options->map(fn($o) => ['id' => $o->id, 'name' => $o->name])->toArray(),
-                                ],
-                            )->toArray(),
-                    ],
-                )->toArray(),
+                fn($c) => [
+                    'id' => $c->id,
+                    'subCategories' => $c->subCategories->map(
+                        fn($sc) => [
+                            'id' => $sc->id,
+                            'name' => $sc->name,
+                            'options' => $sc->options->map(fn($o) => ['id' => $o->id, 'name' => $o->name])->toArray(),
+                        ],
+                    )->toArray(),
+                ],
+            )->toArray(),
         ) !!};
+
+        // Old values untuk repopulasi setelah validasi gagal
+        const oldSelections = {!! json_encode(old('sub_category_selections', [])) !!};
 
         function showFileName(input) {
             if (input.files[0]) {
@@ -229,48 +220,71 @@
             }
         }
 
+        /**
+         * Render semua sub-kategori milik kategori yang dipilih,
+         * masing-masing sebagai dropdown terpisah.
+         * Field name: sub_category_selections[{subCatId}]
+         */
         function updateSubCategories() {
             const categoryId = document.getElementById('google_category_id').value;
-            const hiddenSubCat = document.getElementById('google_drive_sub_category_id');
-            const optionsSelect = document.getElementById('sub_category_option');
-            const optionsField = document.getElementById('subCategoryOptionsField');
-            const optionsLabel = document.getElementById('subCategoryOptionsLabel');
+            const container  = document.getElementById('subCategoriesContainer');
 
-            // Reset
-            hiddenSubCat.value = '';
-            optionsSelect.innerHTML = '<option value="">— Pilih Pilihan —</option>';
-            optionsField.classList.add('hidden');
+            // Reset container
+            container.innerHTML = '';
+            container.classList.add('hidden');
 
             if (!categoryId) return;
 
-            const category = categoriesData.find(c => c.id == categoryId);
+            const category = categoriesData.find(c => c.id === categoryId);
             if (!category || !category.subCategories.length) return;
 
-            // Jika kategori punya beberapa sub-kategori, pakai yang pertama punya options
-            // atau bisa di-loop jika perlu multiple groups
-            const subCat = category.subCategories[0];
-            hiddenSubCat.value = subCat.id;
-            optionsLabel.textContent = subCat.name; // label = nama sub-kategori dari DB (e.g. "Tingkat")
+            category.subCategories.forEach(subCat => {
+                // Buat wrapper div per sub-kategori
+                const wrapper = document.createElement('div');
 
-            subCat.options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt.name;
-                option.textContent = opt.name;
-                optionsSelect.appendChild(option);
+                // Label
+                const label = document.createElement('label');
+                label.className = 'mb-2 block text-sm font-semibold text-gray-700';
+                label.textContent = subCat.name;
+                wrapper.appendChild(label);
+
+                // Select
+                const select = document.createElement('select');
+                select.name = `sub_category_selections[${subCat.id}]`;
+                select.className = 'w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm transition-colors focus:border-[#1b84ff] focus:ring-2 focus:ring-[#1b84ff]/30';
+
+                // Default option
+                const defaultOpt = document.createElement('option');
+                defaultOpt.value = '';
+                defaultOpt.textContent = `— Pilih ${subCat.name} —`;
+                select.appendChild(defaultOpt);
+
+                // Isi options dari database
+                subCat.options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.name;
+                    option.textContent = opt.name;
+
+                    // Restore old value jika ada (setelah validasi gagal)
+                    if (oldSelections && oldSelections[subCat.id] === opt.name) {
+                        option.selected = true;
+                    }
+
+                    select.appendChild(option);
+                });
+
+                wrapper.appendChild(select);
+                container.appendChild(wrapper);
             });
 
-            optionsField.classList.remove('hidden');
-
-            // Restore old value saat validasi gagal
-            const oldVal = "{{ old('sub_category_option') }}";
-            if (oldVal) optionsSelect.value = oldVal;
+            container.classList.remove('hidden');
         }
 
         function toggleExpertiseField() {
-            const sel = document.getElementById('google_category_id');
+            const sel  = document.getElementById('google_category_id');
             const slug = sel.options[sel.selectedIndex].getAttribute('data-slug');
-            const ef = document.getElementById('expertiseField');
-            const es = document.getElementById('expertise_id');
+            const ef   = document.getElementById('expertiseField');
+            const es   = document.getElementById('expertise_id');
             if (slug === 'prestasi') {
                 ef.classList.remove('hidden');
                 es.required = true;
@@ -281,23 +295,23 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             toggleExpertiseField();
             updateSubCategories();
         });
 
-        document.getElementById('uploadForm').addEventListener('submit', function() {
+        document.getElementById('uploadForm').addEventListener('submit', function () {
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             document.getElementById('submitBtnText').textContent = 'Mengupload…';
         });
 
-        (function() {
-            const fileInput = document.getElementById('file');
-            const submitBtn = document.getElementById('submitBtn');
-            const clientError = document.getElementById('clientError');
+        (function () {
+            const fileInput    = document.getElementById('file');
+            const submitBtn    = document.getElementById('submitBtn');
+            const clientError  = document.getElementById('clientError');
             const remainingBytes = Number({{ $remainingBytes ?? 0 }});
-            const perFileLimit = 1 * 1024 * 1024;
+            const perFileLimit   = 1 * 1024 * 1024;
 
             function setError(msg) {
                 clientError.textContent = msg;
@@ -309,7 +323,7 @@
                 clientError.classList.add('hidden');
             }
 
-            fileInput.addEventListener('change', function() {
+            fileInput.addEventListener('change', function () {
                 clearError();
                 const f = fileInput.files && fileInput.files[0];
                 if (!f) return;
@@ -326,8 +340,7 @@
                     return;
                 }
                 if (f.size > remainingBytes) {
-                    setError('Sisa kuota tidak cukup. Sisa: ' + (remainingBytes / (1024 * 1024)).toFixed(2) +
-                        ' MB.');
+                    setError('Sisa kuota tidak cukup. Sisa: ' + (remainingBytes / (1024 * 1024)).toFixed(2) + ' MB.');
                     submitBtn.disabled = true;
                     return;
                 }

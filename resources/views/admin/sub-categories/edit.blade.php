@@ -17,7 +17,7 @@
     </div>
 
     {{-- Form --}}
-    <div class="max-w-2xl">
+    <div class="max-w-2xl mx-auto">
         <form method="POST" action="{{ route('admin.sub-categories.update', $subCategory->id) }}" class="space-y-6">
             @csrf
             @method('PUT')

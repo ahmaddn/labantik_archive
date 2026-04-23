@@ -84,4 +84,8 @@ class GoogleDriveFile extends Model
 
         return round($bytes, 2) . ' ' . $units[$i];
     }
+    public function logs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(GoogleFileLog::class, 'google_drive_file_id');
+    }
 }
