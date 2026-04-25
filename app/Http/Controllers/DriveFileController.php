@@ -89,7 +89,12 @@ class DriveFileController extends Controller
             'google_category_id'         => 'required|exists:google_drive_categories,id',
             'sub_category_selections'    => 'nullable|array',
             'sub_category_selections.*'  => 'nullable|string|max:255',
-            'expertise_id'               => 'nullable|exists:core_expertise_concentrations,id',
+            'expertise_id'               => ['nullable', function ($attribute, $value, $fail) {
+                if ($value === 'umum') return; // hardcoded "Umum" selalu lolos
+                if (!ExpertiseConcentration::where('id', $value)->exists()) {
+                    $fail('Keahlian tidak valid.');
+                }
+            }],
             'year'                       => 'nullable|numeric|digits:4|min:1900|max:' . (date('Y') + 1),
         ], [
             'document_name.required'     => 'Nama dokumen wajib diisi.',
@@ -143,13 +148,19 @@ class DriveFileController extends Controller
                 }
             }
 
+            // expertise_id: jika "umum" simpan NULL agar tidak melanggar FK constraint
+            // (kolom expertise_id adalah FK ke core_expertise_concentrations, tidak bisa menerima string)
+            $expertiseId = ($request->expertise_id && $request->expertise_id !== 'umum')
+                ? $request->expertise_id
+                : null;
+
             // Simpan metadata file ke database
             $driveFile = GoogleDriveFile::create([
                 'user_id'                     => auth()->id(),
                 'document_name'               => $request->document_name,
                 'google_category_id'          => $request->google_category_id,
                 'google_drive_sub_category_id' => $primarySubCatId, // kolom legacy: sub-cat pertama
-                'expertise_id'                => $request->expertise_id,
+                'expertise_id'                => $expertiseId,
                 'year'                        => $request->year,
                 'google_file_id'              => $uploaded['google_file_id'],
                 'name'                        => $uploaded['name'],

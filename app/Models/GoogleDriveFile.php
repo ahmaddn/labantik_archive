@@ -73,6 +73,11 @@ class GoogleDriveFile extends Model
         return $this->belongsTo(GoogleDriveSubCategory::class, 'google_drive_sub_category_id');
     }
 
+    public function logs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(GoogleFileLog::class, 'google_drive_file_id');
+    }
+
     public function getFormattedSizeAttribute(): string
     {
         $bytes = $this->size;
@@ -84,8 +89,22 @@ class GoogleDriveFile extends Model
 
         return round($bytes, 2) . ' ' . $units[$i];
     }
-    public function logs(): \Illuminate\Database\Eloquent\Relations\HasMany
+
+    /**
+     * Mengembalikan label keahlian yang siap ditampilkan di view.
+     * Menangani nilai hardcoded "umum" dan relasi dari database.
+     *
+     * Penggunaan di view: {{ $file->expertise_label }}
+     */
+    public function getExpertiseLabelAttribute(): string
     {
-        return $this->hasMany(GoogleFileLog::class, 'google_drive_file_id');
+        // expertise_id = null bisa berarti: (1) bukan kategori prestasi, atau (2) user pilih Umum
+        // Bedakan dengan cek relasi kategori
+        if (is_null($this->expertise_id)) {
+            $categorySlug = $this->category?->slug;
+            return $categorySlug === 'prestasi' ? 'Umum' : '-';
+        }
+
+        return $this->expertise?->name ?? '-';
     }
 }

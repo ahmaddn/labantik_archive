@@ -150,6 +150,8 @@
                     <select id="expertise_id" name="expertise_id"
                         class="@error('expertise_id') border-red-400 @enderror w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm transition-colors focus:border-[#1b84ff] focus:ring-2 focus:ring-[#1b84ff]/30">
                         <option value="">— Pilih Keahlian —</option>
+                        {{-- Opsi "Umum" hardcoded, bukan dari database --}}
+                        <option value="umum" {{ old('expertise_id') === 'umum' ? 'selected' : '' }}>Umum</option>
                         @foreach ($expertises as $expertise)
                             <option value="{{ $expertise->id }}"
                                 {{ old('expertise_id') == $expertise->id ? 'selected' : '' }}>
