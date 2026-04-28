@@ -3,54 +3,98 @@
 namespace App\Http\Controllers;
 
 use App\Models\StudentSignature;
+use App\Models\GoogleGraduation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class SignatureController extends Controller
 {
-    /**
-     * Simpan base64 signature ke tabel student_signatures.
-     * POST /signature/store
-     */
     public function store(Request $request)
     {
         $request->validate([
             'signature_data' => ['required', 'string', 'starts_with:data:image/png;base64,'],
         ]);
 
-        // updateOrCreate — jika sudah pernah tanda tangan, timpa saja
-        StudentSignature::updateOrCreate(
-            ['user_id' => Auth::id()],
+        $signature = StudentSignature::updateOrCreate(
+            ['id' => Auth::id()],
             ['signature_data' => $request->signature_data]
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Tanda tangan berhasil disimpan.',
-        ]);
+        // Rekam ke google_statement (user_id = student, signature_id = signature yang baru disimpan)
+        DB::table('google_statement')->updateOrInsert(
+            ['user_id' => Auth::id()],
+            [
+                'uuid' => Str::uuid(),
+                'signature_id' => $signature->id,
+                'updated_at' => now(),
+            ]
+        );
+
+        return response()->json(['success' => true, 'message' => 'Tanda tangan berhasil disimpan.']);
     }
 
     /**
-     * Tampilkan Transkrip Nilai.
+     * Tampilkan Surat Pernyataan/Fakta Integritas (setelah sudah TTD)
+     * GET /pernyataan/{id}
+     */
+    public function showPernyataan($id)
+    {
+        // Siswa hanya bisa cetak surat miliknya sendiri
+        if (Auth::id() !== $id && !Auth::user()->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $userId = auth()->id();
+        $user   = auth()->user();
+
+        // Ambil data dari ref_students berdasarkan user yang login
+        $student = DB::table('ref_students')->where('user_id', $userId)->first();
+
+        // Validasi signature
+        $statement = DB::table('google_statement')->where('user_id', $id)->first();
+        if (!$statement) {
+            return redirect()->back()->with('error', 'Belum ada tanda tangan.');
+        }
+
+        $signature = StudentSignature::find($statement->signature_id);
+        if (!$signature) {
+            return redirect()->back()->with('error', 'Belum ada tanda tangan.');
+        }
+
+        return view('kelulusan.surat_pernyataan', compact('user', 'student', 'signature'));
+    }
+
+    /**
+     * Tampilkan Surat Keterangan Lulus
      * GET /transkrip/{id}
      */
     public function showTranskrip($id)
     {
-        $user = User::findOrFail($id);
-
-        // Hanya pemilik atau superadmin yang boleh akses
-        if (Auth::id() !== $user->id && Auth::user()->role !== 'superadmin') {
-            abort(403, 'Unauthorized');
+        if (Auth::id() !== $id && !Auth::user()->isSuperAdmin()) {
+            abort(403);
         }
 
-        // Ambil signature dari tabel terpisah
-        $signature = StudentSignature::where('user_id', $user->id)->first();
+        $userId = auth()->id();
+        $user   = auth()->user();
 
+        // Ambil data siswa dari ref_students
+        $student = DB::table('ref_students')->where('user_id', $userId)->first();
+
+        $statement = DB::table('google_statement')->where('user_id', $id)->first();
+        if (!$statement) {
+            return redirect()->back()->with('error', 'Belum ada tanda tangan.');
+        }
+
+        $signature = StudentSignature::find($statement->signature_id);
         if (!$signature) {
-            return redirect()->back()->with('error', 'Selesaikan Surat Pernyataan terlebih dahulu.');
+            return redirect()->back()->with('error', 'Belum ada tanda tangan.');
         }
 
-        return view('kelulusan.pernyataan', compact('user', 'signature'));
+        $graduation = GoogleGraduation::where('user_id', $id)->first();
+
+        return view('kelulusan.kelulusan', compact('user', 'student', 'signature', 'graduation'));
     }
 }

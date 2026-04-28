@@ -36,12 +36,9 @@ Route::middleware('auth')->prefix('drive')->name('drive.')->group(function () {
     Route::post('/store',  [DriveFileController::class, 'store'])->name('store');
     Route::delete('/{id}', [DriveFileController::class, 'destroy'])->name('destroy');
 
-    Route::post('/signature/store', [SignatureController::class, 'store'])
-        ->name('signature.store');
-
-    // Tampilkan Transkrip Nilai (Surat Kelulusan)
-    Route::get('/transkrip/{id}', [SignatureController::class, 'showTranskrip'])
-        ->name('transkrip.show');
+    Route::post('/signature/store',     [SignatureController::class, 'store'])->name('signature.store');
+    Route::get('/pernyataan/{id}',      [SignatureController::class, 'showPernyataan'])->name('pernyataan.show'); // ← BARU
+    Route::get('/transkrip/{id}',       [SignatureController::class, 'showTranskrip'])->name('transkrip.show');
 });
 
 // ── Profile (semua user login) ────────────────────

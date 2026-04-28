@@ -5,82 +5,77 @@
 ═══════════════════════════════════════════════════════════════════════════ --}}
 
 {{-- ── TOMBOL ──────────────────────────────────────────────────────────────── --}}
+@php
+    $sudahTandaTangan = \App\Models\GoogleStatement::where('user_id', auth()->id())->exists();
+@endphp
+
 <div class="flex items-center gap-3">
 
     {{-- Tombol Surat Pernyataan --}}
-    <button
-        type="button"
-        onclick="document.getElementById('modalSuratPernyataan').classList.remove('hidden')"
-        class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-        </svg>
-        Surat Pernyataan
-    </button>
-
-    {{-- Tombol Surat Kelulusan — enabled jika sudah tanda tangan --}}
-    @php
-        $sudahTandaTangan = \App\Models\StudentSignature::where('user_id', auth()->id())->exists();
-    @endphp
-
-    @if($sudahTandaTangan)
-        <a
-            href="{{ route('drive.transkrip.show', auth()->user()->id) }}"
-            class="inline-flex items-center gap-2 rounded-xl bg-[#1b84ff] px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-[#1570e0]">
+    @if ($sudahTandaTangan)
+        {{-- Sudah TTD → redirect ke view surat pernyataan, bukan buka modal --}}
+        <a href="{{ route('drive.pernyataan.show', auth()->user()->id) }}"
+            class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
             </svg>
+            Surat Pernyataan
+        </a>
+    @else
+        {{-- Belum TTD → buka modal --}}
+        <button type="button" onclick="document.getElementById('modalSuratPernyataan').classList.remove('hidden')"
+            class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+            Surat Pernyataan
+        </button>
+    @endif
+
+    {{-- Tombol Surat Kelulusan --}}
+    @if ($sudahTandaTangan)
+        <a href="{{ route('drive.transkrip.show', auth()->user()->id) }}"
+            class="inline-flex items-center gap-2 rounded-xl bg-[#1b84ff] px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-[#1570e0]">
+
             Surat Kelulusan
         </a>
     @else
-        <button
-            type="button"
-            disabled
-            title="Selesaikan Surat Pernyataan terlebih dahulu"
-            class="inline-flex items-center gap-2 rounded-xl bg-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-500 shadow-sm cursor-not-allowed select-none">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-            </svg>
+        <button disabled
+            class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-[#1b84ff] px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-[#1570e0] disabled:opacity-50">
+
             Surat Kelulusan
         </button>
-    @endif
+        @endif
 
 </div>
 
 {{-- ── MODAL SURAT PERNYATAAN ──────────────────────────────────────────────── --}}
-<div
-    id="modalSuratPernyataan"
-    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+<div id="modalSuratPernyataan" class="fixed inset-0 z-50 flex hidden items-center justify-center bg-black/60 p-4"
     role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 
-    <div class="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl flex flex-col max-h-[92vh]">
+    <div class="relative flex max-h-[92vh] w-full max-w-2xl flex-col rounded-2xl bg-white shadow-2xl">
 
         {{-- Header --}}
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 shrink-0">
+        <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-6 py-4">
             <h2 id="modalTitle" class="text-lg font-bold text-gray-800">Surat Pernyataan Kelulusan</h2>
-            <button
-                type="button"
-                onclick="closeModal()"
-                class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+            <button type="button" onclick="closeModal()"
+                class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
 
         {{-- Scrollable Content --}}
-        <div
-            id="scrollArea"
-            onscroll="checkScroll()"
-            class="overflow-y-auto px-8 py-6 text-sm text-gray-700 leading-relaxed grow"
+        <div id="scrollArea" onscroll="checkScroll()"
+            class="grow overflow-y-auto px-8 py-6 text-sm leading-relaxed text-gray-700"
             style="font-family: 'Times New Roman', Times, serif;">
 
             {{-- ── ISI SURAT PERNYATAAN ── --}}
-            <div class="text-center mb-6">
-                <p class="font-bold text-base uppercase">SURAT PERNYATAAN</p>
+            <div class="mb-6 text-center">
+                <p class="text-base font-bold uppercase">SURAT PERNYATAAN</p>
                 <p class="text-sm">No: ___/TU.01.01/SMK-Tlg/CADISDIKWIL.IX/2025</p>
             </div>
 
@@ -113,7 +108,7 @@
                 Dengan ini menyatakan dengan sesungguhnya bahwa saya:
             </p>
 
-            <ol class="list-decimal list-outside pl-5 space-y-2 mb-4">
+            <ol class="mb-4 list-outside list-decimal space-y-2 pl-5">
                 <li>
                     Bersedia menerima dan mengakui keabsahan Transkrip Nilai yang diterbitkan oleh
                     <strong>SMKN 1 Talaga</strong> sebagai dokumen resmi hasil belajar saya selama mengikuti
@@ -148,21 +143,18 @@
 
             {{-- ── SIGNATURE PAD ── --}}
             <div id="signatureSection" class="mt-2">
-                <p class="text-xs text-gray-500 mb-2 text-center">
-                    <span id="signHint">↕ Scroll ke bawah untuk membaca seluruh surat, lalu tanda tangani di kotak berikut.</span>
+                <p class="mb-2 text-center text-xs text-gray-500">
+                    <span id="signHint">↕ Scroll ke bawah untuk membaca seluruh surat, lalu tanda tangani di kotak
+                        berikut.</span>
                 </p>
 
-                <div class="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 overflow-hidden" style="height:160px;">
-                    <canvas
-                        id="signatureCanvas"
-                        class="w-full h-full touch-none"
-                        style="display:block;"></canvas>
+                <div class="overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50"
+                    style="height:160px;">
+                    <canvas id="signatureCanvas" class="h-full w-full touch-none" style="display:block;"></canvas>
                 </div>
 
-                <div class="flex justify-between items-center mt-2">
-                    <button
-                        type="button"
-                        onclick="clearSignature()"
+                <div class="mt-2 flex items-center justify-between">
+                    <button type="button" onclick="clearSignature()"
                         class="text-xs text-gray-500 underline hover:text-gray-700">
                         Hapus Tanda Tangan
                     </button>
@@ -172,19 +164,13 @@
         </div>
 
         {{-- Footer Tombol --}}
-        <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 shrink-0">
-            <button
-                type="button"
-                onclick="closeModal()"
-                class="rounded-xl border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+        <div class="flex shrink-0 justify-end gap-3 border-t border-gray-200 px-6 py-4">
+            <button type="button" onclick="closeModal()"
+                class="rounded-xl border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                 Batal
             </button>
-            <button
-                id="btnSimpan"
-                type="button"
-                onclick="saveSignature()"
-                disabled
-                class="rounded-xl bg-[#1b84ff] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1570e0] disabled:opacity-40 disabled:cursor-not-allowed">
+            <button id="btnSimpan" type="button" onclick="saveSignature()" disabled
+                class="rounded-xl bg-[#1b84ff] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1570e0] disabled:cursor-not-allowed disabled:opacity-40">
                 Simpan & Tandatangani
             </button>
         </div>
@@ -192,124 +178,126 @@
 </div>
 
 @push('scripts')
-{{-- Signature Pad Library --}}
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-<script>
-(function () {
-    /* ── Inisialisasi Signature Pad ── */
-    let signaturePad = null;
+    {{-- Signature Pad Library --}}
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script>
+        (function() {
+            /* ── Inisialisasi Signature Pad ── */
+            let signaturePad = null;
 
-    function initPad() {
-        const canvas = document.getElementById('signatureCanvas');
-        if (!canvas || signaturePad) return;
+            function initPad() {
+                const canvas = document.getElementById('signatureCanvas');
+                if (!canvas || signaturePad) return;
 
-        // Sesuaikan ukuran canvas dengan elemen
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width  = canvas.offsetWidth  * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext('2d').scale(ratio, ratio);
+                // Sesuaikan ukuran canvas dengan elemen
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext('2d').scale(ratio, ratio);
 
-        signaturePad = new SignaturePad(canvas, {
-            minWidth: 0.8,
-            maxWidth: 2.5,
-            penColor: '#1a1a2e',
-            backgroundColor: 'rgb(0,0,0,0)', // transparan
-        });
+                signaturePad = new SignaturePad(canvas, {
+                    minWidth: 0.8,
+                    maxWidth: 2.5,
+                    penColor: '#1a1a2e',
+                    backgroundColor: 'rgb(0,0,0,0)', // transparan
+                });
 
-        // Aktifkan tombol Simpan saat ada goresan
-        signaturePad.addEventListener('endStroke', () => {
-            document.getElementById('btnSimpan').disabled = signaturePad.isEmpty();
-        });
-    }
+                // Aktifkan tombol Simpan saat ada goresan
+                signaturePad.addEventListener('endStroke', () => {
+                    document.getElementById('btnSimpan').disabled = signaturePad.isEmpty();
+                });
+            }
 
-    /* ── Cek apakah sudah scroll ke bawah ── */
-    window.checkScroll = function () {
-        const el = document.getElementById('scrollArea');
-        const reachedBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
-        if (reachedBottom) {
-            document.getElementById('signHint').textContent =
-                'Tanda tangan di kotak di bawah ini menggunakan mouse atau jari.';
-            // Init pad saat sudah scroll
-            initPad();
-        }
-    };
+            /* ── Cek apakah sudah scroll ke bawah ── */
+            window.checkScroll = function() {
+                const el = document.getElementById('scrollArea');
+                const reachedBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+                if (reachedBottom) {
+                    document.getElementById('signHint').textContent =
+                        'Tanda tangan di kotak di bawah ini menggunakan mouse atau jari.';
+                    // Init pad saat sudah scroll
+                    initPad();
+                }
+            };
 
-    /* ── Hapus tanda tangan ── */
-    window.clearSignature = function () {
-        if (signaturePad) {
-            signaturePad.clear();
-            document.getElementById('btnSimpan').disabled = true;
-        }
-    };
+            /* ── Hapus tanda tangan ── */
+            window.clearSignature = function() {
+                if (signaturePad) {
+                    signaturePad.clear();
+                    document.getElementById('btnSimpan').disabled = true;
+                }
+            };
 
-    /* ── Simpan ke server ── */
-    window.saveSignature = async function () {
-        if (!signaturePad || signaturePad.isEmpty()) {
-            alert('Mohon tanda tangani terlebih dahulu.');
-            return;
-        }
+            /* ── Simpan ke server ── */
+            window.saveSignature = async function() {
+                if (!signaturePad || signaturePad.isEmpty()) {
+                    alert('Mohon tanda tangani terlebih dahulu.');
+                    return;
+                }
 
-        const base64 = signaturePad.toDataURL('image/png'); // base64 string
-        const btn    = document.getElementById('btnSimpan');
+                const base64 = signaturePad.toDataURL('image/png'); // base64 string
+                const btn = document.getElementById('btnSimpan');
 
-        btn.disabled    = true;
-        btn.textContent = 'Menyimpan…';
+                btn.disabled = true;
+                btn.textContent = 'Menyimpan…';
 
-        try {
-            const res = await fetch('{{ route("drive.signature.store") }}', {
-                method : 'POST',
-                headers: {
-                    'Content-Type'     : 'application/json',
-                    'X-CSRF-TOKEN'     : '{{ csrf_token() }}',
-                    'Accept'           : 'application/json',
-                },
-                body: JSON.stringify({ signature_data: base64 }),
+                try {
+                    const res = await fetch('{{ route('drive.signature.store') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            signature_data: base64
+                        }),
+                    });
+
+                    const json = await res.json();
+
+                    if (res.ok && json.success) {
+                        // Tutup modal, reload halaman agar tombol Surat Kelulusan menjadi aktif
+                        closeModal();
+                        window.location.reload();
+                    } else {
+                        alert(json.message ?? 'Terjadi kesalahan. Coba lagi.');
+                        btn.disabled = false;
+                        btn.textContent = 'Simpan & Tandatangani';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Koneksi gagal. Coba lagi.');
+                    btn.disabled = false;
+                    btn.textContent = 'Simpan & Tandatangani';
+                }
+            };
+
+            /* ── Tutup modal & reset ── */
+            window.closeModal = function() {
+                document.getElementById('modalSuratPernyataan').classList.add('hidden');
+                // Reset scroll ke atas saat dibuka ulang
+                document.getElementById('scrollArea').scrollTop = 0;
+            };
+
+            /* ── Re-init pad saat ukuran window berubah ── */
+            window.addEventListener('resize', () => {
+                if (signaturePad) {
+                    const canvas = document.getElementById('signatureCanvas');
+                    const data = signaturePad.toData();
+                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                    canvas.width = canvas.offsetWidth * ratio;
+                    canvas.height = canvas.offsetHeight * ratio;
+                    canvas.getContext('2d').scale(ratio, ratio);
+                    signaturePad.fromData(data);
+                }
             });
 
-            const json = await res.json();
-
-            if (res.ok && json.success) {
-                // Tutup modal, reload halaman agar tombol Surat Kelulusan menjadi aktif
-                closeModal();
-                window.location.reload();
-            } else {
-                alert(json.message ?? 'Terjadi kesalahan. Coba lagi.');
-                btn.disabled    = false;
-                btn.textContent = 'Simpan & Tandatangani';
-            }
-        } catch (err) {
-            console.error(err);
-            alert('Koneksi gagal. Coba lagi.');
-            btn.disabled    = false;
-            btn.textContent = 'Simpan & Tandatangani';
-        }
-    };
-
-    /* ── Tutup modal & reset ── */
-    window.closeModal = function () {
-        document.getElementById('modalSuratPernyataan').classList.add('hidden');
-        // Reset scroll ke atas saat dibuka ulang
-        document.getElementById('scrollArea').scrollTop = 0;
-    };
-
-    /* ── Re-init pad saat ukuran window berubah ── */
-    window.addEventListener('resize', () => {
-        if (signaturePad) {
-            const canvas = document.getElementById('signatureCanvas');
-            const data   = signaturePad.toData();
-            const ratio  = Math.max(window.devicePixelRatio || 1, 1);
-            canvas.width  = canvas.offsetWidth  * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
-            canvas.getContext('2d').scale(ratio, ratio);
-            signaturePad.fromData(data);
-        }
-    });
-
-    /* ── Tutup saat klik backdrop ── */
-    document.getElementById('modalSuratPernyataan')
-        .addEventListener('click', function (e) {
-            if (e.target === this) closeModal();
-        });
-})();
-</script>
+            /* ── Tutup saat klik backdrop ── */
+            document.getElementById('modalSuratPernyataan')
+                .addEventListener('click', function(e) {
+                    if (e.target === this) closeModal();
+                });
+        })();
+    </script>
 @endpush
