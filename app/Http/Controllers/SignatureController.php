@@ -22,7 +22,7 @@ class SignatureController extends Controller
 
         // Check if user has graduation record (moved to google_graduation)
         $hasGraduation = GoogleGraduation::where('user_id', Auth::id())->exists();
-        
+
         if (!$hasGraduation) {
             return response()->json([
                 'success' => false,
