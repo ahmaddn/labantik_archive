@@ -75,6 +75,12 @@ class User extends Authenticatable
         return $this->hasOne(Employee::class, 'user_id');
     }
 
+    public function student(): HasOne
+    {
+        return $this->hasOne(RefStudent::class, 'user_id');
+    }
+
+
     /**
      * Data akademik siswa terbaru dari ref_student_academic_years
      */
@@ -118,6 +124,28 @@ class User extends Authenticatable
         $student = DB::table('ref_students')->where('user_id', $this->id)->first();
         if ($student) {
             return $student->student_number
+                ?? $student->national_student_number
+                ?? $student->national_identification_number
+                ?? null;
+        }
+
+        return null;
+    }
+
+    /**
+     * NISN (Nomor Induk Siswa Nasional)
+     */
+    public function getNisnAttribute(): ?string
+    {
+        // Prefer field on latest student academic year if present
+        if ($this->latestStudentAcademicYear?->nisn) {
+            return $this->latestStudentAcademicYear->nisn;
+        }
+
+        // Fallback: check ref_students table
+        $student = DB::table('ref_students')->where('user_id', $this->id)->first();
+        if ($student) {
+            return $student->nisn
                 ?? $student->national_student_number
                 ?? $student->national_identification_number
                 ?? null;

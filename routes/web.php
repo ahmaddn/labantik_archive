@@ -8,6 +8,7 @@ use App\Http\Controllers\DriveFileController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\GraduationController;
 use App\Http\Controllers\SignatureController;
 
 // ── Root redirect ─────────────────────────────────
@@ -89,4 +90,23 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     // ─── Data Guru TU (Guru Piket) ────────────────────────────────────
     Route::get('/piket',             [AdminUserController::class, 'piket'])->name('piket.index');
     Route::get('/piket/{id}',        [AdminUserController::class, 'piketShow'])->name('piket.show');
+
+    // ─── Data Kelulusan (Google Graduation) ───────────────────────────────
+    Route::get('/graduation',        [GraduationController::class, 'index'])->name('graduation.index');
+    Route::get('/graduation/create',        [GraduationController::class, 'create'])->name('graduation.create');
+    Route::post('/graduation/store',        [GraduationController::class, 'store'])->name('graduation.store');
+    Route::get('/graduation/download-template', [GraduationController::class, 'downloadTemplate'])->name('graduation.downloadTemplate');
+
+    // Mapel Routes
+    Route::get('/graduation/mapel/create', [GraduationController::class, 'createMapel'])->name('graduation.createMapel');
+    Route::post('/graduation/mapel/store', [GraduationController::class, 'storeMapel'])->name('graduation.storeMapel');
+
+    // Import Mapel Routes
+    Route::get('/graduation/mapel/import', [GraduationController::class, 'showImportMapel'])->name('graduation.showImportMapel');
+    Route::post('/graduation/mapel/import', [GraduationController::class, 'importMapel'])->name('graduation.importMapel');
+
+    Route::post('/graduation/import',        [GraduationController::class, 'import'])->name('graduation.import');
+    Route::post('/graduation/export',        [GraduationController::class, 'export'])->name('graduation.exportExcel');
+    Route::post('/graduation/export',        [GraduationController::class, 'export'])->name('graduation.exportPDF');
+    Route::post('/graduation/exportAll',        [GraduationController::class, 'export'])->name('graduation.exportAll');
 });
