@@ -2,22 +2,36 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GoogleGraduation extends Model
 {
-    use HasUuids;
-
     protected $table = 'google_graduation';
 
+    protected $primaryKey = 'uuid';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     protected $fillable = [
+        'uuid',
         'user_id',
-        'mapel_id',
         'letter_number',
         'graduation_date',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->{$model->getKeyName()})) {
+                $model->{$model->getKeyName()} = \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
 
     public function user(): BelongsTo
     {

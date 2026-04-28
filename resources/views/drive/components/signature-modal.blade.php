@@ -5,44 +5,49 @@
 ═══════════════════════════════════════════════════════════════════════════ --}}
 
 {{-- ── TOMBOL ──────────────────────────────────────────────────────────────── --}}
+@php
+    $sudahTandaTangan = \App\Models\GoogleStatement::where('user_id', auth()->id())->exists();
+@endphp
+
 <div class="flex items-center gap-3">
 
     {{-- Tombol Surat Pernyataan --}}
-    <button type="button" onclick="document.getElementById('modalSuratPernyataan').classList.remove('hidden')"
-        class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-        </svg>
-        Surat Pernyataan
-    </button>
+    @if ($sudahTandaTangan)
+        {{-- Sudah TTD → redirect ke view surat pernyataan, bukan buka modal --}}
+        <a href="{{ route('drive.pernyataan.show', auth()->user()->id) }}"
+            class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+            Surat Pernyataan
+        </a>
+    @else
+        {{-- Belum TTD → buka modal --}}
+        <button type="button" onclick="document.getElementById('modalSuratPernyataan').classList.remove('hidden')"
+            class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+            Surat Pernyataan
+        </button>
+    @endif
 
-    {{-- Tombol Surat Kelulusan — enabled jika sudah tanda tangan dan punya data kelulusan --}}
-    @php
-        $sudahTandaTangan =
-            \App\Models\StudentSignature::find(auth()->id()) !== null &&
-            \App\Models\GoogleGraduation::where('user_id', auth()->id())->exists();
-    @endphp
-
+    {{-- Tombol Surat Kelulusan --}}
     @if ($sudahTandaTangan)
         <a href="{{ route('drive.transkrip.show', auth()->user()->id) }}"
             class="inline-flex items-center gap-2 rounded-xl bg-[#1b84ff] px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-[#1570e0]">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-            </svg>
+
             Surat Kelulusan
         </a>
     @else
-        <button type="button" disabled title="Selesaikan Surat Pernyataan terlebih dahulu"
-            class="inline-flex cursor-not-allowed select-none items-center gap-2 rounded-xl bg-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-500 shadow-sm">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-            </svg>
+        <button disabled
+            class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-[#1b84ff] px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-[#1570e0] disabled:opacity-50">
+
             Surat Kelulusan
         </button>
-    @endif
+        @endif
 
 </div>
 
