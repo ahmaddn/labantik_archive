@@ -36,4 +36,3 @@ class GoogleGraduationSeeder extends Seeder
         }
     }
 }
-
