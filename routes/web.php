@@ -8,6 +8,7 @@ use App\Http\Controllers\DriveFileController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\SignatureController;
 
 // ── Root redirect ─────────────────────────────────
 Route::get('/', function () {
@@ -33,6 +34,13 @@ Route::middleware('auth')->prefix('drive')->name('drive.')->group(function () {
     Route::get('/create',  [DriveFileController::class, 'create'])->name('create');
     Route::post('/store',  [DriveFileController::class, 'store'])->name('store');
     Route::delete('/{id}', [DriveFileController::class, 'destroy'])->name('destroy');
+
+    Route::post('/signature/store', [SignatureController::class, 'store'])
+        ->name('signature.store');
+
+    // Tampilkan Transkrip Nilai (Surat Kelulusan)
+    Route::get('/transkrip/{id}', [SignatureController::class, 'showTranskrip'])
+        ->name('transkrip.show');
 });
 
 // ── Profile (semua user login) ────────────────────

@@ -662,6 +662,7 @@
 
     {{-- ✅ FIX: Yield scripts from child views (enables @section('scripts') to work) --}}
     @yield('scripts')
+    @stack('scripts')
 </body>
 
 </html>

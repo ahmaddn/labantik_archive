@@ -59,6 +59,11 @@
                 </p>
             </div>
         </div>
+        <div class="mb-6 flex items-center gap-3">
+            @if (auth()->user()->isSiswa())
+                @include('drive.components.signature-modal')
+            @endif
+        </div>
     @endif
 
     {{-- ── Category Accordion Boxes ─────────────────── --}}
@@ -166,14 +171,15 @@
                                                     </div>
                                                 </td>
                                                 <td class="hidden px-6 py-4 text-gray-500 xl:table-cell">
-    @if ($file->expertise_label !== '-')
-        <span class="{{ $c['badge'] }} rounded-full px-2 py-0.5 text-xs font-medium">
-            {{ $file->expertise_label }}
-        </span>
-    @else
-        <span class="text-gray-400">—</span>
-    @endif
-</td>
+                                                    @if ($file->expertise_label !== '-')
+                                                        <span
+                                                            class="{{ $c['badge'] }} rounded-full px-2 py-0.5 text-xs font-medium">
+                                                            {{ $file->expertise_label }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-gray-400">—</span>
+                                                    @endif
+                                                </td>
                                                 <td class="hidden px-6 py-4 text-xs text-gray-500 md:table-cell">
                                                     {{ $file->formatted_size }}
                                                 </td>

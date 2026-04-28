@@ -162,6 +162,12 @@ class User extends Authenticatable
             ->where('code', 'super-admin')
             ->exists();
     }
+    public function isSiswa(): bool
+    {
+        return $this->roles()
+            ->where('code', 'siswa')
+            ->exists();
+    }
 
     /**
      * Get role names
