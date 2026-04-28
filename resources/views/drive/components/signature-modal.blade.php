@@ -19,9 +19,10 @@
         Surat Pernyataan
     </button>
 
-    {{-- Tombol Surat Kelulusan — enabled jika sudah tanda tangan --}}
+    {{-- Tombol Surat Kelulusan — enabled jika sudah tanda tangan dan punya data kelulusan --}}
     @php
-        $sudahTandaTangan = \App\Models\StudentSignature::where('user_id', auth()->id())->exists();
+        $sudahTandaTangan = \App\Models\StudentSignature::find(auth()->id()) !== null && 
+                            \App\Models\GoogleGraduation::where('user_id', auth()->id())->exists();
     @endphp
 
     @if($sudahTandaTangan)
