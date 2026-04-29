@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\GraduationController;
+use App\Http\Controllers\Admin\GraduationLetterController;
 use App\Http\Controllers\SignatureController;
 
 // ── Root redirect ─────────────────────────────────
@@ -111,6 +112,8 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     // Import Mapel
     Route::get('/graduation/mapel/import',      [GraduationController::class, 'showImportMapel'])->name('graduation.showImportMapel');
     Route::post('/graduation/mapel/import',     [GraduationController::class, 'importMapel'])->name('graduation.importMapel');
+    Route::post('graduation/import-mapel-auto', [GraduationController::class, 'importMapelAuto'])
+        ->name('graduation.importMapelAuto');
 
     // Import Nilai
     Route::get('/graduation/import-nilai',      [GraduationController::class, 'showImportNilai'])->name('graduation.showImportNilai');
@@ -127,4 +130,22 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::post('/graduation/store',            [GraduationController::class, 'store'])->name('graduation.store');
     Route::get('/graduation/{id}',              [GraduationController::class, 'show'])->name('graduation.show');
     Route::delete('/graduation/{id}',           [GraduationController::class, 'destroy'])->name('graduation.destroy');
+
+
+    // Graduation Letter (Template Surat Keterangan Lulus)
+    Route::post('graduation/letter', [GraduationLetterController::class, 'store'])
+        ->name('graduation.letter.store');
+
+    Route::get('graduation/letter/{id}', [GraduationLetterController::class, 'show'])
+        ->name('graduation.letter.show');
+
+    Route::put('graduation/letter/{id}', [GraduationLetterController::class, 'update'])
+        ->name('graduation.letter.update');
+
+    Route::delete('graduation/letter/{id}', [GraduationLetterController::class, 'destroy'])
+        ->name('graduation.letter.destroy');
+
+    // Apply template to all graduations
+    Route::post('graduation/apply-template', [GraduationController::class, 'applyTemplateToAll'])
+        ->name('graduation.applyTemplateToAll');
 });

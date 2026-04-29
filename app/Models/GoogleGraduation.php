@@ -18,8 +18,7 @@ class GoogleGraduation extends Model
     protected $fillable = [
         'uuid',
         'user_id',
-        'letter_number',
-        'graduation_date',
+        'letter_id',
     ];
 
     public function mapels()
@@ -41,5 +40,10 @@ class GoogleGraduation extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(RefStudent::class, 'user_id', 'id');
+    }
+
+    public function letter(): BelongsTo
+    {
+        return $this->belongsTo(GoogleGraduationLetter::class, 'letter_id', 'uuid');
     }
 }

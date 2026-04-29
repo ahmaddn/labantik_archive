@@ -4,105 +4,113 @@
 
 @section('content')
     {{-- Header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-extrabold text-gray-900">Manajemen Kelulusan</h1>
-            <p class="text-gray-500 text-sm mt-1">Kelola data mapel dan nilai kelulusan siswa.</p>
-        </div>
-        @if (session('import_errors'))
-            <div class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6">
-                <p class="font-medium text-red-800 mb-2">Detail Error:</p>
-                <ul class="text-xs text-red-700 space-y-1 max-h-60 overflow-y-auto">
-                    @foreach (session('import_errors') as $error)
-                        <li>• {{ $error }}</li>
-                    @endforeach
-                </ul>
+    <div class="mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+
+            {{-- Title --}}
+            <div class="shrink-0">
+                <h1 class="text-xl sm:text-2xl font-extrabold text-gray-900">Manajemen Kelulusan</h1>
+                <p class="text-gray-500 text-sm mt-1">Kelola data mapel dan nilai kelulusan siswa.</p>
             </div>
-        @endif
 
-        <div class="flex items-center gap-2">
-            <button onclick="openDownloadModal()"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-colors text-sm shadow-sm border border-gray-200">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-                Download Template
-            </button>
+            {{-- Import Error Alert --}}
+            @if (session('import_errors'))
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-4 w-full sm:max-w-sm">
+                    <p class="font-medium text-red-800 mb-2 text-sm">Detail Error:</p>
+                    <ul class="text-xs text-red-700 space-y-1 max-h-40 overflow-y-auto">
+                        @foreach (session('import_errors') as $error)
+                            <li>• {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-            <a href="{{ route('admin.graduation.showImportMapel') }}"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-green-50 hover:bg-green-100 text-green-700 font-semibold rounded-xl transition-colors text-sm shadow-sm shadow-green-200">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Import Mapel
-            </a>
+            {{-- Action Buttons --}}
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-end gap-2">
+                <a href="{{ route('admin.graduation.showImportMapel') }}"
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-green-50 hover:bg-green-100 text-green-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-green-200 w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Import Mapel</span>
+                </a>
 
-            <a href="{{ route('admin.graduation.showImportNilai') }}"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-semibold rounded-xl transition-colors text-sm shadow-sm shadow-cyan-200">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" />
-                </svg>
-                Import Nilai
-            </a>
 
-            <a href="{{ route('admin.graduation.createMapel') }}"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1b84ff] hover:bg-[#1570e0] text-white font-semibold rounded-xl transition-colors text-sm shadow-sm shadow-blue-200">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Tambah Mapel
-            </a>
+                <a href="{{ route('admin.graduation.createMapel') }}"
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-[#1b84ff] hover:bg-[#1570e0] text-white font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-blue-200 w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Tambah Mapel</span>
+                </a>
 
-            {{-- Di bagian Header Button --}}
-            <a href="{{ route('admin.graduation.create') }}"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors text-sm shadow-sm shadow-purple-200">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Input Kelulusan
-            </a>
+                <button onclick="openDownloadModal()"
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-gray-200 w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    <span>Download Template</span>
+                </button>
+
+
+                <a href="{{ route('admin.graduation.showImportNilai') }}"
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-cyan-200 w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" />
+                    </svg>
+                    <span>Import Nilai</span>
+                </a>
+
+                <a href="{{ route('admin.graduation.create') }}"
+                    class="col-span-2 sm:col-auto inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-purple-200 w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Tambah Nilai</span>
+                </a>
+            </div>
         </div>
     </div>
 
     {{-- Stats --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex items-center gap-4">
-            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-[#1b84ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#1b84ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 6.253v13m0-13C6.228 6.253 2.092 10.814 2.092 16.427c0 5.613 4.136 10.174 9.908 10.174s9.908-4.561 9.908-10.174c0-5.613-4.136-10.174-9.908-10.174z" />
                 </svg>
             </div>
             <div>
-                <p class="text-2xl font-extrabold text-gray-900">{{ $totalMapels }}</p>
+                <p class="text-xl sm:text-2xl font-extrabold text-gray-900">{{ $totalMapels }}</p>
                 <p class="text-xs text-gray-500 font-medium">Total Mapel</p>
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex items-center gap-4">
-            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
             <div>
-                <p class="text-2xl font-extrabold text-gray-900">{{ $totalGraduations }}</p>
+                <p class="text-xl sm:text-2xl font-extrabold text-gray-900">{{ $totalGraduations }}</p>
                 <p class="text-xs text-gray-500 font-medium">Total Data Kelulusan</p>
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex items-center gap-4">
-            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a6 6 0 11-12 0 6 6 0 0112 0z" />
                 </svg>
             </div>
             <div>
-                <p class="text-2xl font-extrabold text-gray-900">{{ $totalUsers }}</p>
+                <p class="text-xl sm:text-2xl font-extrabold text-gray-900">{{ $totalUsers }}</p>
                 <p class="text-xs text-gray-500 font-medium">Siswa Lulus</p>
             </div>
         </div>
@@ -110,10 +118,10 @@
 
     {{-- Daftar Mapel --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-800">Daftar Mapel</h2>
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-100">
+            <h2 class="text-sm sm:text-base font-semibold text-gray-800">Daftar Mapel</h2>
         </div>
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
             @include('admin._partials.mapel_list_table', [
                 'routeEdit' => 'admin.graduation.editMapel',
                 'routeDelete' => 'admin.graduation.destroyMapel',
@@ -122,12 +130,51 @@
     </div>
 
     {{-- DAFTAR KELULUSAN SISWA --}}
-    <div class="mt-8 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-800">Daftar Siswa Lulus</h2>
+    <div class="mt-6 sm:mt-8 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-100">
+            <h2 class="text-sm sm:text-base font-semibold text-gray-800">Daftar Siswa Lulus</h2>
         </div>
 
-        <div class="p-6">
+        {{-- Apply template section --}}
+        <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+            <div class="flex items-start gap-3 mb-4">
+                <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <div>
+                    <p class="text-sm font-semibold text-gray-800">Terapkan Template ke Semua Kelulusan</p>
+                    <p class="text-xs text-gray-600 mt-0.5">Pilih template surat, lalu klik tombol untuk mengisi letter_id
+                        semua data kelulusan siswa.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                <select id="templateSelectDropdown"
+                    class="flex-1 px-4 py-2.5 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-blue-300 transition-colors">
+                    <option value="">-- Pilih Template Surat --</option>
+                    @foreach ($letters as $letter)
+                        <option value="{{ $letter->uuid }}">
+                            {{ $letter->letter_number }}
+                            ({{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('d M Y') }})
+                        </option>
+                    @endforeach
+                </select>
+
+                <button onclick="openApplyTemplateModal()" id="applyTemplateBtn"
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg opacity-50 cursor-not-allowed"
+                    disabled>
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="whitespace-nowrap">Gunakan ke Semua</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-4 sm:p-6">
             @include('admin._partials.graduation_list_table', [
                 'routeIndex' => 'admin.graduation.index',
                 'routeShow' => 'admin.graduation.show',
@@ -136,74 +183,81 @@
         </div>
     </div>
 
-    <!-- Download Template Modal -->
+    @include('admin._partials.graduation_letter_section', ['letters' => $letters])
+
+
+    {{-- ===================================================== --}}
+    {{-- MODAL: Download Template                              --}}
+    {{-- ===================================================== --}}
     <div id="downloadModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background -->
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeDownloadModal()">
-            </div>
+        <div
+            class="flex items-end sm:items-center justify-center min-h-screen px-4 pt-4 pb-0 sm:pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeDownloadModal()"></div>
 
-            <!-- Modal Panel -->
+            {{-- Slide up on mobile, centered on desktop --}}
             <div
-                class="relative inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                                Download Template Kelulusan
-                            </h3>
+                class="relative inline-block w-full sm:w-auto align-bottom sm:align-middle bg-white rounded-t-2xl sm:rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg">
+                {{-- Drag handle (mobile) --}}
+                <div class="flex justify-center pt-3 pb-1 sm:hidden">
+                    <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+                </div>
 
-                            <div class="space-y-4">
-                                <!-- Class Filter -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Pilih Kelas (Opsional)
-                                    </label>
-                                    <select id="classFilter"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <option value="">Semua Kelas</option>
-                                        @foreach ($classes as $class)
-                                            <option value="{{ $class->id }}">{{ $class->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                <div class="bg-white px-5 pt-4 pb-4 sm:p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-900">Download Template Kelulusan</h3>
+                        <button onclick="closeDownloadModal()"
+                            class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
 
-                                <!-- Expertise Filter -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Pilih Jurusan (Opsional)
-                                    </label>
-                                    <select id="expertiseFilter"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        <option value="">Semua Jurusan</option>
-                                        @foreach ($expertise as $exp)
-                                            <option value="{{ $exp->id }}">{{ $exp->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Kelas (Opsional)</label>
+                            <select id="classFilter"
+                                class="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Semua Kelas</option>
+                                @foreach ($classes as $class)
+                                    <option value="{{ $class->id }}">{{ $class->academic_level }} {{ $class->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                                <div class="text-sm text-gray-500 bg-blue-50 p-3 rounded-lg">
-                                    <p>💡 Template akan berisi semua siswa yang sesuai dengan filter kelas dan jurusan
-                                        yang
-                                        dipilih.</p>
-                                </div>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Jurusan (Opsional)</label>
+                            <select id="expertiseFilter"
+                                class="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Semua Jurusan</option>
+                                @foreach ($expertise as $exp)
+                                    <option value="{{ $exp->id }}">{{ $exp->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="text-sm text-gray-500 bg-blue-50 p-3 rounded-xl">
+                            <p class="text-xs">💡 Template akan berisi semua siswa yang sesuai dengan filter kelas dan
+                                jurusan yang dipilih.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                <div
+                    class="bg-gray-50 px-5 py-4 sm:px-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-gray-100">
+                    <button type="button" onclick="closeDownloadModal()"
+                        class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-gray-300 px-5 py-3 sm:py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        Batal
+                    </button>
                     <button type="button" onclick="downloadTemplate()"
-                        class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-[#1b84ff] text-base font-medium text-white hover:bg-[#1570e0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="w-full sm:w-auto inline-flex justify-center items-center gap-2 rounded-xl px-5 py-3 sm:py-2 bg-[#1b84ff] text-sm font-semibold text-white hover:bg-[#1570e0] transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
                         Download
-                    </button>
-                    <button type="button" onclick="closeDownloadModal()"
-                        class="w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto">
-                        Batal
                     </button>
                 </div>
             </div>
@@ -213,37 +267,40 @@
     <script>
         function openDownloadModal() {
             document.getElementById('downloadModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeDownloadModal() {
             document.getElementById('downloadModal').classList.add('hidden');
+            document.body.style.overflow = '';
         }
 
         function downloadTemplate() {
             const classId = document.getElementById('classFilter').value;
             const expertiseId = document.getElementById('expertiseFilter').value;
-
             let url = '{{ route('admin.graduation.downloadTemplate') }}';
-
             const params = new URLSearchParams();
             if (classId) params.append('class_id', classId);
             if (expertiseId) params.append('expertise_id', expertiseId);
-
-            if (params.toString()) {
-                url += '?' + params.toString();
-            }
-
-            // Trigger download
+            if (params.toString()) url += '?' + params.toString();
             window.location.href = url;
-
             closeDownloadModal();
         }
 
-        // Close modal when pressing Escape
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeDownloadModal();
-            }
+        // Template dropdown enable/disable button
+        const templateSelectDropdown = document.getElementById('templateSelectDropdown');
+        const applyTemplateBtn = document.getElementById('applyTemplateBtn');
+
+        templateSelectDropdown.addEventListener('change', function() {
+            const has = this.value !== '';
+            applyTemplateBtn.disabled = !has;
+            applyTemplateBtn.classList.toggle('opacity-50', !has);
+            applyTemplateBtn.classList.toggle('cursor-not-allowed', !has);
+            applyTemplateBtn.classList.toggle('hover:scale-[1.02]', has);
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeDownloadModal();
         });
     </script>
 @endsection

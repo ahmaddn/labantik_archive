@@ -429,6 +429,17 @@
                         </svg>
                         History Upload
                     </a>
+
+                    <p class="mb-3 px-3 py-3 text-xs font-semibold uppercase tracking-widest text-gray-400">Dokumen Arsip
+                    </p>
+
+                    <a href="{{ route('admin.graduation.index') }}"
+                        class="sidebar-link {{ request()->routeIs('admin.graduation.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600">
+                        <svg class="icon h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" />
+                        </svg>
+                        Kelulusan
+                    </a>
                 @endif
             @endauth
         </nav>
