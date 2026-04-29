@@ -24,10 +24,9 @@ class GraduationController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        // 2. AMBIL DATA KELULUSAN (Tambahkan bagian ini)
-        // Kita gunakan withCount untuk menghitung jumlah mapel di setiap kelulusan
-        $graduations = GoogleGraduation::with(['user'])
-            ->withCount('mapels')
+        // 2. AMBIL DATA KELULUSAN untuk tabel component
+        // Component akan handle pagination sendiri
+        $graduations = GoogleGraduation::with(['user', 'mapels'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -43,7 +42,7 @@ class GraduationController extends Controller
         // 5. Kirim 'graduations' ke view menggunakan compact
         return view('admin.graduation.index', compact(
             'mapels',
-            'graduations', // Pastikan variabel ini dikirim!
+            'graduations',
             'totalMapels',
             'totalGraduations',
             'totalUsers',
@@ -53,43 +52,84 @@ class GraduationController extends Controller
     }
     public function create()
     {
-        // Menggunakan relasi whereHas karena Model User menggunakan roles() plural
-        $users = User::whereHas('roles', function ($q) {
-            $q->where('code', 'siswa'); // Sesuaikan dengan code role di database Anda ('siswa' atau 'student')
-        })->get();
+        $classes = RefClass::with('expertiseConcentration')
+            ->orderBy('academic_level')
+            ->orderBy('name')
+            ->get();
 
-        // Ambil mapel dan kelompokkan (seperti kode sebelumnya)
-        $mapels_grouped = GoogleMapel::with(['class', 'expertise'])
-            ->get()
-            ->groupBy(fn($item) => $item->expertise->name ?? 'Umum');
+        return view('admin.graduation.create', compact('classes'));
+    }
 
-        return view('admin.graduation.create', compact('users', 'mapels_grouped'));
+    public function getStudentsByClass(Request $request)
+    {
+        $classId = $request->query('class_id');
+
+        $students = RefStudent::whereHas('academicYears', function ($q) use ($classId) {
+            $q->where('class_id', $classId);
+        })
+            ->select('id', 'full_name', 'student_number')
+            ->orderBy('full_name')
+            ->get();
+
+        return response()->json($students);
+    }
+
+    public function getMapelsByClass(Request $request)
+    {
+        try {
+            $classId = $request->query('class_id');
+
+            if (!$classId) {
+                return response()->json([]);
+            }
+
+            // Cek dulu apakah class_id yang dikirim valid
+            $class = RefClass::find($classId);
+            if (!$class) {
+                return response()->json(['error' => 'Kelas tidak ditemukan'], 404);
+            }
+
+            $mapels = GoogleMapel::with(['expertise'])
+                ->where('class_id', $classId)
+                ->orderBy('type')
+                ->orderBy('name')
+                ->get()
+                ->map(fn($m) => [
+                    'uuid'           => $m->uuid,
+                    'name'           => $m->name,
+                    'type'           => $m->type,
+                    'expertise_name' => $m->expertise->name ?? 'Umum',
+                ]);
+
+            return response()->json($mapels);
+        } catch (\Exception $e) {
+            \Log::error('getMapelsByClass error', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'letter_number' => 'required|string',
+            'student_id'      => 'required|exists:ref_students,id',
+            'letter_number'   => 'required|string',
             'graduation_date' => 'required|date',
-            'mapel_ids' => 'required|array|min:1',
+            'mapel_ids'       => 'required|array|min:1',
         ]);
 
         try {
             \DB::beginTransaction();
 
-            // 1. Simpan Header Kelulusan
             $graduation = GoogleGraduation::create([
-                'user_id' => $validated['user_id'],
-                'letter_number' => $validated['letter_number'],
+                'user_id'         => $validated['student_id'],
+                'letter_number'   => $validated['letter_number'],
                 'graduation_date' => $validated['graduation_date'],
             ]);
 
-            // 2. Simpan Detail Mapel (Pivot)
             foreach ($validated['mapel_ids'] as $mapelUuid) {
                 GoogleGraduationMapel::create([
-                    'graduation_id' => $graduation->id,
-                    'mapel_id' => $mapelUuid, // Karena di Model GoogleMapel primary-nya UUID
+                    'graduation_id' => $graduation->uuid,
+                    'mapel_id'      => $mapelUuid,
                 ]);
             }
 
@@ -325,9 +365,10 @@ class GraduationController extends Controller
             }
 
             $successCount = 0;
-            $errorCount = 0;
-            $errors = [];
-            $mapelData = [];
+            $skipCount    = 0;
+            $errorCount   = 0;
+            $errors       = [];
+            $mapelData    = [];
 
             // Process data rows (skip header)
             foreach (array_slice($rows, 1) as $index => $row) {
@@ -355,8 +396,8 @@ class GraduationController extends Controller
                 }
 
                 $mapelData[] = [
-                    'name' => $name,
-                    'type' => $type,
+                    'name'      => $name,
+                    'type'      => $type,
                     'rowNumber' => $rowNumber,
                 ];
             }
@@ -366,49 +407,71 @@ class GraduationController extends Controller
             // Create mapels for each combination of class and expertise
             foreach ($mapelData as $mapel) {
                 foreach ($classIds as $classId) {
-                    // Untuk tipe 'umum', expertise_id tidak relevan — cukup 1 record per kelas
-                    // Untuk tipe 'jurusan', buat per kombinasi kelas + jurusan
+                    /*
+                 * - Tipe 'umum'   : expertise_id = NULL, cukup 1 record per kelas
+                 * - Tipe 'jurusan': buat per kombinasi kelas + jurusan
+                 */
                     $targetExpertiseIds = $mapel['type'] === 'umum'
-                        ? [null]  // umum tidak perlu per-jurusan
+                        ? [null]
                         : $expertiseIds;
 
                     foreach ($targetExpertiseIds as $expertiseId) {
                         try {
-                            $exists = GoogleMapel::where('class_id', $classId)
+                            $query = GoogleMapel::where('class_id', $classId)
                                 ->where('name', $mapel['name'])
-                                ->where('type', $mapel['type'])
-                                ->when($expertiseId, fn($q) => $q->where('expertise_id', $expertiseId))
-                                ->when(!$expertiseId, fn($q) => $q->whereNull('expertise_id'))
-                                ->exists();
+                                ->where('type', $mapel['type']);
+
+                            // Untuk umum: expertise_id harus NULL
+                            // Untuk jurusan: expertise_id harus sesuai
+                            if ($expertiseId === null) {
+                                $query->whereNull('expertise_id');
+                            } else {
+                                $query->where('expertise_id', $expertiseId);
+                            }
+
+                            $exists = $query->exists();
+
+                            \Log::info('Import Mapel - Check exists', [
+                                'name'        => $mapel['name'],
+                                'type'        => $mapel['type'],
+                                'classId'     => $classId,
+                                'expertiseId' => $expertiseId,
+                                'exists'      => $exists,
+                            ]);
 
                             if ($exists) {
-                                $errors[] = "Baris {$mapel['rowNumber']}: Mapel '{$mapel['name']}' sudah ada untuk kelas ini";
-                                $errorCount++;
+                                // Skip duplikat tanpa dihitung sebagai error
+                                $skipCount++;
                                 continue;
                             }
 
                             GoogleMapel::create([
                                 'class_id'     => $classId,
-                                'expertise_id' => $expertiseId,
+                                'expertise_id' => $expertiseId, // null untuk umum
                                 'name'         => $mapel['name'],
                                 'type'         => $mapel['type'],
                             ]);
 
                             $successCount++;
                         } catch (\Exception $e) {
-                            $errors[] = "Baris {$mapel['rowNumber']}: " . $e->getMessage();
+                            $errors[]   = "Baris {$mapel['rowNumber']} ({$mapel['name']}): " . $e->getMessage();
                             $errorCount++;
                         }
                     }
                 }
             }
+
             \Log::info('Import Mapel - Done', [
                 'successCount' => $successCount,
-                'errorCount' => $errorCount,
-                'errors' => $errors,
+                'skipCount'    => $skipCount,
+                'errorCount'   => $errorCount,
+                'errors'       => $errors,
             ]);
 
             $message = "Import berhasil! $successCount mapel ditambahkan.";
+            if ($skipCount > 0) {
+                $message .= " $skipCount mapel dilewati (sudah ada).";
+            }
             if ($errorCount > 0) {
                 $message .= " $errorCount baris gagal.";
             }
@@ -419,6 +482,247 @@ class GraduationController extends Controller
                 ->with('import_errors', $errors);
         } catch (\Exception $e) {
             \Log::error('Import Mapel - Fatal error', ['error' => $e->getMessage()]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal melakukan import: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+    /**
+     * Show detail kelulusan
+     */
+    public function show($id)
+    {
+        $graduation = GoogleGraduation::with([
+            'user',
+            'mapels.mapel.class',
+            'mapels.mapel.expertise',
+        ])
+            ->where('uuid', $id)
+            ->firstOrFail();
+
+        return view('admin.graduation.show', compact('graduation'));
+    }
+
+    /**
+     * Delete kelulusan
+     */
+    public function destroy($id)
+    {
+        try {
+            $graduation = GoogleGraduation::findOrFail($id);
+
+            \DB::beginTransaction();
+
+            // Hapus detail mapel terlebih dahulu
+            GoogleGraduationMapel::where('graduation_id', $id)->delete();
+
+            // Hapus header kelulusan
+            $graduation->delete();
+
+            \DB::commit();
+
+            return redirect()
+                ->route('admin.graduation.index')
+                ->with('success', 'Data kelulusan berhasil dihapus!');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal menghapus data kelulusan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show form untuk import nilai
+     */
+    public function showImportNilai()
+    {
+        return view('admin.graduation.import-nilai');
+    }
+
+    /**
+     * Process import nilai dari file CSV
+     * CSV harus memiliki kolom: No, NIS, NISN, Nama Siswa, Kelas, Tapel, Id Mapel, Nama Mapel, Nilai
+     */
+    public function importNilai(Request $request)
+    {
+        $validated = $request->validate([
+            'file' => 'required|file|mimes:csv,xlsx,xls,txt|max:10240',
+        ], [
+            'file.required' => 'File harus diupload',
+            'file.file' => 'File harus berupa file',
+            'file.mimes' => 'File harus berformat CSV, XLSX, XLS, atau TXT',
+            'file.max' => 'Ukuran file maksimal 10MB',
+        ]);
+
+        try {
+            \DB::beginTransaction();
+
+            $file = $request->file('file');
+            $successCount = 0;
+            $skipCount = 0;
+            $errorCount = 0;
+            $errors = [];
+            $graduationMap = []; // Cache untuk graduation record per user
+
+            // Baca file CSV
+            $handle = fopen($file->getRealPath(), 'r');
+
+            // Skip BOM jika ada
+            $bom = fread($handle, 3);
+            if ($bom !== "\xef\xbb\xbf") {
+                rewind($handle);
+            }
+
+            // Baca header (baris pertama)
+            $headers = fgetcsv($handle, 1000, ';');
+            if (!$headers) {
+                throw new \Exception('File kosong atau tidak valid');
+            }
+
+            // Normalize headers
+            $headers = array_map(
+                fn($h) => strtolower(trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', (string)$h))),
+                $headers
+            );
+
+            // Find column indices
+            $nisCol = collect($headers)->search(
+                fn($h) => str_contains($h, 'nis') && !str_contains($h, 'nisn')
+            );
+            $nisnCol = collect($headers)->search(
+                fn($h) => str_contains($h, 'nisn')
+            );
+            $namaCol = collect($headers)->search(
+                fn($h) => str_contains($h, 'nama')
+            );
+            $mapelIdCol = collect($headers)->search(
+                fn($h) => str_contains($h, 'id mapel') || str_contains($h, 'id_mapel')
+            );
+            $nilaiCol = collect($headers)->search(
+                fn($h) => str_contains($h, 'nilai')
+            );
+
+            if ($nisCol === false || $nilaiCol === false) {
+                throw new \Exception('Kolom NIS dan Nilai harus ada di file');
+            }
+
+            $rowNumber = 1; // Header adalah baris 1
+
+            // Process data rows
+            while (($row = fgetcsv($handle, 1000, ';')) !== false) {
+                $rowNumber++;
+
+                // Skip empty rows
+                if (empty(array_filter($row, fn($v) => trim((string)$v) !== ''))) {
+                    continue;
+                }
+
+                $nis = trim((string)($row[$nisCol] ?? ''));
+                $nilai = trim((string)($row[$nilaiCol] ?? ''));
+                $mapelId = trim((string)($row[$mapelIdCol] ?? ''));
+
+                // Skip jika NIS kosong
+                if (empty($nis)) {
+                    $skipCount++;
+                    continue;
+                }
+
+                // Skip jika tidak ada mapelId atau nilai
+                if (empty($mapelId) || empty($nilai)) {
+                    $skipCount++;
+                    continue;
+                }
+
+                try {
+                    // Cari student berdasarkan NIS
+                    $student = RefStudent::where('student_number', $nis)->first();
+
+                    if (!$student) {
+                        $errors[] = "Baris $rowNumber: NIS '$nis' tidak ditemukan di database";
+                        $errorCount++;
+                        continue;
+                    }
+
+                    // HAPUS blok cek $user, langsung pakai $student->id sebagai user_id
+                    if (!isset($graduationMap[$student->id])) {
+                        $graduation = GoogleGraduation::firstOrCreate(
+                            ['user_id' => $student->id],  // kolom tetap user_id, isi pakai student->id
+                            [
+                                'letter_number' => '',
+                                'graduation_date' => now(),
+                            ]
+                        );
+                        $graduationMap[$student->id] = $graduation;
+                    } else {
+                        $graduation = $graduationMap[$student->id];
+                    }
+
+                    // Cek apakah mapelId valid
+                    $mapel = GoogleMapel::where('uuid', $mapelId)->first();
+                    if (!$mapel) {
+                        $errors[] = "Baris $rowNumber: Mapel dengan ID '$mapelId' tidak ditemukan";
+                        $errorCount++;
+                        continue;
+                    }
+
+                    // Validate nilai (harus numeric dan antara 0-100)
+                    $nilaiNumeric = (float)str_replace(',', '.', $nilai);
+                    if (!is_numeric($nilaiNumeric) || $nilaiNumeric < 0 || $nilaiNumeric > 100) {
+                        $errors[] = "Baris $rowNumber: Nilai '$nilai' tidak valid (harus numeric antara 0-100)";
+                        $errorCount++;
+                        continue;
+                    }
+
+                    // Simpan atau update GoogleGraduationMapel
+                    $existingMapel = GoogleGraduationMapel::where('graduation_id', $graduation->uuid)
+                        ->where('mapel_id', $mapel->uuid)
+                        ->first();
+
+                    if ($existingMapel) {
+                        $existingMapel->update(['score' => $nilaiNumeric]);
+                    } else {
+                        GoogleGraduationMapel::create([
+                            'graduation_id' => $graduation->uuid,
+                            'mapel_id'      => $mapel->uuid,
+                            'score'         => $nilaiNumeric,
+                        ]);
+                    }
+
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $errors[] = "Baris $rowNumber: " . $e->getMessage();
+                    $errorCount++;
+                }
+            }
+
+            fclose($handle);
+
+            \DB::commit();
+
+            \Log::info('Import Nilai - Done', [
+                'successCount' => $successCount,
+                'skipCount' => $skipCount,
+                'errorCount' => $errorCount,
+            ]);
+
+            $message = "Import berhasil! $successCount nilai berhasil disimpan.";
+            if ($skipCount > 0) {
+                $message .= " $skipCount baris dilewati (kosong/tidak lengkap).";
+            }
+            if ($errorCount > 0) {
+                $message .= " $errorCount baris gagal.";
+            }
+
+            return redirect()
+                ->route('admin.graduation.index')
+                ->with('success', $message)
+                ->with('import_errors', $errors);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Import Nilai - Fatal error', ['error' => $e->getMessage()]);
 
             return redirect()
                 ->back()

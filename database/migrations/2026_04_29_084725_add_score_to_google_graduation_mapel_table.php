@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('google_graduation', function (Blueprint $table) {
-            $table->dropColumn('mapel_id');    // Then drop the column
+        Schema::table('google_graduation_mapel', function (Blueprint $table) {
+            $table->decimal('score', 5, 2)->nullable()->default(null)->after('mapel_id');
         });
     }
 
@@ -21,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('google_graduation_mapel', function (Blueprint $table) {
+            $table->dropColumn('score');
+        });
     }
 };

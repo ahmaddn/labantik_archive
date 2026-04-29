@@ -23,4 +23,14 @@ class RefClass extends Model
         'expertise_program_id',
         'expertise_concentration_id',
     ];
+
+    public function expertiseProgram()
+    {
+        return $this->belongsTo(CoreExpertiseProgram::class, 'expertise_program_id', 'id');
+    }
+
+    public function expertiseConcentration()
+    {
+        return $this->belongsTo(CoreExpertiseConcentration::class, 'expertise_concentration_id', 'id');
+    }
 }

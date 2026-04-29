@@ -23,7 +23,7 @@ class GoogleMapel extends Model
     ];
     public function graduations()
     {
-        return $this->hasMany(GoogleGraduationMapel::class, 'mapel_id', 'id');
+        return $this->hasMany(GoogleGraduationMapel::class, 'mapel_id', 'uuid');
     }
 
     public function expertise()

@@ -37,7 +37,7 @@ Route::middleware('auth')->prefix('drive')->name('drive.')->group(function () {
     Route::delete('/{id}', [DriveFileController::class, 'destroy'])->name('destroy');
 
     Route::post('/signature/store',     [SignatureController::class, 'store'])->name('signature.store');
-    Route::get('/pernyataan/{id}',      [SignatureController::class, 'showPernyataan'])->name('pernyataan.show'); // ← BARU
+    Route::get('/pernyataan/{id}',      [SignatureController::class, 'showPernyataan'])->name('pernyataan.show');
     Route::get('/transkrip/{id}',       [SignatureController::class, 'showTranskrip'])->name('transkrip.show');
 });
 
@@ -77,33 +77,54 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::get('/history', [AdminUserController::class, 'history'])->name('history.index');
 
     // ─── Data Siswa ───────────────────────────────────────────────────
-    Route::get('/students',          [AdminUserController::class, 'students'])->name('students.index');
-    Route::get('/students/{id}',     [AdminUserController::class, 'studentShow'])->name('students.show');
+    Route::get('/students',      [AdminUserController::class, 'students'])->name('students.index');
+    Route::get('/students/{id}', [AdminUserController::class, 'studentShow'])->name('students.show');
 
     // ─── Data Guru ────────────────────────────────────────────────────
-    Route::get('/teachers',          [AdminUserController::class, 'teachers'])->name('teachers.index');
-    Route::get('/teachers/{id}',     [AdminUserController::class, 'teacherShow'])->name('teachers.show');
+    Route::get('/teachers',      [AdminUserController::class, 'teachers'])->name('teachers.index');
+    Route::get('/teachers/{id}', [AdminUserController::class, 'teacherShow'])->name('teachers.show');
 
     // ─── Data Guru TU (Guru Piket) ────────────────────────────────────
-    Route::get('/piket',             [AdminUserController::class, 'piket'])->name('piket.index');
-    Route::get('/piket/{id}',        [AdminUserController::class, 'piketShow'])->name('piket.show');
+    Route::get('/piket',         [AdminUserController::class, 'piket'])->name('piket.index');
+    Route::get('/piket/{id}',    [AdminUserController::class, 'piketShow'])->name('piket.show');
 
-    // ─── Data Kelulusan (Google Graduation) ───────────────────────────────
-    Route::get('/graduation',        [GraduationController::class, 'index'])->name('graduation.index');
-    Route::get('/graduation/create',        [GraduationController::class, 'create'])->name('graduation.create');
-    Route::post('/graduation/store',        [GraduationController::class, 'store'])->name('graduation.store');
+    // ─── Kelulusan ────────────────────────────────────────────────────
+    // PENTING: route static harus didaftarkan SEBELUM route dynamic {id}
+    // agar tidak tertangkap sebagai parameter
+
+    // Index
+    Route::get('/graduation', [GraduationController::class, 'index'])->name('graduation.index');
+
+    // Template
     Route::get('/graduation/download-template', [GraduationController::class, 'downloadTemplate'])->name('graduation.downloadTemplate');
 
-    // Mapel Routes
-    Route::get('/graduation/mapel/create', [GraduationController::class, 'createMapel'])->name('graduation.createMapel');
-    Route::post('/graduation/mapel/store', [GraduationController::class, 'storeMapel'])->name('graduation.storeMapel');
+    // Mapel — static routes
+    Route::get('/graduation/mapel/create',      [GraduationController::class, 'createMapel'])->name('graduation.createMapel');
+    // routes/web.php
+    Route::get('/admin/graduation/api/students-by-class',  [GraduationController::class, 'getStudentsByClass'])->name('graduation.studentsByClass');
+    Route::get('/admin/graduation/api/mapels-by-class',    [GraduationController::class, 'getMapelsByClass'])->name('graduation.mapelsByClass');
+    Route::post('/graduation/mapel/store',      [GraduationController::class, 'storeMapel'])->name('graduation.storeMapel');
+    Route::get('/graduation/mapel/{id}/edit',   [GraduationController::class, 'editMapel'])->name('graduation.editMapel');
+    Route::put('/graduation/mapel/{id}',        [GraduationController::class, 'updateMapel'])->name('graduation.updateMapel');
+    Route::delete('/graduation/mapel/{id}',     [GraduationController::class, 'destroyMapel'])->name('graduation.destroyMapel');
 
-    // Import Mapel Routes
-    Route::get('/graduation/mapel/import', [GraduationController::class, 'showImportMapel'])->name('graduation.showImportMapel');
-    Route::post('/graduation/mapel/import', [GraduationController::class, 'importMapel'])->name('graduation.importMapel');
+    // Import Mapel
+    Route::get('/graduation/mapel/import',      [GraduationController::class, 'showImportMapel'])->name('graduation.showImportMapel');
+    Route::post('/graduation/mapel/import',     [GraduationController::class, 'importMapel'])->name('graduation.importMapel');
 
-    Route::post('/graduation/import',        [GraduationController::class, 'import'])->name('graduation.import');
-    Route::post('/graduation/export',        [GraduationController::class, 'export'])->name('graduation.exportExcel');
-    Route::post('/graduation/export',        [GraduationController::class, 'export'])->name('graduation.exportPDF');
-    Route::post('/graduation/exportAll',        [GraduationController::class, 'export'])->name('graduation.exportAll');
+    // Import Nilai
+    Route::get('/graduation/import-nilai',      [GraduationController::class, 'showImportNilai'])->name('graduation.showImportNilai');
+    Route::post('/graduation/import-nilai',     [GraduationController::class, 'importNilai'])->name('graduation.importNilai');
+
+    // Import / Export kelulusan
+    Route::post('/graduation/import',           [GraduationController::class, 'import'])->name('graduation.import');
+    Route::post('/graduation/export',           [GraduationController::class, 'export'])->name('graduation.export');
+    Route::post('/graduation/export-pdf',       [GraduationController::class, 'exportPDF'])->name('graduation.exportPDF');
+    Route::post('/graduation/export-all',       [GraduationController::class, 'exportAll'])->name('graduation.exportAll');
+
+    // Graduation CRUD — dynamic {id} HARUS paling bawah
+    Route::get('/graduation/create',            [GraduationController::class, 'create'])->name('graduation.create');
+    Route::post('/graduation/store',            [GraduationController::class, 'store'])->name('graduation.store');
+    Route::get('/graduation/{id}',              [GraduationController::class, 'show'])->name('graduation.show');
+    Route::delete('/graduation/{id}',           [GraduationController::class, 'destroy'])->name('graduation.destroy');
 });
