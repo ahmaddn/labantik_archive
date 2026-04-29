@@ -4,26 +4,24 @@
      Pastikan @stack('scripts') ada di bagian bawah layout sebelum </body>
 ═══════════════════════════════════════════════════════════════════════════ --}}
 
-{{-- ── TOMBOL ──────────────────────────────────────────────────────────────── --}}
 @php
     $sudahTandaTangan = \App\Models\GoogleStatement::where('user_id', auth()->id())->exists();
 @endphp
 
 <div class="flex items-center gap-3">
 
-    {{-- Tombol Surat Pernyataan --}}
     @if ($sudahTandaTangan)
-        {{-- Sudah TTD → redirect ke view surat pernyataan, bukan buka modal --}}
-        <a href="{{ route('drive.pernyataan.show', auth()->user()->id) }}"
-            class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
+        {{-- Sudah TTD → 1 tombol saja: Surat Kelulusan (berisi kelulusan + pernyataan dalam 1 file) --}}
+        <a href="{{ route('drive.transkrip.show', auth()->user()->id) }}"
+            class="inline-flex items-center gap-2 rounded-xl bg-[#1b84ff] px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-[#1570e0]">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Surat Pernyataan
+            Surat Kelulusan
         </a>
     @else
-        {{-- Belum TTD → buka modal --}}
+        {{-- Belum TTD → tombol Surat Pernyataan membuka modal untuk tanda tangan --}}
         <button type="button" onclick="document.getElementById('modalSuratPernyataan').classList.remove('hidden')"
             class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,26 +30,14 @@
             </svg>
             Surat Pernyataan
         </button>
+
+        {{-- Surat Kelulusan disabled sebelum TTD --}}
+        
     @endif
-
-    {{-- Tombol Surat Kelulusan --}}
-    @if ($sudahTandaTangan)
-        <a href="{{ route('drive.transkrip.show', auth()->user()->id) }}"
-            class="inline-flex items-center gap-2 rounded-xl bg-[#1b84ff] px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-[#1570e0]">
-
-            Surat Kelulusan
-        </a>
-    @else
-        <button disabled
-            class="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-[#1b84ff] px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition-colors hover:bg-[#1570e0] disabled:opacity-50">
-
-            Surat Kelulusan
-        </button>
-        @endif
 
 </div>
 
-{{-- ── MODAL SURAT PERNYATAAN ──────────────────────────────────────────────── --}}
+{{-- ── MODAL SURAT PERNYATAAN/FAKTA INTEGRITAS ────────────────────────────── --}}
 <div id="modalSuratPernyataan" class="fixed inset-0 z-50 flex hidden items-center justify-center bg-black/60 p-4"
     role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 
@@ -59,7 +45,7 @@
 
         {{-- Header --}}
         <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-6 py-4">
-            <h2 id="modalTitle" class="text-lg font-bold text-gray-800">Surat Pernyataan Kelulusan</h2>
+            <h2 id="modalTitle" class="text-lg font-bold text-gray-800">Surat Pernyataan / Fakta Integritas</h2>
             <button type="button" onclick="closeModal()"
                 class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,79 +59,97 @@
             class="grow overflow-y-auto px-8 py-6 text-sm leading-relaxed text-gray-700"
             style="font-family: 'Times New Roman', Times, serif;">
 
-            {{-- ── ISI SURAT PERNYATAAN ── --}}
-            <div class="mb-6 text-center">
-                <p class="text-base font-bold uppercase">SURAT PERNYATAAN</p>
-                <p class="text-sm">No: ___/TU.01.01/SMK-Tlg/CADISDIKWIL.IX/2025</p>
+            {{-- ── ISI SURAT PERNYATAAN/FAKTA INTEGRITAS (sesuai blade surat_pernyataan) ── --}}
+            <div class="mb-4 text-center">
+                <p class="text-base font-bold uppercase underline">Surat Pernyataan/Fakta Integritas</p>
             </div>
 
-            <p class="mb-4">Yang bertanda tangan di bawah ini:</p>
+            <p class="mb-4">Saya yang bertanda tangan di bawah ini:</p>
 
             <table class="mb-4 w-full text-sm" style="border-collapse:collapse;">
                 <tr>
-                    <td class="w-48 align-top">Nama</td>
-                    <td class="w-4 align-top">:</td>
-                    <td><strong>{{ auth()->user()->name }}</strong></td>
+                    <td class="w-56 align-top py-0.5">Nama Lengkap</td>
+                    <td class="w-4 align-top py-0.5">:</td>
+                    @php
+                            $student = \Illuminate\Support\Facades\DB::table('ref_students')
+                                ->where('user_id', auth()->id())
+                                ->first();
+                            $program = \Illuminate\Support\Facades\DB::table('ref_classes')
+                                ->join('core_expertise_concentrations', 'ref_classes.expertise_concentration_id', '=', 'core_expertise_concentrations.id')
+                                ->where('ref_classes.id', auth()->user()->class_id)
+                                ->select('core_expertise_concentrations.name as program_name')
+                                ->first();
+                        @endphp
+                    <td class="py-0.5"><strong>{{ $student->full_name ?? '—' }}</strong></td>
                 </tr>
                 <tr>
-                    <td>NISN</td>
-                    <td>:</td>
-                    <td>{{ auth()->user()->nisn ?? '—' }}</td>
+                    <td class="align-top py-0.5">Tempat/Tanggal Lahir</td>
+                    <td class="py-0.5">:</td>
+                    <td class="py-0.5">
+
+                        {{ $student->birth_place_date ?? '—' }}
+                    </td>
                 </tr>
                 <tr>
-                    <td>Program Keahlian</td>
-                    <td>:</td>
-                    <td>{{ auth()->user()->program_keahlian ?? '—' }}</td>
+                    <td class="align-top py-0.5">NISN</td>
+                    <td class="py-0.5">:</td>
+                    <td class="py-0.5">{{ $student->national_student_number ?? '—' }}</td>
                 </tr>
                 <tr>
-                    <td>Konsentrasi Keahlian</td>
-                    <td>:</td>
-                    <td>{{ auth()->user()->konsentrasi_keahlian ?? '—' }}</td>
+                    <td class="align-top py-0.5">NPSN</td>
+                    <td class="py-0.5">:</td>
+                    <td class="py-0.5">20213872</td>
+                </tr>
+                <tr>
+                    <td class="align-top py-0.5">Nama Sekolah</td>
+                    <td class="py-0.5">:</td>
+                    <td class="py-0.5">SMK Negeri 1 Talaga</td>
+                </tr>
+                <tr>
+                    <td class="align-top py-0.5">Program Keahlian</td>
+                    <td class="py-0.5">:</td>
+                    <td class="py-0.5">{{ $program->program_name ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td class="align-top py-0.5">Alamat</td>
+                    <td class="py-0.5">:</td>
+                    <td class="py-0.5">{{ $student->address ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td class="align-top py-0.5">Nama Orang Tua/Wali</td>
+                    <td class="py-0.5">:</td>
+                    <td class="py-0.5">{{ $student->guardian_name ?? '—' }}</td>
                 </tr>
             </table>
 
-            <p class="mb-3">
-                Dengan ini menyatakan dengan sesungguhnya bahwa saya:
-            </p>
+            <p class="mb-3">Menyatakan secara sadar dan sungguh-sungguh apabila saya dinyatakan lulus tidak akan melakukan:</p>
 
-            <ol class="mb-4 list-outside list-decimal space-y-2 pl-5">
-                <li>
-                    Bersedia menerima dan mengakui keabsahan Transkrip Nilai yang diterbitkan oleh
-                    <strong>SMKN 1 Talaga</strong> sebagai dokumen resmi hasil belajar saya selama mengikuti
-                    pendidikan di sekolah tersebut.
-                </li>
-                <li>
-                    Menyatakan bahwa seluruh data yang tercantum dalam transkrip nilai adalah benar dan sesuai
-                    dengan data yang telah saya berikan kepada pihak sekolah.
-                </li>
-                <li>
-                    Tidak akan melakukan pemalsuan, pengubahan, atau penyalahgunaan dokumen transkrip nilai
-                    dalam bentuk apapun.
-                </li>
-                <li>
-                    Bersedia bertanggung jawab secara hukum apabila dikemudian hari terbukti melakukan
-                    tindakan pemalsuan dokumen sebagaimana dimaksud di atas.
-                </li>
-                <li>
-                    Surat pernyataan ini dibuat dengan penuh kesadaran dan tanpa paksaan dari pihak manapun,
-                    untuk dipergunakan sebagaimana mestinya.
-                </li>
+            <ol class="mb-4 list-outside list-decimal space-y-1.5 pl-5">
+                <li>Hal-hal yang tidak terpuji, seperti mencorat-coret baju atau sarana dan prasarana fasilitas umum.</li>
+                <li>Konvoi kendaraan sehingga mengganggu pengguna jalan lainnya.</li>
+                <li>Kumpul-kumpul pada tempat tertentu dengan melakukan hal yang tidak terpuji yang akan merusak nama baik diri, keluarga dan lembaga.</li>
             </ol>
 
-            <p class="mb-6">
-                Demikian surat pernyataan ini saya buat untuk dipergunakan sebagaimana mestinya.
+            <p class="mb-3">Bila lulus saya bersedia:</p>
+
+            <ol class="mb-4 list-outside list-decimal space-y-1.5 pl-5">
+                <li>Sujud Syukur sebagai ungkapan kebahagiaan saya.</li>
+                <li>Menyumbangkan seragam kepada pihak yang memerlukan.</li>
+            </ol>
+
+            <p class="mb-3">
+                Bila saya melanggar ketentuan di atas dan terjadi hal negatif yang melibatkan saya dengan pihak berwajib maka saya tidak akan membawa nama sekolah dan sepenuhnya menjadi tanggung jawab saya.
             </p>
 
-            <p class="mb-1">
-                Majalengka, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
-            </p>
+            <p class="mb-6">Demikian pernyataan saya dibuat dengan sadar tanpa paksaan dari pihak mana pun.</p>
+
+            <p class="mb-1">Majalengka, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
             <p class="mb-8">Yang menyatakan,</p>
 
             {{-- ── SIGNATURE PAD ── --}}
             <div id="signatureSection" class="mt-2">
                 <p class="mb-2 text-center text-xs text-gray-500">
-                    <span id="signHint">↕ Scroll ke bawah untuk membaca seluruh surat, lalu tanda tangani di kotak
-                        berikut.</span>
+                    <span id="signHint">↕ Scroll ke bawah untuk membaca seluruh surat, lalu tanda tangani di kotak berikut.</span>
                 </p>
 
                 <div class="overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50"
@@ -178,20 +182,17 @@
 </div>
 
 @push('scripts')
-    {{-- Signature Pad Library --}}
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <script>
         (function() {
-            /* ── Inisialisasi Signature Pad ── */
             let signaturePad = null;
 
             function initPad() {
                 const canvas = document.getElementById('signatureCanvas');
                 if (!canvas || signaturePad) return;
 
-                // Sesuaikan ukuran canvas dengan elemen
                 const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                canvas.width = canvas.offsetWidth * ratio;
+                canvas.width  = canvas.offsetWidth  * ratio;
                 canvas.height = canvas.offsetHeight * ratio;
                 canvas.getContext('2d').scale(ratio, ratio);
 
@@ -199,28 +200,24 @@
                     minWidth: 0.8,
                     maxWidth: 2.5,
                     penColor: '#1a1a2e',
-                    backgroundColor: 'rgb(0,0,0,0)', // transparan
+                    backgroundColor: 'rgba(0,0,0,0)',
                 });
 
-                // Aktifkan tombol Simpan saat ada goresan
                 signaturePad.addEventListener('endStroke', () => {
                     document.getElementById('btnSimpan').disabled = signaturePad.isEmpty();
                 });
             }
 
-            /* ── Cek apakah sudah scroll ke bawah ── */
             window.checkScroll = function() {
                 const el = document.getElementById('scrollArea');
                 const reachedBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
                 if (reachedBottom) {
                     document.getElementById('signHint').textContent =
                         'Tanda tangan di kotak di bawah ini menggunakan mouse atau jari.';
-                    // Init pad saat sudah scroll
                     initPad();
                 }
             };
 
-            /* ── Hapus tanda tangan ── */
             window.clearSignature = function() {
                 if (signaturePad) {
                     signaturePad.clear();
@@ -228,16 +225,14 @@
                 }
             };
 
-            /* ── Simpan ke server ── */
             window.saveSignature = async function() {
                 if (!signaturePad || signaturePad.isEmpty()) {
                     alert('Mohon tanda tangani terlebih dahulu.');
                     return;
                 }
 
-                const base64 = signaturePad.toDataURL('image/png'); // base64 string
+                const base64 = signaturePad.toDataURL('image/png');
                 const btn = document.getElementById('btnSimpan');
-
                 btn.disabled = true;
                 btn.textContent = 'Menyimpan…';
 
@@ -249,15 +244,12 @@
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'Accept': 'application/json',
                         },
-                        body: JSON.stringify({
-                            signature_data: base64
-                        }),
+                        body: JSON.stringify({ signature_data: base64 }),
                     });
 
                     const json = await res.json();
 
                     if (res.ok && json.success) {
-                        // Tutup modal, reload halaman agar tombol Surat Kelulusan menjadi aktif
                         closeModal();
                         window.location.reload();
                     } else {
@@ -273,27 +265,23 @@
                 }
             };
 
-            /* ── Tutup modal & reset ── */
             window.closeModal = function() {
                 document.getElementById('modalSuratPernyataan').classList.add('hidden');
-                // Reset scroll ke atas saat dibuka ulang
                 document.getElementById('scrollArea').scrollTop = 0;
             };
 
-            /* ── Re-init pad saat ukuran window berubah ── */
             window.addEventListener('resize', () => {
                 if (signaturePad) {
                     const canvas = document.getElementById('signatureCanvas');
-                    const data = signaturePad.toData();
-                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                    canvas.width = canvas.offsetWidth * ratio;
+                    const data   = signaturePad.toData();
+                    const ratio  = Math.max(window.devicePixelRatio || 1, 1);
+                    canvas.width  = canvas.offsetWidth  * ratio;
                     canvas.height = canvas.offsetHeight * ratio;
                     canvas.getContext('2d').scale(ratio, ratio);
                     signaturePad.fromData(data);
                 }
             });
 
-            /* ── Tutup saat klik backdrop ── */
             document.getElementById('modalSuratPernyataan')
                 .addEventListener('click', function(e) {
                     if (e.target === this) closeModal();

@@ -190,7 +190,7 @@
             <tr>
                 <td class="label">Program Keahlian</td>
                 <td class="sep">:</td>
-                <td>{{ $user->className ?? '—' }}</td>
+                <td>{{ $program->program_name ?? '—' }}</td>
             </tr>
             <tr>
                 <td class="label">Alamat</td>

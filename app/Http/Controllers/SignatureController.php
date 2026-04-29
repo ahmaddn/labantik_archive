@@ -42,18 +42,23 @@ class SignatureController extends Controller
      */
     public function showPernyataan($id)
     {
-        // Siswa hanya bisa cetak surat miliknya sendiri
         if (Auth::id() !== $id && !Auth::user()->isSuperAdmin()) {
             abort(403);
         }
 
         $userId = auth()->id();
-        $user   = auth()->user();
+        $user = DB::table('core_users')->where('id', $userId)->first();
 
-        // Ambil data dari ref_students berdasarkan user yang login
         $student = DB::table('ref_students')->where('user_id', $userId)->first();
 
-        // Validasi signature
+        // Ambil program keahlian lewat class_id dari user
+        $program = DB::table('ref_classes')
+            ->join('core_expertise_concentrations', 'ref_classes.expertise_concentration_id', '=', 'core_expertise_concentrations.id')
+            ->where('ref_classes.id', $user->class_id)
+            ->select('core_expertise_concentrations.name as program_name')
+            ->first();
+
+
         $statement = DB::table('google_statement')->where('user_id', $id)->first();
         if (!$statement) {
             return redirect()->back()->with('error', 'Belum ada tanda tangan.');
@@ -64,7 +69,7 @@ class SignatureController extends Controller
             return redirect()->back()->with('error', 'Belum ada tanda tangan.');
         }
 
-        return view('kelulusan.surat_pernyataan', compact('user', 'student', 'signature'));
+        return view('kelulusan.surat_pernyataan', compact('user', 'student', 'signature', 'program'));
     }
 
     /**
@@ -78,10 +83,21 @@ class SignatureController extends Controller
         }
 
         $userId = auth()->id();
-        $user   = auth()->user();
+        $user = DB::table('core_users')->where('id', $userId)->first();
 
-        // Ambil data siswa dari ref_students
         $student = DB::table('ref_students')->where('user_id', $userId)->first();
+
+        // Ambil program keahlian lewat class_id dari user
+        $program = DB::table('ref_classes')
+            ->join('core_expertise_concentrations', 'ref_classes.expertise_concentration_id', '=', 'core_expertise_concentrations.id')
+            ->where('ref_classes.id', $user->class_id)
+            ->select('core_expertise_concentrations.name as program_name')
+            ->first();
+        $program1 = DB::table('ref_classes')
+            ->join('core_expertise_programs', 'ref_classes.expertise_program_id', '=', 'core_expertise_programs.id')
+            ->where('ref_classes.id', $user->class_id)
+            ->select('core_expertise_programs.name as program1_name')
+            ->first();
 
         $statement = DB::table('google_statement')->where('user_id', $id)->first();
         if (!$statement) {
@@ -95,6 +111,6 @@ class SignatureController extends Controller
 
         $graduation = GoogleGraduation::where('user_id', $id)->first();
 
-        return view('kelulusan.kelulusan', compact('user', 'student', 'signature', 'graduation'));
+        return view('kelulusan.kelulusan', compact('user', 'student', 'signature', 'graduation', 'program', 'program1'));
     }
 }
