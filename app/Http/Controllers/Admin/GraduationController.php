@@ -28,7 +28,7 @@ class GraduationController extends Controller
 
         // 2. AMBIL DATA KELULUSAN untuk tabel component - FILTER HANYA KELAS 12
         // Component akan handle pagination sendiri
-        $graduations = GoogleGraduation::with(['user', 'mapels'])
+        $graduations = GoogleGraduation::with(['user', 'mapels', 'letter'])
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
             })
@@ -1100,20 +1100,23 @@ class GraduationController extends Controller
      */
     public function applyTemplateToAll(Request $request)
     {
-        $validated = $request->validate([
-            'letter_id' => 'required|string|exists:google_graduation_letters,uuid',
-        ], [
-            'letter_id.required' => 'Template surat harus dipilih',
-            'letter_id.exists' => 'Template surat tidak ditemukan',
-        ]);
-
         try {
+            $validated = $request->validate([
+                'letter_id' => 'required|string|exists:google_graduation_letters,uuid',
+            ]);
+
             $letterUuid = $validated['letter_id'];
 
-            // Verify letter exists
-            $letter = GoogleGraduationLetter::findOrFail($letterUuid);
+            // Pakai where+first bukan findOrFail agar tidak throw HTML exception
+            $letter = GoogleGraduationLetter::where('uuid', $letterUuid)->first();
 
-            // Update semua graduation dengan letter_id ini - HANYA KELAS 12
+            if (!$letter) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Template surat tidak ditemukan',
+                ], 404);
+            }
+
             $updatedCount = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
             })->update([
@@ -1122,17 +1125,16 @@ class GraduationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "Template '$letter->letter_number' berhasil diterapkan ke $updatedCount data kelulusan!",
+                'message' => "Template '{$letter->letter_number}' berhasil diterapkan ke {$updatedCount} data kelulusan!",
                 'updated_count' => $updatedCount,
             ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Template surat tidak ditemukan',
-            ], 404);
+                'message' => collect($e->errors())->flatten()->first(),
+            ], 422);
         } catch (\Exception $e) {
             \Log::error('Apply Template To All - Error', ['error' => $e->getMessage()]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menerapkan template: ' . $e->getMessage(),
