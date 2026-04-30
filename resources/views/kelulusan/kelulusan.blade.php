@@ -12,8 +12,7 @@
         }
 
         body {
-            font-family: sans-serif;
-            font-size: 10pt;
+    font-family: "Times New Roman", Times, serif;
             line-height: 1.3;
             margin: 0;
             padding: 20px;
