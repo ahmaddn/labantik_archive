@@ -885,46 +885,69 @@ class GraduationController extends Controller
     public function importNilai(Request $request)
     {
         $validated = $request->validate([
-            'file' => 'required|file|mimes:csv,xlsx,xls,txt|max:10240',
+            'file' => 'required|file|mimes:csv,txt|max:10240',
         ], [
             'file.required' => 'File harus diupload',
-            'file.file' => 'File harus berupa file',
-            'file.mimes' => 'File harus berformat CSV, XLSX, XLS, atau TXT',
-            'file.max' => 'Ukuran file maksimal 10MB',
+            'file.file'     => 'File harus berupa file',
+            'file.mimes'    => 'File harus berformat CSV atau TXT',
+            'file.max'      => 'Ukuran file maksimal 10MB',
         ]);
 
         try {
             \DB::beginTransaction();
 
-            $file = $request->file('file');
+            $file         = $request->file('file');
             $successCount = 0;
-            $skipCount = 0;
-            $errorCount = 0;
-            $errors = [];
-            $graduationMap = []; // Cache untuk graduation record per user
+            $skipCount    = 0;
+            $errorCount   = 0;
+            $errors       = [];
+            $graduationMap = [];
 
-            // Baca file CSV
+            // Buka file
             $handle = fopen($file->getRealPath(), 'r');
+            if (!$handle) {
+                throw new \Exception('Gagal membuka file');
+            }
 
-            // Skip BOM jika ada
+            // ── 1. Skip BOM jika ada ──────────────────────────────────────────
             $bom = fread($handle, 3);
             if ($bom !== "\xef\xbb\xbf") {
                 rewind($handle);
             }
 
-            // Baca header (baris pertama)
-            $headers = fgetcsv($handle, 1000, ';');
+            // ── 2. Auto-detect delimiter ──────────────────────────────────────
+            $firstLine = fgets($handle);
+            if (!$firstLine) {
+                throw new \Exception('File kosong atau tidak valid');
+            }
+            // Kembali ke posisi setelah BOM (atau awal file)
+            fseek($handle, $bom === "\xef\xbb\xbf" ? 3 : 0);
+
+            $delimiters = [';' => 0, ',' => 0, "\t" => 0, '|' => 0];
+            foreach ($delimiters as $delim => &$count) {
+                $count = substr_count($firstLine, $delim);
+            }
+            unset($count);
+            arsort($delimiters);
+            $delimiter = array_key_first($delimiters);
+
+            \Log::info('Import Nilai - Delimiter detected', ['delimiter' => json_encode($delimiter)]);
+
+            // ── 3. Baca header ────────────────────────────────────────────────
+            $headers = fgetcsv($handle, 0, $delimiter);
             if (!$headers) {
                 throw new \Exception('File kosong atau tidak valid');
             }
 
-            // Normalize headers
+            // Normalize headers: lowercase, trim, buang karakter non-printable
             $headers = array_map(
-                fn($h) => strtolower(trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', (string)$h))),
+                fn($h) => strtolower(trim(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', (string) $h))),
                 $headers
             );
 
-            // Find column indices
+            \Log::info('Import Nilai - Headers parsed', ['headers' => $headers]);
+
+            // ── 4. Cari indeks kolom ──────────────────────────────────────────
             $nisCol = collect($headers)->search(
                 fn($h) => str_contains($h, 'nis') && !str_contains($h, 'nisn')
             );
@@ -935,39 +958,54 @@ class GraduationController extends Controller
                 fn($h) => str_contains($h, 'nama')
             );
             $mapelIdCol = collect($headers)->search(
-                fn($h) => str_contains($h, 'id mapel') || str_contains($h, 'id_mapel')
+                fn($h) => str_contains($h, 'id mapel')
+                    || str_contains($h, 'id_mapel')
+                    || $h === 'id'
             );
             $nilaiCol = collect($headers)->search(
                 fn($h) => str_contains($h, 'nilai')
             );
 
-            if ($nisCol === false || $nilaiCol === false) {
-                throw new \Exception('Kolom NIS dan Nilai harus ada di file');
+            // Validasi kolom wajib
+            if ($nisCol === false) {
+                throw new \Exception(
+                    'Kolom NIS tidak ditemukan. Header yang terbaca: ' . implode(', ', $headers)
+                );
+            }
+            if ($nilaiCol === false) {
+                throw new \Exception(
+                    'Kolom Nilai tidak ditemukan. Header yang terbaca: ' . implode(', ', $headers)
+                );
+            }
+            if ($mapelIdCol === false) {
+                throw new \Exception(
+                    'Kolom Id Mapel tidak ditemukan. Header yang terbaca: ' . implode(', ', $headers)
+                );
             }
 
-            $rowNumber = 1; // Header adalah baris 1
+            $rowNumber = 1; // baris 1 = header
 
-            // Process data rows
-            while (($row = fgetcsv($handle, 1000, ';')) !== false) {
+            // ── 5. Proses data ────────────────────────────────────────────────
+            while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
                 $rowNumber++;
 
-                // Skip empty rows
-                if (empty(array_filter($row, fn($v) => trim((string)$v) !== ''))) {
+                // Skip baris kosong
+                if (empty(array_filter($row, fn($v) => trim((string) $v) !== ''))) {
                     continue;
                 }
 
-                $nis = trim((string)($row[$nisCol] ?? ''));
-                $nilai = trim((string)($row[$nilaiCol] ?? ''));
-                $mapelId = trim((string)($row[$mapelIdCol] ?? ''));
+                $nis     = trim((string) ($row[$nisCol]     ?? ''));
+                $nilai   = trim((string) ($row[$nilaiCol]   ?? ''));
+                $mapelId = trim((string) ($row[$mapelIdCol] ?? ''));
 
                 // Skip jika NIS kosong
-                if (empty($nis)) {
+                if ($nis === '') {
                     $skipCount++;
                     continue;
                 }
 
-                // Skip jika tidak ada mapelId atau nilai
-                if (empty($mapelId) || empty($nilai)) {
+                // Skip jika mapelId atau nilai kosong
+                if ($mapelId === '' || $nilai === '') {
                     $skipCount++;
                     continue;
                 }
@@ -982,12 +1020,12 @@ class GraduationController extends Controller
                         continue;
                     }
 
-                    // HAPUS blok cek $user, langsung pakai $student->id sebagai user_id
+                    // Ambil atau buat graduation record
                     if (!isset($graduationMap[$student->id])) {
                         $graduation = GoogleGraduation::firstOrCreate(
-                            ['user_id' => $student->id],  // kolom tetap user_id, isi pakai student->id
+                            ['user_id' => $student->id],
                             [
-                                'letter_number' => '',
+                                'letter_number'   => '',
                                 'graduation_date' => now(),
                             ]
                         );
@@ -996,7 +1034,7 @@ class GraduationController extends Controller
                         $graduation = $graduationMap[$student->id];
                     }
 
-                    // Cek apakah mapelId valid
+                    // Cek mapel valid
                     $mapel = GoogleMapel::where('uuid', $mapelId)->first();
                     if (!$mapel) {
                         $errors[] = "Baris $rowNumber: Mapel dengan ID '$mapelId' tidak ditemukan";
@@ -1004,28 +1042,22 @@ class GraduationController extends Controller
                         continue;
                     }
 
-                    // Validate nilai (harus numeric dan antara 0-100)
-                    $nilaiNumeric = (float)str_replace(',', '.', $nilai);
-                    if (!is_numeric($nilaiNumeric) || $nilaiNumeric < 0 || $nilaiNumeric > 100) {
-                        $errors[] = "Baris $rowNumber: Nilai '$nilai' tidak valid (harus numeric antara 0-100)";
+                    // Validasi nilai numerik 0–100
+                    $nilaiNumeric = (float) str_replace(',', '.', $nilai);
+                    if ($nilaiNumeric < 0 || $nilaiNumeric > 100) {
+                        $errors[] = "Baris $rowNumber: Nilai '$nilai' tidak valid (harus angka antara 0–100)";
                         $errorCount++;
                         continue;
                     }
 
                     // Simpan atau update GoogleGraduationMapel
-                    $existingMapel = GoogleGraduationMapel::where('graduation_id', $graduation->uuid)
-                        ->where('mapel_id', $mapel->uuid)
-                        ->first();
-
-                    if ($existingMapel) {
-                        $existingMapel->update(['score' => $nilaiNumeric]);
-                    } else {
-                        GoogleGraduationMapel::create([
+                    GoogleGraduationMapel::updateOrCreate(
+                        [
                             'graduation_id' => $graduation->uuid,
                             'mapel_id'      => $mapel->uuid,
-                            'score'         => $nilaiNumeric,
-                        ]);
-                    }
+                        ],
+                        ['score' => $nilaiNumeric]
+                    );
 
                     $successCount++;
                 } catch (\Exception $e) {
@@ -1040,17 +1072,13 @@ class GraduationController extends Controller
 
             \Log::info('Import Nilai - Done', [
                 'successCount' => $successCount,
-                'skipCount' => $skipCount,
-                'errorCount' => $errorCount,
+                'skipCount'    => $skipCount,
+                'errorCount'   => $errorCount,
             ]);
 
             $message = "Import berhasil! $successCount nilai berhasil disimpan.";
-            if ($skipCount > 0) {
-                $message .= " $skipCount baris dilewati (kosong/tidak lengkap).";
-            }
-            if ($errorCount > 0) {
-                $message .= " $errorCount baris gagal.";
-            }
+            if ($skipCount > 0) $message .= " $skipCount baris dilewati.";
+            if ($errorCount > 0) $message .= " $errorCount baris gagal.";
 
             return redirect()
                 ->route('admin.graduation.index')
@@ -1066,7 +1094,6 @@ class GraduationController extends Controller
                 ->withInput();
         }
     }
-
     /**
      * Apply template letter ke semua graduation records
      * POST /admin/graduation/apply-template

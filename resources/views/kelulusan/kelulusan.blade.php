@@ -7,7 +7,9 @@
     <title>Surat Kelulusan - {{ $user->name }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Times New Roman', Times, serif;
@@ -31,7 +33,7 @@
             padding: 15px 20px;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
         }
 
         .btn {
@@ -46,8 +48,14 @@
             display: inline-block;
         }
 
-        .btn-print { background-color: #10b981; color: white; }
-        .btn-print:hover { background-color: #059669; }
+        .btn-print {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background-color: #059669;
+        }
 
         /* ── PAGE (A4) ── */
         .page {
@@ -56,13 +64,12 @@
             min-height: 297mm;
             margin: 0 auto 20px auto;
             padding: 8mm 15mm 10mm 15mm;
-            box-shadow: 0 0 10px rgba(0,0,0,.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, .1);
         }
 
         /* ═══════════════════════════════════════════
            HALAMAN 1 — SURAT KETERANGAN LULUS
         ═══════════════════════════════════════════ */
-
         /* KOP SURAT */
         .header {
             text-align: center;
@@ -81,9 +88,23 @@
             height: 100px;
         }
 
-        .header .line1 { font-size: 15pt; font-weight: bold; margin: 0; }
-        .header .line2 { font-size: 15pt; font-weight: bold; margin: 0; }
-        .header .line3 { font-size: 13pt; font-weight: bold; margin: 0; }
+        .header .line1 {
+            font-size: 15pt;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .header .line2 {
+            font-size: 15pt;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .header .line3 {
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 0;
+        }
 
         .header .address {
             font-size: 8.5pt;
@@ -94,11 +115,21 @@
             margin-top: 4px;
         }
 
-        .header-border-top   { border-top: 3px solid #000; margin-top: 5px; }
-        .header-border-thin  { border-top: 1px solid #000; margin-top: 2px; }
+        .header-border-top {
+            border-top: 3px solid #000;
+            margin-top: 5px;
+        }
+
+        .header-border-thin {
+            border-top: 1px solid #000;
+            margin-top: 2px;
+        }
 
         /* JUDUL */
-        .doc-title { text-align: center; margin: 12px 0 4px 0; }
+        .doc-title {
+            text-align: center;
+            margin: 12px 0 4px 0;
+        }
 
         .doc-title h2 {
             font-size: 14pt;
@@ -108,7 +139,10 @@
             letter-spacing: 1px;
         }
 
-        .doc-title .nomor { font-size: 10pt; margin: 0 0 8px 0; }
+        .doc-title .nomor {
+            font-size: 10pt;
+            margin: 0 0 8px 0;
+        }
 
         /* TEKS PEMBUKA */
         .pembuka {
@@ -126,11 +160,23 @@
             font-size: 10pt;
         }
 
-        .info-table td { padding: 1px 2px; vertical-align: top; border: none; }
-        .info-table .label { width: 210px; }
-        .info-table .sep   { width: 14px; }
+        .info-table td {
+            padding: 1px 2px;
+            vertical-align: top;
+            border: none;
+        }
 
-        .dinyatakan-lulus { font-weight: bold; }
+        .info-table .label {
+            width: 210px;
+        }
+
+        .info-table .sep {
+            width: 14px;
+        }
+
+        .dinyatakan-lulus {
+            font-weight: bold;
+        }
 
         /* TABEL NILAI */
         .nilai-table {
@@ -147,11 +193,29 @@
             vertical-align: middle;
         }
 
-        .nilai-table thead th { text-align: center; font-weight: bold; }
-        .nilai-table .col-no    { width: 35px; text-align: center; }
-        .nilai-table .col-nilai { width: 70px; text-align: center; }
-        .nilai-table .section-header td { font-weight: bold; }
-        .nilai-table .rata-rata td { font-weight: bold; text-align: center; }
+        .nilai-table thead th {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .nilai-table .col-no {
+            width: 35px;
+            text-align: center;
+        }
+
+        .nilai-table .col-nilai {
+            width: 70px;
+            text-align: center;
+        }
+
+        .nilai-table .section-header td {
+            font-weight: bold;
+        }
+
+        .nilai-table .rata-rata td {
+            font-weight: bold;
+            text-align: center;
+        }
 
         /* TANDA TANGAN KELULUSAN */
         .ttd-section {
@@ -159,24 +223,34 @@
             justify-content: flex-end;
             margin-top: 10px;
             font-size: 10pt;
+            margin-left: 480px;
         }
 
-        .ttd-block { text-align: left; width: 260px; }
-        .ttd-space { height: 60px; }
-        .ttd-block .nama { font-weight: bold; text-decoration: underline; }
+        .ttd-block {
+            text-align: left;
+            width: 260px;
+        }
+
+        .ttd-space {
+            height: 60px;
+        }
+
+        .ttd-block .nama {
+            font-weight: bold;
+            text-decoration: underline;
+        }
 
         /* ═══════════════════════════════════════════
            HALAMAN 2 — SURAT PERNYATAAN/FAKTA INTEGRITAS
            PAGE BREAK sebelum halaman ini
         ═══════════════════════════════════════════ */
-
         .page-pernyataan {
             background: white;
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto;
             padding: 20mm 20mm 20mm 25mm;
-            box-shadow: 0 0 10px rgba(0,0,0,.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, .1);
         }
 
         h2.judul-pernyataan {
@@ -195,9 +269,18 @@
             font-size: 11pt;
         }
 
-        .pernyataan-info-table td { padding: 2px 3px; vertical-align: top; }
-        .pernyataan-info-table .label { width: 220px; }
-        .pernyataan-info-table .sep   { width: 12px; }
+        .pernyataan-info-table td {
+            padding: 2px 3px;
+            vertical-align: top;
+        }
+
+        .pernyataan-info-table .label {
+            width: 220px;
+        }
+
+        .pernyataan-info-table .sep {
+            width: 12px;
+        }
 
         .pernyataan-text {
             font-size: 11pt;
@@ -212,16 +295,19 @@
             line-height: 1.6;
         }
 
-        .pernyataan-ol li { margin-bottom: 4px; }
+        .pernyataan-ol li {
+            margin-bottom: 4px;
+        }
 
         .ttd-pernyataan {
             display: flex;
             justify-content: flex-end;
             margin-top: 30px;
+            padding-left: 400px;
         }
 
         .ttd-pernyataan-block {
-            text-align: center;
+            text-align: left;
             width: 280px;
             font-size: 11pt;
             line-height: 1.6;
@@ -232,7 +318,7 @@
             height: 80px;
             object-fit: contain;
             display: block;
-            margin: 8px auto;
+                
         }
 
         .ttd-pernyataan-block .nama-ttd {
@@ -242,7 +328,9 @@
 
         /* ── PRINT ── */
         @media print {
-            .action-buttons { display: none !important; }
+            .action-buttons {
+                display: none !important;
+            }
 
             body {
                 background: none;
@@ -268,7 +356,10 @@
             }
         }
 
-        @page { size: A4 portrait; margin: 0; }
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -412,7 +503,8 @@
                 <tr>
                     <td class="col-no" rowspan="2" style="vertical-align:middle; padding:0px;">7</td>
                     <td style="padding:2px;">Muatan Lokal</td>
-                    <td class="col-nilai" style="vertical-align:middle; padding:0px;" rowspan="2">{{ $graduation->nilai_mulok ?? '' }}</td>
+                    <td class="col-nilai" style="vertical-align:middle; padding:0px;" rowspan="2">
+                        {{ $graduation->nilai_mulok ?? '' }}</td>
                 </tr>
                 <tr>
                     <td style="padding:2px;">Bahasa Sunda</td>
@@ -488,7 +580,6 @@
 
     </div>{{-- end .page (halaman 1) --}}
 
-
     {{-- ══════════════════════════════════════
          HALAMAN 2: SURAT PERNYATAAN/FAKTA INTEGRITAS
          page-break-before: always (di CSS print)
@@ -542,12 +633,14 @@
             </tr>
         </table>
 
-        <p class="pernyataan-text">Menyatakan secara sadar dan sungguh-sungguh apabila saya dinyatakan lulus tidak akan melakukan:</p>
+        <p class="pernyataan-text">Menyatakan secara sadar dan sungguh-sungguh apabila saya dinyatakan lulus tidak akan
+            melakukan:</p>
 
         <ol class="pernyataan-ol">
             <li>Hal-hal yang tidak terpuji, seperti mencorat-coret baju atau sarana dan prasarana fasilitas umum.</li>
             <li>Konvoi kendaraan sehingga mengganggu pengguna jalan lainnya.</li>
-            <li>Kumpul-kumpul pada tempat tertentu dengan melakukan hal yang tidak terpuji yang akan merusak nama baik diri, keluarga dan lembaga.</li>
+            <li>Kumpul-kumpul pada tempat tertentu dengan melakukan hal yang tidak terpuji yang akan merusak nama baik
+                diri, keluarga dan lembaga.</li>
         </ol>
 
         <p class="pernyataan-text">Bila lulus saya bersedia:</p>
@@ -558,7 +651,8 @@
         </ol>
 
         <p class="pernyataan-text">
-            Bila saya melanggar ketentuan di atas dan terjadi hal negatif yang melibatkan saya dengan pihak berwajib maka saya tidak akan membawa nama sekolah dan sepenuhnya menjadi tanggung jawab saya.
+            Bila saya melanggar ketentuan di atas dan terjadi hal negatif yang melibatkan saya dengan pihak berwajib
+            maka saya tidak akan membawa nama sekolah dan sepenuhnya menjadi tanggung jawab saya.
         </p>
 
         <p class="pernyataan-text">Demikian pernyataan saya dibuat dengan sadar tanpa paksaan dari pihak mana pun.</p>
