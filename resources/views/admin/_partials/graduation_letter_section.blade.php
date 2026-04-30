@@ -613,19 +613,37 @@
             confirmApplyText.textContent = 'Sedang memproses...';
 
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+                if (!csrfToken) {
+                    throw new Error(
+                        'CSRF token tidak ditemukan. Pastikan tag meta csrf-token ada di layout.');
+                }
+
                 const response = await fetch('{{ route('admin.graduation.applyTemplateToAll') }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                            ?.content || '',
+                        'Accept': 'application/json', // <-- WAJIB agar Laravel return JSON bukan redirect
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
                     },
                     body: JSON.stringify({
                         letter_id: selectedId
                     }),
                 });
 
+                // Cek apakah response benar-benar JSON sebelum parse
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text.substring(0, 500));
+                    throw new Error(
+                        'Server mengembalikan response bukan JSON. Kemungkinan session expired atau error server. Coba refresh halaman.'
+                    );
+                }
+
                 const result = await response.json();
+
                 if (result.success) {
                     window.closeApplyTemplateModal();
                     document.getElementById('successMessage').textContent = result.message;
@@ -654,15 +672,13 @@
             }
         });
 
-        @if ($errors->any() && old('letter_number'))
-            document.addEventListener('DOMContentLoaded', function() {
+        @if ($errors->any() && old('letter_number')) document.addEventListener('DOMContentLoaded', function() {
                 openLetterModal();
                 document.getElementById('letter_number').value = '{{ old('letter_number') }}';
                 document.getElementById('graduation_date').value = '{{ old('graduation_date') }}';
                 document.getElementById('statement').value = `{{ old('statement') }}`;
                 document.getElementById('content').value = `{{ old('content') }}`;
                 updateContentPreview();
-            });
-        @endif
+            }); @endif
     })();
 </script>

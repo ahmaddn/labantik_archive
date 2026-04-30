@@ -146,6 +146,6 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
         ->name('graduation.letter.destroy');
 
     // Apply template to all graduations
-    Route::post('graduation/apply-template', [GraduationController::class, 'applyTemplateToAll'])
+    Route::post('graduation/apply-template-all', [GraduationController::class, 'applyTemplateToAll'])
         ->name('graduation.applyTemplateToAll');
 });

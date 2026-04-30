@@ -13,8 +13,8 @@
         ->map(function ($graduation) {
             $arr = $graduation->toArray();
             $arr['user_name'] = $graduation->user->full_name ?? 'User Terhapus';
-            $arr['letter_number'] = $graduation->letter_number ?? '-';
-            $arr['graduation_date'] = $graduation->graduation_date ?? null;
+            $arr['letter_number'] = $graduation->letter->letter_number ?? '-';
+            $arr['graduation_date'] = $graduation->letter->graduation_date ?? null;
             $arr['mapel_count'] = $graduation->mapels->count();
             return $arr;
         })

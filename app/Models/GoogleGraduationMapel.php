@@ -17,6 +17,8 @@ class GoogleGraduationMapel extends Model
         'graduation_id',
         'mapel_id',
         'score',
+        'order',
+        'join',
     ];
 
     protected static function boot()
