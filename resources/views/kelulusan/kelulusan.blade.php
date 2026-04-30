@@ -318,7 +318,7 @@
             height: 80px;
             object-fit: contain;
             display: block;
-                
+
         }
 
         .ttd-pernyataan-block .nama-ttd {
@@ -376,209 +376,220 @@
     ══════════════════════════════════════ --}}
     <div class="page">
 
-        <!-- KOP SURAT -->
-        <div class="header">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Coat_of_arms_of_West_Java.svg/500px-Coat_of_arms_of_West_Java.svg.png"
-                alt="Logo" />
-            <div class="line1">PEMERINTAH PROVINSI JAWA BARAT</div>
-            <div class="line2">CABANG DINAS PENDIDIKAN WILAYAH IX</div>
-            <div class="line3">SEKOLAH MENENGAH KEJURUAN NEGERI 1 TALAGA</div>
-            <div class="address">
-                Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan Manajemen<br />
-                Kampus 1 : Jalan Sekolah No.20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
-                Kampus 2 : Jalan Talaga - Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
-                Telepon (0233) 319238 &nbsp; Fax (0233) 319238 &nbsp; Kode Pos 45463 &nbsp; NPSN 20.21.38.72<br />
-                Website https://smkn1talaga.sch.id/ &nbsp; E-mail: mailsmkn1talaga@gmail.com
-            </div>
+    {{-- KOP SURAT --}}
+    <div class="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Coat_of_arms_of_West_Java.svg/500px-Coat_of_arms_of_West_Java.svg.png"
+            alt="Logo" />
+        <div class="line1">PEMERINTAH PROVINSI JAWA BARAT</div>
+        <div class="line2">CABANG DINAS PENDIDIKAN WILAYAH IX</div>
+        <div class="line3">SEKOLAH MENENGAH KEJURUAN NEGERI 1 TALAGA</div>
+        <div class="address">
+            Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan Manajemen<br />
+            Kampus 1 : Jalan Sekolah No.20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
+            Kampus 2 : Jalan Talaga - Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
+            Telepon (0233) 319238 &nbsp; Fax (0233) 319238 &nbsp; Kode Pos 45463 &nbsp; NPSN 20.21.38.72<br />
+            Website https://smkn1talaga.sch.id/ &nbsp; E-mail: mailsmkn1talaga@gmail.com
         </div>
-        <div class="header-border-top"></div>
-        <div class="header-border-thin"></div>
+    </div>
+    <div class="header-border-top"></div>
+    <div class="header-border-thin"></div>
 
-        <!-- JUDUL -->
-        <div class="doc-title">
-            <h2>SURAT KETERANGAN LULUS</h2>
-            <div class="nomor">Nomor : 260/TU.01.02/SMK-Tlg.CADISDIKWIL.IX/V/2025</div>
+    {{-- JUDUL --}}
+    <div class="doc-title">
+        <h2>SURAT KETERANGAN LULUS</h2>
+        <div class="nomor">Nomor : {{ $letter->letter_number ?? '—' }}</div>
+    </div>
+
+    {{-- TEKS PEMBUKA (dari google_graduation_letters) --}}
+    <div class="pembuka">
+    @if($letter)
+        <p>{{ $letter->statement }}</p>
+        @php
+            $contentLines = array_filter(array_map('trim', explode("\n", $letter->content)));
+        @endphp
+        @if(!empty($contentLines))
+            <ol style="margin: 6px 0 6px 20px; padding: 0;">
+                @foreach($contentLines as $line)
+                    <li style="margin-bottom: 3px;">{{ $line }}</li>
+                @endforeach
+            </ol>
+        @endif
+    @else
+        <p>—</p>
+    @endif
+</div>
+
+    <div style="margin-bottom:6px; font-size:10pt;">Menerangkan Bahwa</div>
+
+    {{-- INFO SISWA --}}
+    <table class="info-table">
+        <tr>
+            <td class="label" style="padding:0;">Nama</td>
+            <td class="sep" style="padding:0;">:</td>
+            <td style="padding:0;">{{ strtoupper($student->full_name ?? '—') }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="padding:0;">Tempat, Tanggal Lahir</td>
+            <td class="sep" style="padding:0;">:</td>
+            <td style="padding:0;">{{ strtoupper($student->birth_place_date ?? '—') }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="padding:0;">Nama Orang Tua/Wali</td>
+            <td class="sep" style="padding:0;">:</td>
+            <td style="padding:0;">{{ strtoupper($student->guardian_name ?? '—') }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="padding:0;">Nomor Induk Siswa</td>
+            <td class="sep" style="padding:0;">:</td>
+            <td style="padding:0;">{{ $student->student_number ?? '—' }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="padding:0;">Nomor Induk Siswa Nasional</td>
+            <td class="sep" style="padding:0;">:</td>
+            <td style="padding:0;">{{ $student->national_student_number ?? '—' }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="padding:0;">Program Keahlian</td>
+            <td class="sep" style="padding:0;">:</td>
+            <td style="padding:0;">{{ strtoupper($program1->program1_name ?? '—') }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="padding:0;">Konsentrasi Keahlian</td>
+            <td class="sep" style="padding:0;">:</td>
+            <td style="padding:0;">{{ strtoupper($program->program_name ?? '—') }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="padding:0;">Dinyatakan</td>
+            <td class="sep" style="padding:0;">:</td>
+            <td class="dinyatakan-lulus" style="padding:0;">LULUS</td>
+        </tr>
+    </table>
+
+    <div style="font-size:10pt; margin-bottom:6px;">dengan nilai sebagai berikut :</div>
+
+    {{-- ═══════════════════════════════════════════
+         TABEL NILAI — dinamis dari google_mapel
+         + google_graduation_mapel
+    ═══════════════════════════════════════════ --}}
+    <table class="nilai-table">
+        <thead>
+            <tr>
+                <th class="col-no">No</th>
+                <th>Mata Pelajaran (Kurikulum Merdeka)</th>
+                <th class="col-nilai">Nilai</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {{-- ── A. UMUM ─────────────────────────────── --}}
+            <tr class="section-header">
+                <td colspan="3" style="font-weight:bold;">
+                    A. Kelompok Mata Pelajaran Umum Muatan Nasional
+                </td>
+            </tr>
+
+            @php
+                $noUmum    = 1;
+                $skipUmum  = 0;   // sisa baris yang dilewati karena rowspan
+            @endphp
+
+            @foreach ($mapelUmum as $mapel)
+                @php
+                    $rowspan = intval($mapel->join ?? 1);
+                    $score   = $mapel->score !== null ? $mapel->score : '';
+                @endphp
+
+                @if ($skipUmum > 0)
+                    {{-- Baris lanjutan rowspan: tidak tampilkan No & Nilai --}}
+                    <tr>
+                        <td style="padding:2px;">{{ $mapel->name }}</td>
+                    </tr>
+                    @php $skipUmum--; @endphp
+                @else
+                    <tr>
+                        <td class="col-no"
+                            style="padding:0px; vertical-align:middle;"
+                            @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                            {{ $noUmum++ }}
+                        </td>
+                        <td style="padding:2px;">{{ $mapel->name }}</td>
+                        <td class="col-nilai"
+                            style="padding:0px; vertical-align:middle;"
+                            @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                            {{ $score }}
+                        </td>
+                    </tr>
+                    @php $skipUmum = $rowspan - 1; @endphp
+                @endif
+            @endforeach
+
+            {{-- ── B. KEJURUAN ─────────────────────────── --}}
+            <tr class="section-header">
+                <td colspan="3" style="font-weight:bold;">
+                    B. Kelompok Mata Pelajaran Kejuruan
+                </td>
+            </tr>
+
+            @php
+                $noJurusan   = 1;
+                $skipJurusan = 0;
+            @endphp
+
+            @foreach ($mapelJurusan as $mapel)
+                @php
+                    $rowspan = intval($mapel->join ?? 1);
+                    $score   = $mapel->score !== null ? $mapel->score : '';
+                @endphp
+
+                @if ($skipJurusan > 0)
+                    <tr>
+                        <td style="padding:2px;">{{ $mapel->name }}</td>
+                    </tr>
+                    @php $skipJurusan--; @endphp
+                @else
+                    <tr>
+                        <td class="col-no"
+                            style="padding:0px; vertical-align:middle;"
+                            @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                            {{ $noJurusan++ }}
+                        </td>
+                        <td style="padding:2px;">{{ $mapel->name }}</td>
+                        <td class="col-nilai"
+                            style="padding:0px; vertical-align:middle;"
+                            @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                            {{ $score }}
+                        </td>
+                    </tr>
+                    @php $skipJurusan = $rowspan - 1; @endphp
+                @endif
+            @endforeach
+
+            {{-- ── RATA-RATA ─────────────────────────────── --}}
+            <tr class="rata-rata">
+                <td colspan="2" style="text-align:center; font-weight:bold;">Rata-Rata</td>
+                <td class="col-nilai" style="padding:0px;">{{ $rataRata ?? '' }}</td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    {{-- TANDA TANGAN KEPALA SEKOLAH --}}
+    <div class="ttd-section">
+        <div class="ttd-block">
+            @if($letter)
+                Talaga, {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+            @else
+                Talaga, ___________________<br />
+            @endif
+            Kepala SMK Negeri 1 Talaga,
+            <div class="ttd-space"></div>
+            <div class="nama">Muchamad Eki S.A., S.Kom.</div>
+            <div>Pembina Tingkat I/IVb</div>
+            <div>NIP. 197610012006041011</div>
         </div>
+    </div>
 
-        <!-- TEKS PEMBUKA -->
-        <div class="pembuka">
-            Kepala SMK Negeri 1 Talaga Selaku Ketua Penyelenggara Ujian Sekolah Tahun Pelajaran 2025/2026
-            berdasarkan:<br />
-            1. Ketuntasan dari seluruh program pembelajaran pada kurikulum merdeka<br />
-            2. Kriteria kelulusan dari satuan pendidikan sesuai dengan peraturan perundang-undangan;<br />
-            3. Rapat Pleno Dewan Guru tentang Kelulusan pada tanggal 5 Mei 2025.
-        </div>
-
-        <div style="margin-bottom:6px; font-size:10pt;">Menerangkan Bahwa</div>
-
-        <!-- INFO SISWA -->
-        <table class="info-table">
-            <tr>
-                <td class="label" style="padding:0;">Nama</td>
-                <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper($student->full_name ?? '—') }}</td>
-            </tr>
-            <tr>
-                <td class="label" style="padding:0;">Tempat, Tanggal Lahir</td>
-                <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper($student->birth_place_date ?? '—') }}</td>
-            </tr>
-            <tr>
-                <td class="label" style="padding:0;">Nama Orang Tua/Wali</td>
-                <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper($student->guardian_name ?? '—') }}</td>
-            </tr>
-            <tr>
-                <td class="label" style="padding:0;">Nomor Induk Siswa</td>
-                <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ $student->student_number ?? '—' }}</td>
-            </tr>
-            <tr>
-                <td class="label" style="padding:0;">Nomor Induk Siswa Nasional</td>
-                <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ $student->national_student_number ?? '—' }}</td>
-            </tr>
-            <tr>
-                <td class="label" style="padding:0;">Program Keahlian</td>
-                <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper($program1->program1_name ?? '—') }}</td>
-            </tr>
-            <tr>
-                <td class="label" style="padding:0;">Konsentrasi Keahlian</td>
-                <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper($program->program_name ?? '—') }}</td>
-            </tr>
-            <tr>
-                <td class="label" style="padding:0;">Dinyatakan</td>
-                <td class="sep" style="padding:0;">:</td>
-                <td class="dinyatakan-lulus" style="padding:0;">LULUS</td>
-            </tr>
-        </table>
-
-        <div style="font-size:10pt; margin-bottom:6px;">dengan nilai sebagai berikut :</div>
-
-        <!-- TABEL NILAI -->
-        <table class="nilai-table">
-            <thead>
-                <tr>
-                    <th class="col-no" rowspan="2">No</th>
-                    <th rowspan="2" style="padding:0;">Mata Pelajaran<br />(Kurikulum Merdeka)</th>
-                    <th class="col-nilai" rowspan="2">Nilai</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="section-header">
-                    <td colspan="3" style="font-weight:bold;">A. Kelompok Mata Pelajaran Umum Muatan Nasional</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">1</td>
-                    <td style="padding:2px;">Pendidikan Agama Islam dan Budi Pekerti</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_agama ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">2</td>
-                    <td style="padding:2px;">Pendidikan Pancasila</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_pancasila ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">3</td>
-                    <td style="padding:2px;">Bahasa Indonesia</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_b_indonesia ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">4</td>
-                    <td style="padding:2px;">Pendidikan Jasmani, Olahraga dan Kesehatan</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_pjok ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">5</td>
-                    <td style="padding:2px;">Sejarah</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_sejarah ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">6</td>
-                    <td style="padding:2px;">Seni Budaya</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_seni ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" rowspan="2" style="vertical-align:middle; padding:0px;">7</td>
-                    <td style="padding:2px;">Muatan Lokal</td>
-                    <td class="col-nilai" style="vertical-align:middle; padding:0px;" rowspan="2">
-                        {{ $graduation->nilai_mulok ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td style="padding:2px;">Bahasa Sunda</td>
-                </tr>
-
-                <tr class="section-header">
-                    <td colspan="3" style="font-weight:bold;">B. Kelompok Mata Pelajaran Kejuruan</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">1</td>
-                    <td style="padding:2px;">Matematika</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_matematika ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">2</td>
-                    <td style="padding:2px;">Bahasa Inggris</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_b_inggris ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">3</td>
-                    <td style="padding:2px;">Informatika</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_informatika ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">4</td>
-                    <td style="padding:2px;">Projek Ilmu Pengetahuan Alam dan Sosial</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_ipas ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">5</td>
-                    <td style="padding:2px;">Dasar-dasar {{ $program1->program1_name ?? 'Program Keahlian' }}</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_dasar_program ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">6</td>
-                    <td style="padding:2px;">Konsentrasi Keahlian {{ $program->program_name ?? '' }}</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_konsentrasi ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">7</td>
-                    <td style="padding:2px;">Projek Kreatif dan Kewirausahaan</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_pkk ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">8</td>
-                    <td style="padding:2px;">Mata Pelajaran Pilihan (Bahasa Jepang)</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_pilihan ?? '' }}</td>
-                </tr>
-                <tr>
-                    <td class="col-no" style="padding:0px;">9</td>
-                    <td style="padding:2px;">Praktik Kerja Lapangan</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_pkl ?? '' }}</td>
-                </tr>
-
-                <tr class="rata-rata">
-                    <td colspan="2" style="text-align:center; font-weight:bold;">Rata-Rata</td>
-                    <td class="col-nilai" style="padding:0px;">{{ $graduation->nilai_rata_rata ?? '' }}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- TANDA TANGAN KEPALA SEKOLAH -->
-        <div class="ttd-section">
-            <div class="ttd-block">
-                Talaga, 5 Mei 2025<br />
-                Kepala SMK Negeri 1 Talaga,
-                <div class="ttd-space"></div>
-                <div class="nama">Muchamad Eki S.A., S.Kom.</div>
-                <div>Pembina Tingkat I/IVb</div>
-                <div>NIP. 197610012006041011</div>
-            </div>
-        </div>
-
-    </div>{{-- end .page (halaman 1) --}}
+</div>{{-- end .page (halaman 1) --}}
 
     {{-- ══════════════════════════════════════
          HALAMAN 2: SURAT PERNYATAAN/FAKTA INTEGRITAS
