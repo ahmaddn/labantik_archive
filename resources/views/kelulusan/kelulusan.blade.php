@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: 'Times New Roman', Times, serif;
+            font-family: sans-serif;
             font-size: 10pt;
             line-height: 1.3;
             margin: 0;
@@ -367,9 +367,9 @@
     <div class="action-buttons">
         <button onclick="window.history.back()" class="btn btn-back">
             <i class="fa-solid fa-arrow-left"></i> Kembali
-        <button onclick="window.print()" class="btn btn-print">
-            <i class="fa-solid fa-print"></i> Print
-        </button>
+            <button onclick="window.print()" class="btn btn-print">
+                <i class="fa-solid fa-print"></i> Print
+            </button>
     </div>
 
     {{-- ══════════════════════════════════════
