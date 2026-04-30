@@ -365,6 +365,8 @@
 <body>
 
     <div class="action-buttons">
+        <button onclick="window.history.back()" class="btn btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Kembali
         <button onclick="window.print()" class="btn btn-print">
             <i class="fa-solid fa-print"></i> Print
         </button>
