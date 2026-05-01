@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\StudentSignature;
 use App\Models\GoogleGraduation;
+use App\Models\GoogleStatement;
 use App\Models\User;
 use App\Models\GoogleGraduationMapel;
 use App\Models\RefClass;
@@ -35,6 +36,24 @@ class SignatureController extends Controller
         );
 
         return response()->json(['success' => true, 'message' => 'Tanda tangan berhasil disimpan.']);
+    }
+
+    /**
+     * Track setiap kali siswa menekan tombol Print.
+     * Increment print_count di google_statement untuk user yang sedang login.
+     */
+    public function trackPrint(Request $request)
+    {
+        $userId = Auth::id();
+
+        DB::table('google_statement')
+            ->where('user_id', $userId)
+            ->update([
+                'print_count' => DB::raw('print_count + 1'),
+                'last_print_at' => now(),
+            ]);
+
+        return response()->json(['success' => true]);
     }
 
     public function showTranskrip($id)
@@ -123,8 +142,6 @@ class SignatureController extends Controller
             if (!empty($scores)) {
                 $rataRata = number_format(array_sum($scores) / count($scores), 2);
             }
-        }
-
         return view('kelulusan.kelulusan', compact(
             'user',
             'student',
@@ -135,7 +152,8 @@ class SignatureController extends Controller
             'program1',
             'mapelUmum',
             'mapelJurusan',
-            'rataRata',
+            'rataRata'
         ));
     }
+}
 }

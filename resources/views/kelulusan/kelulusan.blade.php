@@ -366,9 +366,11 @@
     <div class="action-buttons">
         <button onclick="window.history.back()" class="btn btn-back">
             <i class="fa-solid fa-arrow-left"></i> Kembali
-            <button onclick="window.print()" class="btn btn-print">
-                <i class="fa-solid fa-print"></i> Print
-            </button>
+        </button>
+        <button id="btnPrint" onclick="trackPrint()" class="btn btn-print">
+            <i class="fa-solid fa-print"></i> 
+            <span id="printBtnText">Print</span>
+        </button>
     </div>
 
     {{-- ══════════════════════════════════════
@@ -677,5 +679,38 @@
     </div>{{-- end .page-pernyataan (halaman 2) --}}
 
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    async function trackPrint() {
+        const btnPrint = document.getElementById('btnPrint');
+        const printBtnText = document.getElementById('printBtnText');
+        
+        if (btnPrint.disabled) return;
+
+        // Disable sementara biar nggak double click saat request ke server
+        btnPrint.disabled = true;
+        printBtnText.innerText = 'Memproses...';
+
+        try {
+            await fetch('{{ route('drive.track-print') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+            });
+        } catch (error) {
+            // Abaikan error (tetap boleh print meski tracking gagal)
+        } finally {
+            // Kembalikan tombol ke keadaan semula
+            btnPrint.disabled = false;
+            printBtnText.innerText = 'Print';
+            
+            // Panggil dialog print browser
+            window.print();
+        }
+    }
+</script>
 
 </html>

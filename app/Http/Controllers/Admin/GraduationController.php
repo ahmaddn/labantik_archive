@@ -7,6 +7,7 @@ use App\Models\CoreExpertiseConcentration;
 use App\Models\GoogleGraduation;
 use App\Models\GoogleGraduationMapel;
 use App\Models\GoogleMapel;
+use App\Models\GoogleStatement;
 use App\Models\User;
 use App\Models\RefClass;
 use App\Models\RefStudent;
@@ -50,7 +51,9 @@ class GraduationController extends Controller
 
         $letters = GoogleGraduationLetter::orderBy('created_at', 'desc')->get();
 
-        // 3. Tambahkan 'letters' ke compact():
+        // 5. Statistik download dokumen kelulusan
+        $totalDownloaders = GoogleStatement::where('print_count', '>', 0)->count();
+
         return view('admin.graduation.index', compact(
             'mapels',
             'graduations',
@@ -59,9 +62,33 @@ class GraduationController extends Controller
             'totalUsers',
             'classes',
             'expertise',
-            'letters'   // <-- tambahkan ini
+            'letters',
+            'totalDownloaders'
         ));
     }
+
+    /**
+     * Display a paginated listing of students who downloaded the graduation document.
+     */
+    public function downloaders(Request $request)
+    {
+        $search = $request->input('search');
+
+        $downloadersQuery = GoogleStatement::with('user')
+            ->where('print_count', '>', 0)
+            ->orderByDesc('print_count');
+
+        if (!empty($search)) {
+            $downloadersQuery->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $downloaders = $downloadersQuery->paginate(15)->withQueryString();
+
+        return view('admin.graduation.downloaders', compact('downloaders', 'search'));
+    }
+
     public function create()
     {
         // HANYA TAMPILKAN KELAS 12

@@ -38,6 +38,7 @@ Route::middleware('auth')->prefix('drive')->name('drive.')->group(function () {
     Route::delete('/{id}', [DriveFileController::class, 'destroy'])->name('destroy');
 
     Route::post('/signature/store',     [SignatureController::class, 'store'])->name('signature.store');
+    Route::post('/track-print',         [SignatureController::class, 'trackPrint'])->name('track-print');
     Route::get('/pernyataan/{id}',      [SignatureController::class, 'showPernyataan'])->name('pernyataan.show');
     Route::get('/transkrip/{id}',       [SignatureController::class, 'showTranskrip'])->name('transkrip.show');
 });
@@ -95,6 +96,9 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
 
     // Index
     Route::get('/graduation', [GraduationController::class, 'index'])->name('graduation.index');
+
+    // Downloaders List
+    Route::get('/graduation/downloaders', [GraduationController::class, 'downloaders'])->name('graduation.downloaders');
 
     // Template
     Route::get('/graduation/download-template', [GraduationController::class, 'downloadTemplate'])->name('graduation.downloadTemplate');
