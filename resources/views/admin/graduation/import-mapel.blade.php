@@ -184,14 +184,40 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <div>
+                            <div class="min-w-0 flex-1">
                                 <h3 class="font-semibold text-green-900 mb-2">Contoh Data CSV</h3>
                                 <div class="bg-white rounded text-xs p-2 font-mono text-gray-700 overflow-x-auto">
-                                    <pre>name,type,expertise_name
-Matematika,jurusan,Rekayasa Perangkat Lunak
-Bahasa Indonesia,umum,
-Bahasa Inggris,umum,
-Dasar Akuntansi,jurusan,Akuntansi</pre>
+                                    <table class="min-w-max border-collapse">
+                                        <thead>
+                                            <tr class="text-gray-500 border-b border-gray-100">
+                                                <th class="pr-3 py-1 text-left font-medium">name</th>
+                                                <th class="pr-3 py-1 text-left font-medium">type</th>
+                                                <th class="py-1 text-left font-medium">expertise_name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-600">
+                                            <tr class="border-b border-gray-50">
+                                                <td class="pr-3 py-1">Matematika</td>
+                                                <td class="pr-3 py-1">jurusan</td>
+                                                <td class="py-1">Rekayasa Perangkat Lunak (RPL)</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-50">
+                                                <td class="pr-3 py-1">Bahasa Indonesia</td>
+                                                <td class="pr-3 py-1">umum</td>
+                                                <td class="py-1 text-gray-400 italic">(kosong)</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-50">
+                                                <td class="pr-3 py-1">Bahasa Inggris</td>
+                                                <td class="pr-3 py-1">umum</td>
+                                                <td class="py-1 text-gray-400 italic">(kosong)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="pr-3 py-1">Dasar Akuntansi</td>
+                                                <td class="pr-3 py-1">jurusan</td>
+                                                <td class="py-1">Akuntansi (AK)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -331,14 +357,35 @@ Dasar Akuntansi,jurusan,Akuntansi</pre>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <div>
+                            <div class="min-w-0 flex-1">
                                 <h3 class="font-semibold text-green-900 mb-2">Contoh Data CSV</h3>
                                 <div class="bg-white rounded text-xs p-2 font-mono text-gray-700 overflow-x-auto">
-                                    <pre>name,type
-Matematika,jurusan
-Bahasa Indonesia,umum
-Bahasa Inggris,umum
-Dasar Akuntansi,jurusan</pre>
+                                    <table class="min-w-max border-collapse">
+                                        <thead>
+                                            <tr class="text-gray-500 border-b border-gray-100">
+                                                <th class="pr-3 py-1 text-left font-medium">name</th>
+                                                <th class="py-1 text-left font-medium">type</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-600">
+                                            <tr class="border-b border-gray-50">
+                                                <td class="pr-3 py-1">Matematika</td>
+                                                <td class="py-1">jurusan</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-50">
+                                                <td class="pr-3 py-1">Bahasa Indonesia</td>
+                                                <td class="py-1">umum</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-50">
+                                                <td class="pr-3 py-1">Bahasa Inggris</td>
+                                                <td class="py-1">umum</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="pr-3 py-1">Dasar Akuntansi</td>
+                                                <td class="py-1">jurusan</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

@@ -11,23 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('google_graduation', function (Blueprint $table) {
-            $table->uuid('letter_id')->nullable()->after('uuid');
-            $table->dropColumn('letter_number');
-            $table->dropColumn('graduation_date');
+
+        // Hapus order & join dari graduation_mapel (jika sudah ada)
+        Schema::table('google_graduation_mapel', function (Blueprint $table) {
+            $table->dropColumn('order');
+            $table->dropColumn('join');
         });
+
+        // Tambah order & join ke google_mapel
+        Schema::table('google_mapel', function (Blueprint $table) {
+            $table->integer('order')->default(999)->after('type');
+            $table->integer('join')->default(0)->after('order');
+        });
+    }
+
+    public function down(): void
+    {
 
         Schema::table('google_graduation_mapel', function (Blueprint $table) {
             $table->integer('order')->default(1)->after('score');
             $table->integer('join')->default(1)->after('order');
         });
-    }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        //
+        Schema::table('google_mapel', function (Blueprint $table) {
+            $table->dropColumn('order');
+            $table->dropColumn('join');
+        });
     }
 };

@@ -28,4 +28,9 @@ class GoogleStatement extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function signature()
+    {
+        return $this->belongsTo(\App\Models\StudentSignature::class, 'signature_id', 'id');
+    }
 }

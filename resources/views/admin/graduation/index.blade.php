@@ -27,8 +27,12 @@
 
             {{-- Action Buttons --}}
             <div class="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-end gap-2">
+
+                {{-- ── Mapel Group (Biru) ── --}}
                 <a href="{{ route('admin.graduation.showImportMapel') }}"
-                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-green-50 hover:bg-green-100 text-green-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-green-200 w-full sm:w-auto">
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
+               bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200
+               font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm w-full sm:w-auto">
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -36,17 +40,21 @@
                     <span>Import Mapel</span>
                 </a>
 
-
                 <a href="{{ route('admin.graduation.createMapel') }}"
-                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-[#1b84ff] hover:bg-[#1570e0] text-white font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-blue-200 w-full sm:w-auto">
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
+               bg-blue-600 hover:bg-blue-700 text-white
+               font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-blue-200 w-full sm:w-auto">
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     <span>Tambah Mapel</span>
                 </a>
 
+                {{-- ── Utility (Abu Netral) ── --}}
                 <button onclick="openDownloadModal()"
-                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-gray-200 w-full sm:w-auto">
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
+               bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200
+               font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm w-full sm:w-auto">
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -54,9 +62,11 @@
                     <span>Download Template</span>
                 </button>
 
-
+                {{-- ── Nilai Group (Violet) ── --}}
                 <a href="{{ route('admin.graduation.showImportNilai') }}"
-                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-cyan-200 w-full sm:w-auto">
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
+               bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-200
+               font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm w-full sm:w-auto">
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" />
@@ -65,13 +75,16 @@
                 </a>
 
                 <a href="{{ route('admin.graduation.create') }}"
-                    class="col-span-2 sm:col-auto inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-purple-200 w-full sm:w-auto">
+                    class="col-span-2 sm:col-auto inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
+               bg-violet-600 hover:bg-violet-700 text-white
+               font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-violet-200 w-full sm:w-auto">
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>Tambah Nilai</span>
                 </a>
+
             </div>
         </div>
     </div>
@@ -142,6 +155,7 @@
             @include('admin._partials.mapel_list_table', [
                 'routeEdit' => 'admin.graduation.editMapel',
                 'routeDelete' => 'admin.graduation.destroyMapel',
+                'routeDeleteBulk' => 'admin.graduation.destroyMapelBulk', // ← tambah ini
             ])
         </div>
     </div>
@@ -155,42 +169,62 @@
         {{-- Apply template section --}}
         <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
             <div class="flex items-start gap-3 mb-4">
-                <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <svg class="w-5 h-5 mt-0.5 flex-shrink-0 {{ $allHaveLetter ? 'text-green-600' : 'text-blue-600' }}"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if ($allHaveLetter)
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    @else
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    @endif
                 </svg>
                 <div>
                     <p class="text-sm font-semibold text-gray-800">Terapkan Template ke Semua Kelulusan</p>
-                    <p class="text-xs text-gray-600 mt-0.5">Pilih template surat, lalu klik tombol untuk mengisi letter_id
-                        semua data kelulusan siswa.</p>
+                    <p class="text-xs text-gray-600 mt-0.5">
+                        @if ($allHaveLetter)
+                            Semua data kelulusan sudah memiliki surat yang ditetapkan.
+                        @else
+                            Pilih template surat, lalu klik tombol untuk mengisi letter_id semua data kelulusan siswa.
+                        @endif
+                    </p>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-                <select id="templateSelectDropdown"
-                    class="flex-1 px-4 py-2.5 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-blue-300 transition-colors">
-                    <option value="">-- Pilih Template Surat --</option>
-                    @foreach ($letters as $letter)
-                        <option value="{{ $letter->uuid }}">
-                            {{ $letter->letter_number }}
-                            ({{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('d M Y') }})
-                        </option>
-                    @endforeach
-                </select>
-
-                <button onclick="openApplyTemplateModal()" id="applyTemplateBtn"
-                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg opacity-50 cursor-not-allowed"
-                    disabled>
+            @if ($allHaveLetter)
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-50 border border-green-200 text-green-700 text-xs sm:text-sm font-semibold rounded-lg w-full sm:w-auto justify-center sm:justify-start">
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="whitespace-nowrap">Gunakan ke Semua</span>
-                </button>
-            </div>
-        </div>
+                    Semua data sudah memiliki surat
+                </div>
+            @else
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                    <select id="templateSelectDropdown"
+                        class="flex-1 px-4 py-2.5 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-blue-300 transition-colors">
+                        <option value="">-- Pilih Template Surat --</option>
+                        @foreach ($letters as $letter)
+                            <option value="{{ $letter->uuid }}">
+                                {{ $letter->letter_number }}
+                                ({{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('d M Y') }})
+                            </option>
+                        @endforeach
+                    </select>
 
+                    <button onclick="openApplyTemplateModal()" id="applyTemplateBtn"
+                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg opacity-50 cursor-not-allowed"
+                        disabled>
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="whitespace-nowrap">Gunakan ke Semua</span>
+                    </button>
+                </div>
+            @endif
+        </div>
         <div class="p-4 sm:p-6">
             @include('admin._partials.graduation_list_table', [
                 'routeIndex' => 'admin.graduation.index',
@@ -243,17 +277,6 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Jurusan (Opsional)</label>
-                            <select id="expertiseFilter"
-                                class="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Semua Jurusan</option>
-                                @foreach ($expertise as $exp)
-                                    <option value="{{ $exp->id }}">{{ $exp->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
                         <div class="text-sm text-gray-500 bg-blue-50 p-3 rounded-xl">
                             <p class="text-xs">💡 Template akan berisi semua siswa yang sesuai dengan filter kelas dan
                                 jurusan yang dipilih.</p>
@@ -293,11 +316,9 @@
 
         function downloadTemplate() {
             const classId = document.getElementById('classFilter').value;
-            const expertiseId = document.getElementById('expertiseFilter').value;
             let url = '{{ route('admin.graduation.downloadTemplate') }}';
             const params = new URLSearchParams();
             if (classId) params.append('class_id', classId);
-            if (expertiseId) params.append('expertise_id', expertiseId);
             if (params.toString()) url += '?' + params.toString();
             window.location.href = url;
             closeDownloadModal();
@@ -307,13 +328,15 @@
         const templateSelectDropdown = document.getElementById('templateSelectDropdown');
         const applyTemplateBtn = document.getElementById('applyTemplateBtn');
 
-        templateSelectDropdown.addEventListener('change', function() {
-            const has = this.value !== '';
-            applyTemplateBtn.disabled = !has;
-            applyTemplateBtn.classList.toggle('opacity-50', !has);
-            applyTemplateBtn.classList.toggle('cursor-not-allowed', !has);
-            applyTemplateBtn.classList.toggle('hover:scale-[1.02]', has);
-        });
+        if (templateSelectDropdown && applyTemplateBtn) {
+            templateSelectDropdown.addEventListener('change', function() {
+                const has = this.value !== '';
+                applyTemplateBtn.disabled = !has;
+                applyTemplateBtn.classList.toggle('opacity-50', !has);
+                applyTemplateBtn.classList.toggle('cursor-not-allowed', !has);
+                applyTemplateBtn.classList.toggle('hover:scale-[1.02]', has);
+            });
+        }
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {

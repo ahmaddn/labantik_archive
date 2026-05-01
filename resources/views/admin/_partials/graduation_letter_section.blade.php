@@ -219,16 +219,32 @@
                             Isi / Konten Surat <span class="text-red-500">*</span>
                         </label>
                         <p class="text-xs text-gray-400 mb-2">
-                            Tulis setiap poin pada baris baru. Sistem akan menomorinya otomatis (1, 2, 3, ...).
+                            Tekan <kbd class="bg-gray-100 border border-gray-300 rounded px-1 text-xs">Enter</kbd>
+                            sekali untuk lanjut baris (masih satu poin),
+                            tekan <kbd class="bg-gray-100 border border-gray-300 rounded px-1 text-xs">Enter</kbd> dua
+                            kali untuk poin baru.
                         </p>
-                        <textarea id="content" name="content" rows="6"
-                            placeholder="Ketuntasan dari seluruh program pembelajaran pada kurikulum merdeka&#10;Kriteria kelulusan dari satuan pendidikan sesuai dengan peraturan perundang-undangan;&#10;Rapat Pleno Dewan Guru tentang Kelulusan pada tanggal 5 Mei 2025."
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400 resize-none font-mono"
-                            required></textarea>
+
+                        {{-- Editor visual --}}
+                        <div id="contentEditor" contenteditable="true"
+                            class="w-full min-h-[140px] px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                            style="font-family: inherit; line-height: 1.6;"></div>
+
+                        {{-- Hidden textarea untuk submit form --}}
+                        <textarea id="content" name="content" class="hidden" required></textarea>
+
                         <p class="text-xs text-gray-400 mt-1.5">
-                            <span class="font-medium text-gray-500">Tips:</span> Satu baris = satu poin. Tekan Enter
-                            untuk poin baru.
+                            <span class="font-medium text-gray-500">Tips:</span> Satu poin bisa terdiri dari beberapa
+                            baris. Enter 2x untuk poin berikutnya.
                         </p>
+                    </div>
+
+                    {{-- Preview poin --}}
+                    <div id="contentPreviewContainer" class="hidden">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Preview
+                            Poin</label>
+                        <div id="contentPreview"
+                            class="bg-gray-50 rounded-xl px-4 py-3 text-sm text-gray-700 space-y-1.5"></div>
                     </div>
 
                     {{-- Preview poin --}}
@@ -362,7 +378,6 @@
     // Modal: Tambah / Edit
     // --------------------------------------------------------
     function openLetterModal() {
-        // Reset to "create" mode
         document.getElementById('letterModalTitle').textContent = 'Tambah Template Surat';
         document.getElementById('letterSubmitText').textContent = 'Simpan Template';
         document.getElementById('letterFormMethod').value = 'POST';
@@ -371,9 +386,10 @@
         document.getElementById('letter_number').value = '';
         document.getElementById('graduation_date').value = '';
         document.getElementById('statement').value = '';
+        // Reset editor
+        document.getElementById('contentEditor').innerHTML = '<div><br></div>';
         document.getElementById('content').value = '';
-        updateContentPreview();
-
+        updateContentPreview('');
         document.getElementById('letterModal').classList.remove('hidden');
     }
 
@@ -390,40 +406,114 @@
         document.getElementById('letter_number').value = letterNumber;
         document.getElementById('graduation_date').value = graduationDate;
         document.getElementById('statement').value = statement;
+        // Load ke editor
+        textToEditor(content);
         document.getElementById('content').value = content;
-        updateContentPreview();
-
+        updateContentPreview(content);
         document.getElementById('letterModal').classList.remove('hidden');
     }
 
     // --------------------------------------------------------
-    // Preview content poin secara live
+    // CONTENT EDITOR — Enter 1x = baris baru (lanjutan poin)
+    //                  Enter 2x = poin baru
     // --------------------------------------------------------
-    function updateContentPreview() {
-        const contentText = document.getElementById('content').value.trim();
+    const editor = document.getElementById('contentEditor');
+    const hiddenTextarea = document.getElementById('content');
+
+    // Teks → editor (saat load edit)
+    function textToEditor(text) {
+        editor.innerHTML = '';
+        if (!text) {
+            editor.innerHTML = '<div><br></div>';
+            return;
+        }
+        text.split('\n').forEach(line => {
+            const div = document.createElement('div');
+            if (line === '') {
+                div.innerHTML = '<br>';
+            } else {
+                div.textContent = line;
+            }
+            editor.appendChild(div);
+        });
+    }
+
+    // Editor → teks (untuk disimpan & preview)
+    function editorToText() {
+        const lines = [];
+        editor.childNodes.forEach(node => {
+            if (node.nodeName === 'DIV' || node.nodeName === 'P') {
+                const text = node.innerText ?? node.textContent ?? '';
+                // innerText pada div kosong (hanya <br>) = '\n' atau '', normalize ke ''
+                lines.push(text === '\n' ? '' : text);
+            } else if (node.nodeName === 'BR') {
+                lines.push('');
+            } else if (node.nodeType === Node.TEXT_NODE) {
+                lines.push(node.textContent);
+            }
+        });
+        return lines.join('\n');
+    }
+
+    function syncAndPreview() {
+        const text = editorToText();
+        hiddenTextarea.value = text;
+        updateContentPreview(text);
+    }
+
+    // Preview: baris kosong = pemisah antar poin
+    function updateContentPreview(rawText) {
+        const text = rawText !== undefined ? rawText : editorToText();
         const container = document.getElementById('contentPreviewContainer');
         const preview = document.getElementById('contentPreview');
 
-        if (!contentText) {
+        if (!text.trim()) {
             container.classList.add('hidden');
             return;
         }
 
-        const lines = contentText.split('\n').map(l => l.trim()).filter(l => l !== '');
-        if (lines.length === 0) {
+        // Split berdasarkan 1+ baris kosong → tiap grup = 1 poin
+        const groups = text.split(/\n{2,}/).map(g => g.trim()).filter(g => g !== '');
+        if (groups.length === 0) {
             container.classList.add('hidden');
             return;
         }
 
         container.classList.remove('hidden');
-        preview.innerHTML = lines
-            .map((line, i) =>
-                `<p class="flex gap-2"><span class="font-medium text-gray-500 flex-shrink-0">${i + 1}.</span><span>${line}</span></p>`
-            )
-            .join('');
+        preview.innerHTML = groups.map((group, i) => {
+            const htmlLines = group.split('\n').map(l => `<span>${l}</span>`).join('<br>');
+            return `<p class="flex gap-2">
+                <span class="font-medium text-gray-500 flex-shrink-0 w-5 text-right">${i + 1}.</span>
+                <span class="leading-relaxed">${htmlLines}</span>
+            </p>`;
+        }).join('');
     }
 
-    document.getElementById('content').addEventListener('input', updateContentPreview);
+    // Set default paragraph separator to div
+    document.execCommand('defaultParagraphSeparator', false, 'div');
+
+    // Handle Enter natively, just sync
+    editor.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            // Let the browser handle the Enter key natively (it splits the text and creates a new div)
+            setTimeout(syncAndPreview, 10);
+        }
+    });
+
+    // Also sync on input for regular typing
+    editor.addEventListener('input', function() {
+        syncAndPreview();
+    });
+
+    function getCurrentBlock() {
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return null;
+        let node = sel.getRangeAt(0).startContainer;
+        while (node && node.parentNode !== editor) node = node.parentNode;
+        return node;
+    }
+
+    editor.addEventListener('input', syncAndPreview);
 
     // --------------------------------------------------------
     // Modal: Preview Surat
@@ -432,19 +522,23 @@
         document.getElementById('previewLetterNumber').textContent = 'Nomor : ' + letterNumber;
         document.getElementById('previewStatement').textContent = statement;
 
-        // Tanggal format lokal
         const dateObj = new Date(graduationDate);
-        const options = {
+        document.getElementById('previewDate').textContent = dateObj.toLocaleDateString('id-ID', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
-        };
-        document.getElementById('previewDate').textContent = dateObj.toLocaleDateString('id-ID', options);
+        });
 
-        // Poin konten
-        const lines = content.split('\n').map(l => l.trim()).filter(l => l !== '');
+        // Poin: pisah berdasarkan baris kosong
+        const groups = content.split(/\n{2,}/).map(g => g.trim()).filter(g => g !== '');
         const olEl = document.getElementById('previewContent');
-        olEl.innerHTML = lines.map(line => `<li>${line}</li>`).join('');
+        if (groups.length > 0) {
+            olEl.innerHTML = groups.map(g => `<li>${g.split('\n').join('<br>')}</li>`).join('');
+        } else {
+            // fallback: tiap baris = 1 poin
+            const lines = content.split('\n').map(l => l.trim()).filter(l => l !== '');
+            olEl.innerHTML = lines.map(line => `<li>${line}</li>`).join('');
+        }
 
         document.getElementById('letterPreviewModal').classList.remove('hidden');
     }
@@ -467,7 +561,7 @@
     }
 
     // --------------------------------------------------------
-    // Escape key closes all modals
+    // Escape key
     // --------------------------------------------------------
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {

@@ -11,6 +11,9 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\GraduationController;
 use App\Http\Controllers\Admin\GraduationLetterController;
 use App\Http\Controllers\SignatureController;
+use App\Http\Controllers\Admin\GraduationMapelController;
+use App\Http\Controllers\Admin\GraduationImportController;
+use App\Http\Controllers\Admin\GraduationSuratController;
 
 // ── Root redirect ─────────────────────────────────
 Route::get('/', function () {
@@ -90,66 +93,62 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::get('/piket',         [AdminUserController::class, 'piket'])->name('piket.index');
     Route::get('/piket/{id}',    [AdminUserController::class, 'piketShow'])->name('piket.show');
 
-    // ─── Kelulusan ────────────────────────────────────────────────────
+    // =========================================================================
+    // ─── Kelulusan ────────────────────────────────────────────────────────────
     // PENTING: route static harus didaftarkan SEBELUM route dynamic {id}
-    // agar tidak tertangkap sebagai parameter
+    // =========================================================================
 
     // Index
-    Route::get('/graduation', [GraduationController::class, 'index'])->name('graduation.index');
+    Route::get('/graduation',       [GraduationController::class, 'index'])->name('graduation.index');
 
     // Downloaders List
     Route::get('/graduation/downloaders', [GraduationController::class, 'downloaders'])->name('graduation.downloaders');
 
     // Template
     Route::get('/graduation/download-template', [GraduationController::class, 'downloadTemplate'])->name('graduation.downloadTemplate');
+    // API helpers
+    Route::get('/graduation/api/students-by-class', [GraduationController::class, 'getStudentsByClass'])->name('graduation.studentsByClass');
+    Route::get('/graduation/api/mapels-by-class',   [GraduationController::class, 'getMapelsByClass'])->name('graduation.mapelsByClass');
 
-    // Mapel — static routes
-    Route::get('/graduation/mapel/create',      [GraduationController::class, 'createMapel'])->name('graduation.createMapel');
-    // routes/web.php
-    Route::get('/admin/graduation/api/students-by-class',  [GraduationController::class, 'getStudentsByClass'])->name('graduation.studentsByClass');
-    Route::get('/admin/graduation/api/mapels-by-class',    [GraduationController::class, 'getMapelsByClass'])->name('graduation.mapelsByClass');
-    Route::post('/graduation/mapel/store',      [GraduationController::class, 'storeMapel'])->name('graduation.storeMapel');
-    Route::get('/graduation/mapel/{id}/edit',   [GraduationController::class, 'editMapel'])->name('graduation.editMapel');
-    Route::put('/graduation/mapel/{id}',        [GraduationController::class, 'updateMapel'])->name('graduation.updateMapel');
-    Route::delete('/graduation/mapel/{id}',     [GraduationController::class, 'destroyMapel'])->name('graduation.destroyMapel');
+    // Apply template ke semua
+    Route::post('/graduation/apply-template-all',   [GraduationController::class, 'applyTemplateToAll'])->name('graduation.applyTemplateToAll');
 
-    // Import Mapel
-    Route::get('/graduation/mapel/import',      [GraduationController::class, 'showImportMapel'])->name('graduation.showImportMapel');
-    Route::post('/graduation/mapel/import',     [GraduationController::class, 'importMapel'])->name('graduation.importMapel');
-    Route::post('graduation/import-mapel-auto', [GraduationController::class, 'importMapelAuto'])
-        ->name('graduation.importMapelAuto');
+    // ── Mapel ─────────────────────────────────────────────────────────────────
+    Route::get('/graduation/mapel/create',       [GraduationMapelController::class, 'create'])->name('graduation.createMapel');
+    Route::post('/graduation/mapel/store',       [GraduationMapelController::class, 'store'])->name('graduation.storeMapel');
+    Route::get('/graduation/mapel/{id}/edit',    [GraduationMapelController::class, 'edit'])->name('graduation.editMapel');
+    Route::put('/graduation/mapel/{id}',         [GraduationMapelController::class, 'update'])->name('graduation.updateMapel');
+    Route::delete('/graduation/mapel/{id}',      [GraduationMapelController::class, 'destroy'])->name('graduation.destroyMapel');
+    Route::post('/graduation/mapel/update-order', [GraduationMapelController::class, 'updateOrder'])->name('graduation.updateMapelOrder');
+    Route::post('graduation/mapel/bulk-delete', [GraduationMapelController::class, 'destroyBulk'])->name('graduation.destroyMapelBulk');
 
-    // Import Nilai
-    Route::get('/graduation/import-nilai',      [GraduationController::class, 'showImportNilai'])->name('graduation.showImportNilai');
-    Route::post('/graduation/import-nilai',     [GraduationController::class, 'importNilai'])->name('graduation.importNilai');
+    // ── Import Mapel ──────────────────────────────────────────────────────────
+    Route::get('/graduation/mapel/import',       [GraduationImportController::class, 'showImportMapel'])->name('graduation.showImportMapel');
+    Route::post('/graduation/mapel/import',      [GraduationImportController::class, 'importMapel'])->name('graduation.importMapel');
+    Route::post('/graduation/import-mapel-auto', [GraduationImportController::class, 'importMapelAuto'])->name('graduation.importMapelAuto');
 
-    // Import / Export kelulusan
-    Route::post('/graduation/import',           [GraduationController::class, 'import'])->name('graduation.import');
-    Route::post('/graduation/export',           [GraduationController::class, 'export'])->name('graduation.export');
-    Route::post('/graduation/export-pdf',       [GraduationController::class, 'exportPDF'])->name('graduation.exportPDF');
-    Route::post('/graduation/export-all',       [GraduationController::class, 'exportAll'])->name('graduation.exportAll');
+    // ── Import Nilai ──────────────────────────────────────────────────────────
+    Route::get('/graduation/import-nilai',       [GraduationImportController::class, 'showImportNilai'])->name('graduation.showImportNilai');
+    Route::post('/graduation/import-nilai',      [GraduationImportController::class, 'importNilai'])->name('graduation.importNilai');
 
-    // Graduation CRUD — dynamic {id} HARUS paling bawah
-    Route::get('/graduation/create',            [GraduationController::class, 'create'])->name('graduation.create');
-    Route::post('/graduation/store',            [GraduationController::class, 'store'])->name('graduation.store');
-    Route::get('/graduation/{id}',              [GraduationController::class, 'show'])->name('graduation.show');
-    Route::delete('/graduation/{id}',           [GraduationController::class, 'destroy'])->name('graduation.destroy');
+    // ── Download Template ─────────────────────────────────────────────────────
+    Route::get('/graduation/download-template',  [GraduationImportController::class, 'downloadTemplate'])->name('graduation.downloadTemplate');
 
+    // ── Surat (static, harus sebelum {id}) ───────────────────────────────────
+    Route::get('/graduation/{id}/surat-kelulusan',  [GraduationSuratController::class, 'showSuratKelulusan'])->name('graduation.showSuratKelulusan');
+    Route::get('/graduation/{id}/surat-pernyataan', [GraduationSuratController::class, 'showSuratPernyataan'])->name('graduation.showSuratPernyataan');
 
-    // Graduation Letter (Template Surat Keterangan Lulus)
-    Route::post('graduation/letter', [GraduationLetterController::class, 'store'])
-        ->name('graduation.letter.store');
+    // ── Graduation Letter (Template Surat) ────────────────────────────────────
+    Route::post('/graduation/letter',            [GraduationLetterController::class, 'store'])->name('graduation.letter.store');
+    Route::get('/graduation/letter/{id}',        [GraduationLetterController::class, 'show'])->name('graduation.letter.show');
+    Route::put('/graduation/letter/{id}',        [GraduationLetterController::class, 'update'])->name('graduation.letter.update');
+    Route::delete('/graduation/letter/{id}',     [GraduationLetterController::class, 'destroy'])->name('graduation.letter.destroy');
 
-    Route::get('graduation/letter/{id}', [GraduationLetterController::class, 'show'])
-        ->name('graduation.letter.show');
-
-    Route::put('graduation/letter/{id}', [GraduationLetterController::class, 'update'])
-        ->name('graduation.letter.update');
-
-    Route::delete('graduation/letter/{id}', [GraduationLetterController::class, 'destroy'])
-        ->name('graduation.letter.destroy');
-
-    // Apply template to all graduations
-    Route::post('graduation/apply-template-all', [GraduationController::class, 'applyTemplateToAll'])
-        ->name('graduation.applyTemplateToAll');
+    // ── Graduation CRUD — dynamic {id} HARUS paling bawah ────────────────────
+    Route::get('/graduation/create',             [GraduationController::class, 'create'])->name('graduation.create');
+    Route::post('/graduation/store',             [GraduationController::class, 'store'])->name('graduation.store');
+    Route::get('/graduation/{id}',               [GraduationController::class, 'show'])->name('graduation.show');
+    Route::delete('/graduation/{id}',            [GraduationController::class, 'destroy'])->name('graduation.destroy');
+    Route::post('graduation/score/update',      [GraduationController::class, 'updateScore'])->name('graduation.updateScore');
+    Route::post('graduation/score/update-bulk', [GraduationController::class, 'updateScoreBulk'])->name('graduation.updateScoreBulk');
 });
