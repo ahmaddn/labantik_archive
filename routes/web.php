@@ -125,6 +125,10 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::post('/graduation/export-pdf',       [GraduationController::class, 'exportPDF'])->name('graduation.exportPDF');
     Route::post('/graduation/export-all',       [GraduationController::class, 'exportAll'])->name('graduation.exportAll');
 
+    // Surat Kelulusan & Pernyataan — static routes (harus sebelum dynamic {id})
+    Route::get('/graduation/{id}/surat-kelulusan',   [GraduationController::class, 'showSuratKelulusan'])->name('graduation.showSuratKelulusan');
+    Route::get('/graduation/{id}/surat-pernyataan',  [GraduationController::class, 'showSuratPernyataan'])->name('graduation.showSuratPernyataan');
+
     // Graduation CRUD — dynamic {id} HARUS paling bawah
     Route::get('/graduation/create',            [GraduationController::class, 'create'])->name('graduation.create');
     Route::post('/graduation/store',            [GraduationController::class, 'store'])->name('graduation.store');
@@ -148,4 +152,6 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     // Apply template to all graduations
     Route::post('graduation/apply-template-all', [GraduationController::class, 'applyTemplateToAll'])
         ->name('graduation.applyTemplateToAll');
+    Route::post('/graduation/mapel/update-order', [GraduationController::class, 'updateMapelOrder'])
+        ->name('graduation.updateMapelOrder');
 });

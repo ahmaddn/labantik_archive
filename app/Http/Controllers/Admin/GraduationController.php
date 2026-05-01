@@ -190,6 +190,177 @@ class GraduationController extends Controller
     }
 
     /**
+     * Show form untuk edit mapel
+     */
+    public function editMapel($id)
+    {
+        $mapel = GoogleMapel::where('uuid', $id)->firstOrFail();
+
+        $classes = RefClass::where('academic_level', 12)
+            ->select(['id', 'name', 'expertise_concentration_id', 'academic_level'])
+            ->orderBy('name')
+            ->get();
+
+        $expertise = ExpertiseConcentration::select(['id', 'name'])
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.graduation.edit-mapel', compact('mapel', 'classes', 'expertise'));
+    }
+
+    /**
+     * Update mapel ke database
+     */
+    public function updateMapel(Request $request, $id)
+    {
+        $mapel = GoogleMapel::where('uuid', $id)->firstOrFail();
+
+        $validated = $request->validate([
+            'class_id' => 'required|exists:ref_classes,id',
+            'expertise_id' => 'nullable|exists:core_expertise_concentrations,id',
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:umum,jurusan',
+        ], [
+            'class_id.required' => 'Kelas harus dipilih',
+            'class_id.exists' => 'Kelas tidak ditemukan',
+            'expertise_id.exists' => 'Jurusan tidak ditemukan',
+            'name.required' => 'Nama mapel harus diisi',
+            'name.max' => 'Nama mapel maksimal 255 karakter',
+            'type.required' => 'Tipe mapel harus dipilih',
+            'type.in' => 'Tipe mapel harus: umum atau jurusan',
+        ]);
+
+        try {
+            // Validasi: jika tipe jurusan, expertise_id wajib ada
+            if ($validated['type'] === 'jurusan' && !$validated['expertise_id']) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Jurusan harus dipilih untuk tipe mapel jurusan')
+                    ->withInput();
+            }
+
+            // Cek apakah sudah ada mapel yang sama (untuk menghindari duplikat)
+            $exists = GoogleMapel::where('uuid', '!=', $id)
+                ->where('class_id', $validated['class_id'])
+                ->where('name', $validated['name'])
+                ->where('type', $validated['type']);
+
+            if ($validated['expertise_id']) {
+                $exists->where('expertise_id', $validated['expertise_id']);
+            } else {
+                $exists->whereNull('expertise_id');
+            }
+
+            if ($exists->exists()) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Mapel dengan nama, kelas, dan jurusan yang sama sudah ada')
+                    ->withInput();
+            }
+
+            // Update mapel
+            $mapel->update([
+                'class_id' => $validated['class_id'],
+                'expertise_id' => $validated['expertise_id'],
+                'name' => $validated['name'],
+                'type' => $validated['type'],
+            ]);
+
+            return redirect()
+                ->route('admin.graduation.index')
+                ->with('success', 'Mapel berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal memperbarui mapel: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function updateMapelOrder(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'uuid'  => 'required|string',
+                'order' => 'required|integer|min:1|max:999',
+                'join'  => 'required|integer|min:1|max:10',
+            ], [
+                'uuid.required'  => 'UUID mapel wajib diisi',
+                'order.required' => 'Urutan wajib diisi',
+                'order.integer'  => 'Urutan harus berupa angka',
+                'order.min'      => 'Urutan minimal 1',
+                'join.required'  => 'Join baris wajib diisi',
+                'join.integer'   => 'Join baris harus berupa angka',
+                'join.min'       => 'Join baris minimal 1',
+                'join.max'       => 'Join baris maksimal 10',
+            ]);
+
+            $mapel = GoogleMapel::where('uuid', $validated['uuid'])->firstOrFail();
+
+            $mapel->update([
+                'order' => $validated['order'],
+                'join'  => $validated['join'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Urutan & join mapel '{$mapel->name}' berhasil diperbarui.",
+                'data'    => [
+                    'uuid'  => $mapel->uuid,
+                    'order' => $mapel->order,
+                    'join'  => $mapel->join,
+                ],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => collect($e->errors())->flatten()->first(),
+            ], 422);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mapel tidak ditemukan.',
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('updateMapelOrder error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    /**
+     * Delete mapel dari database
+     */
+    public function destroyMapel($id)
+    {
+        try {
+            $mapel = GoogleMapel::where('uuid', $id)->firstOrFail();
+
+            \DB::beginTransaction();
+
+            // Hapus data mapel yang terkait di GoogleGraduationMapel
+            GoogleGraduationMapel::where('mapel_id', $id)->delete();
+
+            // Hapus mapel
+            $mapel->delete();
+
+            \DB::commit();
+
+            return redirect()
+                ->route('admin.graduation.index')
+                ->with('success', 'Mapel berhasil dihapus!');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal menghapus mapel: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Store mapel baru ke database - auto-apply ke semua kelas 12
      */
     public function storeMapel(Request $request)
@@ -308,7 +479,6 @@ class GraduationController extends Controller
     public function downloadTemplate(Request $request)
     {
         $classId = $request->query('class_id');
-        $expertiseId = $request->query('expertise_id');
 
         $students = RefStudent::query()
             ->when($classId, function ($q) use ($classId) {
@@ -335,7 +505,6 @@ class GraduationController extends Controller
         // Load semua mapel, nanti di-match per siswa
         $mapels = GoogleMapel::query()
             ->when($classId, fn($q) => $q->where('class_id', $classId))
-            ->when($expertiseId, fn($q) => $q->where('expertise_id', $expertiseId))
             ->get()
             ->groupBy('class_id'); // Group by class_id untuk lookup cepat
 
@@ -839,6 +1008,123 @@ class GraduationController extends Controller
         }
 
         return view('admin.graduation.show', compact('graduation'));
+    }
+
+    /**
+     * Show surat kelulusan untuk 1 siswa atau semua siswa
+     */
+    public function showSuratKelulusan($id)
+    {
+        // Handle export semua
+        if ($id === 'all') {
+            $graduations = GoogleGraduation::with(['user', 'letter', 'mapels.mapel'])
+                ->get();
+
+            $data = [];
+            foreach ($graduations as $graduation) {
+                $student = $graduation->user;
+                $user = auth()->user();
+                $letter = $graduation->letter;
+
+                $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
+                $mapelUmum = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')
+                    ->sortBy(fn($m) => $m->mapel->order ?? 999)
+                    ->values();
+
+                $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')
+                    ->sortBy(fn($m) => $m->mapel->order ?? 999)
+                    ->values();
+
+                $scores = $mapelsData->whereNotNull('score')->pluck('score');
+                $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
+
+                $latestAcademicYear = $student->academicYears->first();
+                $program = $latestAcademicYear?->class?->expertiseConcentration;
+                $program1 =  $latestAcademicYear?->class?->expertiseProgram;
+
+                $signature = (object)['signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='];
+
+                $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'signature');
+            }
+
+            return view('admin.graduation.surat-kelulusan-all', compact('data'));
+        }
+
+        // Handle 1 siswa
+        $graduation = GoogleGraduation::with(['user', 'letter', 'mapels.mapel'])
+            ->where('uuid', $id)
+            ->firstOrFail();
+
+        $student = $graduation->user;
+        $user = auth()->user();
+        $letter = $graduation->letter;
+
+        $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
+        $mapelUmum = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')
+            ->sortBy(fn($m) => $m->mapel->order ?? 999)
+            ->values();
+
+        $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')
+            ->sortBy(fn($m) => $m->mapel->order ?? 999)
+            ->values();
+
+        $scores = $mapelsData->whereNotNull('score')->pluck('score');
+        $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
+
+        $latestAcademicYear = $student->academicYears->first();
+        $program = $latestAcademicYear?->class?->expertiseConcentration;
+        $program1 =  $latestAcademicYear?->class?->expertiseProgram;
+
+        $signature = (object)['signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='];
+
+        return view('admin.graduation.surat-kelulusan', compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'signature'));
+    }
+
+    /**
+     * Show surat pernyataan untuk 1 siswa atau semua siswa
+     */
+    public function showSuratPernyataan($id)
+    {
+        // Handle export semua
+        if ($id === 'all') {
+            $graduations = GoogleGraduation::with(['user', 'letter'])->get();
+
+            $data = [];
+            foreach ($graduations as $graduation) {
+                $student = $graduation->user;
+                $user = auth()->user();
+
+                $latestAcademicYear = $student->academicYears->first();
+                $program1 = $latestAcademicYear?->class?->expertiseConcentration;
+
+                // Ambil signature dari google_statement → google_student_signatures
+                $statement = \App\Models\GoogleStatement::where('user_id', $student->id)
+                    ->first();
+                $signature = $statement?->signature ?? null;
+
+                $data[] = (object) compact('graduation', 'student', 'user', 'program1', 'signature');
+            }
+
+            return view('admin.graduation.surat-pernyataan-all', compact('data'));
+        }
+
+        // Handle 1 siswa
+        $graduation = GoogleGraduation::with(['user', 'letter'])
+            ->where('uuid', $id)
+            ->firstOrFail();
+
+        $student = $graduation->user;
+        $user = auth()->user();
+
+        $latestAcademicYear = $student->academicYears->first();
+        $program1 = $latestAcademicYear?->class?->expertiseConcentration;
+
+        // Ambil signature
+        $statement = \App\Models\GoogleStatement::where('user_id', $student->id)
+            ->first();
+        $signature = $statement?->signature ?? null;
+
+        return view('admin.graduation.surat-pernyataan', compact('graduation', 'student', 'user', 'program1', 'signature'));
     }
 
     /**

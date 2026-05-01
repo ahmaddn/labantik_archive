@@ -227,17 +227,6 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Jurusan (Opsional)</label>
-                            <select id="expertiseFilter"
-                                class="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Semua Jurusan</option>
-                                @foreach ($expertise as $exp)
-                                    <option value="{{ $exp->id }}">{{ $exp->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
                         <div class="text-sm text-gray-500 bg-blue-50 p-3 rounded-xl">
                             <p class="text-xs">💡 Template akan berisi semua siswa yang sesuai dengan filter kelas dan
                                 jurusan yang dipilih.</p>
@@ -277,11 +266,9 @@
 
         function downloadTemplate() {
             const classId = document.getElementById('classFilter').value;
-            const expertiseId = document.getElementById('expertiseFilter').value;
             let url = '{{ route('admin.graduation.downloadTemplate') }}';
             const params = new URLSearchParams();
             if (classId) params.append('class_id', classId);
-            if (expertiseId) params.append('expertise_id', expertiseId);
             if (params.toString()) url += '?' + params.toString();
             window.location.href = url;
             closeDownloadModal();

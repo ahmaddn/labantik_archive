@@ -96,19 +96,6 @@
                     @enderror
                 </div>
 
-                {{-- Score (Optional) --}}
-                <div>
-                    <label for="score" class="block text-sm font-medium text-gray-700 mb-2">
-                        Skor (Opsional)
-                    </label>
-                    <input type="number" id="score" name="score" placeholder="Contoh: 100"
-                        value="{{ old('score', $mapel->score) }}" min="0" max="100"
-                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('score') border-red-500 @enderror">
-                    @error('score')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 {{-- Info Section --}}
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div class="flex gap-3">
@@ -139,7 +126,8 @@
                     </a>
 
                     {{-- Delete Button --}}
-                    <form method="POST" action="{{ route('admin.graduation.deleteMapel', $mapel->uuid) }}" class="ml-auto"
+                    <form method="POST" action="{{ route('admin.graduation.destroyMapel', $mapel->uuid) }}"
+                        class="ml-auto"
                         onsubmit="return confirm('Hapus mapel {{ addslashes($mapel->name) }}? Tindakan ini tidak dapat dibatalkan.')">
                         @csrf
                         @method('DELETE')

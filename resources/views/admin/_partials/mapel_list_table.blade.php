@@ -21,12 +21,14 @@
 
 <div class="mapel-table-container" data-all-mapels="{{ json_encode($allMapelsData) }}"
     data-route-edit="{{ route($routeEdit, ['id' => ':id']) }}"
-    data-route-delete="{{ route($routeDelete, ['id' => ':id']) }}">
+    data-route-delete="{{ route($routeDelete, ['id' => ':id']) }}"
+    data-route-update-order="{{ route('admin.graduation.updateMapelOrder') }}">
 
     {{-- Search bar --}}
     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex max-w-sm flex-1 items-center gap-2">
-            <div class="relative flex-1">
+        <div class="flex flex-1 flex-wrap items-center gap-2">
+            {{-- Search input --}}
+            <div class="relative min-w-[200px] flex-1">
                 <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none"
                     stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -35,8 +37,25 @@
                 <input type="text" id="mapelSearchInput" placeholder="Cari nama mapel atau kelas..."
                     class="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
             </div>
+
+            {{-- Filter Kelas --}}
+            <div class="relative">
+                <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                </svg>
+                <select id="mapelClassFilter"
+                    class="cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-8 text-sm font-medium text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
+                    <option value="">Semua Kelas</option>
+                    {{-- Opsi diisi oleh JS --}}
+                </select>
+            </div>
+
+            {{-- Clear button --}}
             <button id="mapelClearSearch" style="display:none;"
-                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-50">✕</button>
+                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-50">✕
+                Reset</button>
         </div>
 
         {{-- Total count --}}
@@ -67,7 +86,8 @@
                         <th class="hidden px-6 py-3 text-left font-semibold sm:table-cell">Kelas</th>
                         <th class="hidden px-6 py-3 text-left font-semibold md:table-cell">Jurusan</th>
                         <th class="hidden px-6 py-3 text-left font-semibold md:table-cell">Tipe</th>
-                        <th class="hidden px-6 py-3 text-center font-semibold lg:table-cell">Skor</th>
+                        <th class="hidden px-6 py-3 text-center font-semibold lg:table-cell">Urutan</th>
+                        <th class="hidden px-6 py-3 text-center font-semibold lg:table-cell">Join</th>
                         <th class="px-6 py-3 text-center font-semibold">Aksi</th>
                     </tr>
                 </thead>
@@ -101,6 +121,142 @@
 
 </div>
 
+{{-- ══════════════════════════════════════════════════════════
+     MODAL: Edit Urutan & Join
+══════════════════════════════════════════════════════════ --}}
+<div id="orderJoinModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="flex min-h-screen items-center justify-center px-4 py-8">
+        {{-- Backdrop --}}
+        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" onclick="closeOrderJoinModal()">
+        </div>
+
+        {{-- Panel --}}
+        <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50">
+                        <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Urutan & Gabungan Baris</h3>
+                        <p class="text-xs text-gray-500" id="modalMapelName">—</p>
+                    </div>
+                </div>
+                <button onclick="closeOrderJoinModal()"
+                    class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <div class="px-6 py-5 space-y-5">
+
+                {{-- Info box --}}
+                <div class="rounded-xl bg-blue-50 border border-blue-100 p-3.5 text-xs text-blue-700 leading-relaxed">
+                    <p class="font-semibold text-blue-800 mb-1">💡 Tentang kolom ini:</p>
+                    <p><strong>Urutan</strong>: Nomor urut mapel dalam surat kelulusan (1, 2, 3, …). Semakin kecil
+                        angka, semakin atas posisinya.</p>
+                    <p class="mt-1"><strong>Join Baris</strong>: Kode pengelompokan mapel. Mapel-mapel dengan angka
+                        Join yang <em>sama</em> akan digabung — berbagi satu nomor & satu nilai bersama (rowspan).
+                        Gunakan angka unik (misal 0) jika mapel tidak perlu digabung.</p>
+                </div>
+
+                {{-- Urutan --}}
+                <div>
+                    <label for="inputOrder" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Urutan <span class="text-red-500">*</span>
+                        <span class="ml-1 text-xs text-gray-400 font-normal">(posisi dalam tabel nilai)</span>
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="adjustValue('inputOrder', -1)"
+                            class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:border-gray-300 active:scale-95">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                            </svg>
+                        </button>
+                        <input type="number" id="inputOrder" min="1" max="999" value="1"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-800 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100">
+                        <button type="button" onclick="adjustValue('inputOrder', 1)"
+                            class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:border-gray-300 active:scale-95">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Join --}}
+                <div>
+                    <label for="inputJoin" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Join Baris (Rowspan) <span class="text-red-500">*</span>
+                        <span class="ml-1 text-xs text-gray-400 font-normal">(gabung kolom No & Nilai)</span>
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="adjustValue('inputJoin', -1)"
+                            class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:border-gray-300 active:scale-95">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                            </svg>
+                        </button>
+                        <input type="number" id="inputJoin" min="1" max="10" value="1"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-800 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100">
+                        <button type="button" onclick="adjustValue('inputJoin', 1)"
+                            class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:border-gray-300 active:scale-95">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Visual preview join --}}
+                    <div class="mt-3 overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
+                        <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">Preview
+                            rowspan:</div>
+                        <div class="p-3">
+                            <table class="w-full text-xs border-collapse" id="joinPreviewTable">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="border border-gray-200 px-2 py-1 text-center w-8">No</th>
+                                        <th class="border border-gray-200 px-2 py-1 text-left">Mata Pelajaran</th>
+                                        <th class="border border-gray-200 px-2 py-1 text-center w-12">Nilai</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="joinPreviewBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- Footer --}}
+            <div class="flex items-center justify-end gap-3 border-t border-gray-100 px-6 py-4">
+                <button type="button" onclick="closeOrderJoinModal()"
+                    class="rounded-xl border border-gray-200 bg-white px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                    Batal
+                </button>
+                <button type="button" onclick="saveOrderJoin()" id="saveOrderJoinBtn"
+                    class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 active:scale-[0.98]">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const container = document.querySelector('.mapel-table-container');
@@ -110,6 +266,7 @@
 
         const searchInput = document.getElementById('mapelSearchInput');
         const clearSearchBtn = document.getElementById('mapelClearSearch');
+        const classFilter = document.getElementById('mapelClassFilter');
         const perPageSelect = document.getElementById('mapelPerPageSelect');
         const tableBody = document.getElementById('mapelTableBody');
         const emptyState = document.getElementById('mapelEmptyState');
@@ -125,26 +282,49 @@
         let perPage = 10;
         let filteredData = [...allMapelsData];
 
-        // Restore URL params
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('search')) searchInput.value = urlParams.get('search');
-        if (urlParams.has('per_page')) perPage = parseInt(urlParams.get('per_page'));
-        perPageSelect.value = perPage;
+        // ── Populate class filter options ────────────────────────────────────────
+        const classMap = {};
+        allMapelsData.forEach(mapel => {
+            const key = `${mapel.class_academic} ${mapel.class_name}`.trim();
+            if (key && key !== ' ' && !classMap[key]) {
+                classMap[key] = {
+                    academic: mapel.class_academic,
+                    name: mapel.class_name
+                };
+            }
+        });
+        // Sort by academic level then name
+        Object.keys(classMap).sort().forEach(label => {
+            const opt = document.createElement('option');
+            opt.value = label;
+            opt.textContent = label;
+            classFilter.appendChild(opt);
+        });
 
         // ── Filter ──────────────────────────────────────────────────────────────
         function filterData() {
             const search = searchInput.value.toLowerCase().trim();
+            const selectedClass = classFilter.value;
+
             filteredData = allMapelsData.filter(mapel => {
                 const name = (mapel.name || '').toLowerCase();
                 const className = (mapel.class_name || '').toLowerCase();
                 const expertise = (mapel.expertise_name || '').toLowerCase();
                 const type = (mapel.type || '').toLowerCase();
-                return name.includes(search) || className.includes(search) ||
+                const classLabel = `${mapel.class_academic} ${mapel.class_name}`.trim();
+
+                const matchSearch = !search || name.includes(search) || className.includes(search) ||
                     expertise.includes(search) || type.includes(search);
+                const matchClass = !selectedClass || classLabel === selectedClass;
+
+                return matchSearch && matchClass;
             });
+
             currentPage = 1;
             updateDisplay();
-            clearSearchBtn.style.display = search ? 'block' : 'none';
+
+            const hasFilter = search || selectedClass;
+            clearSearchBtn.style.display = hasFilter ? 'block' : 'none';
         }
 
         // ── Display ──────────────────────────────────────────────────────────────
@@ -185,12 +365,19 @@
                     `<span class="inline-block px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg">Umum</span>` :
                     `<span class="inline-block px-2.5 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-lg">Jurusan</span>`;
 
-                const score = mapel.score !== null && mapel.score !== undefined ?
-                    `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 text-xs font-bold">${mapel.score}</span>` :
-                    `<span class="text-xs text-gray-400 italic">—</span>`;
+                const orderVal = mapel.order !== null && mapel.order !== undefined ? mapel.order : '—';
+                const joinVal = mapel.join !== null && mapel.join !== undefined ? mapel.join : 0;
 
                 const editUrl = routeEdit.replace(':id', mapel.uuid ?? mapel.id);
                 const deleteUrl = routeDelete.replace(':id', mapel.uuid ?? mapel.id);
+
+                const safeName = (mapel.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(
+                    /"/g, '&quot;');
+
+                // Join badge: 0 = solo, >0 = grouped
+                const joinBadge = joinVal == 0 ?
+                    `<span class="inline-flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-gray-100 px-2 text-xs font-bold text-gray-400">—</span>` :
+                    `<span class="inline-flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-amber-50 px-2 text-xs font-bold text-amber-700">${joinVal}</span>`;
 
                 row.innerHTML = `
                 <td class="px-6 py-4 text-gray-400 font-medium">${rowNum}</td>
@@ -209,12 +396,25 @@
                     ${typeBadge}
                 </td>
                 <td class="hidden px-6 py-4 text-center lg:table-cell">
-                    ${score}
+                    <span class="inline-flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-indigo-50 px-2 text-xs font-bold text-indigo-700">${orderVal}</span>
+                </td>
+                <td class="hidden px-6 py-4 text-center lg:table-cell">
+                    ${joinBadge}
                 </td>
                 <td class="px-6 py-4">
-                    <div class="flex items-center justify-center gap-2">
+                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                        <button type="button"
+                            onclick="openOrderJoinModal('${mapel.uuid ?? mapel.id}', '${safeName}', ${mapel.order ?? 999}, ${mapel.join ?? 0})"
+                            class="flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-xs font-medium text-indigo-700 transition-colors hover:bg-indigo-100"
+                            title="Edit urutan & join">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                            Urutan
+                        </button>
                         <a href="${editUrl}"
-                           class="flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100">
+                           class="flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -222,8 +422,8 @@
                             Edit
                         </a>
                         <button type="button"
-                            onclick="confirmDeleteMapel('${deleteUrl}', '${mapel.name.replace(/'/g, "\\'")}')"
-                            class="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100">
+                            onclick="confirmDeleteMapel('${deleteUrl}', '${safeName}')"
+                            class="flex items-center gap-1 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -246,7 +446,6 @@
                 const svgPath = direction === 'prev' ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7';
                 const svg =
                     `<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${svgPath}"/></svg>`;
-
                 if (isDisabled) {
                     const span = document.createElement('span');
                     span.className = 'flex h-8 w-8 items-center justify-center rounded-lg text-gray-300';
@@ -262,21 +461,17 @@
                 return btn;
             }
 
-            paginationButtons.appendChild(
-                makeNavBtn(currentPage === 1, 'prev', () => {
-                    currentPage--;
-                    renderTable();
-                    renderPagination();
-                })
-            );
+            paginationButtons.appendChild(makeNavBtn(currentPage === 1, 'prev', () => {
+                currentPage--;
+                renderTable();
+                renderPagination();
+            }));
 
             const windowSize = 2;
             const pages = [];
             for (let i = 1; i <= lastPage; i++) {
                 if (i === 1 || i === lastPage || (i >= currentPage - windowSize && i <= currentPage +
-                        windowSize)) {
-                    pages.push(i);
-                }
+                        windowSize)) pages.push(i);
             }
 
             let prevPage = null;
@@ -287,7 +482,6 @@
                     dots.textContent = '…';
                     paginationButtons.appendChild(dots);
                 }
-
                 if (page === currentPage) {
                     const activeBtn = document.createElement('span');
                     activeBtn.className =
@@ -310,19 +504,19 @@
                 prevPage = page;
             });
 
-            paginationButtons.appendChild(
-                makeNavBtn(currentPage === lastPage, 'next', () => {
-                    currentPage++;
-                    renderTable();
-                    renderPagination();
-                })
-            );
+            paginationButtons.appendChild(makeNavBtn(currentPage === lastPage, 'next', () => {
+                currentPage++;
+                renderTable();
+                renderPagination();
+            }));
         }
 
         // ── Event listeners ───────────────────────────────────────────────────────
         searchInput.addEventListener('input', filterData);
+        classFilter.addEventListener('change', filterData);
         clearSearchBtn.addEventListener('click', () => {
             searchInput.value = '';
+            classFilter.value = '';
             filterData();
         });
         perPageSelect.addEventListener('change', (e) => {
@@ -333,6 +527,159 @@
 
         updateDisplay();
     });
+
+    // ══════════════════════════════════════════════════════════
+    // ORDER / JOIN MODAL
+    // ══════════════════════════════════════════════════════════
+    let _currentMapelUuid = null;
+
+    function openOrderJoinModal(uuid, name, order, join) {
+        _currentMapelUuid = uuid;
+        document.getElementById('modalMapelName').textContent = name;
+        document.getElementById('inputOrder').value = order || 999;
+        document.getElementById('inputJoin').value = join || 1;
+        document.getElementById('orderJoinModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        updateJoinPreview();
+    }
+
+    function closeOrderJoinModal() {
+        document.getElementById('orderJoinModal').classList.add('hidden');
+        document.body.style.overflow = '';
+        _currentMapelUuid = null;
+    }
+
+    function adjustValue(inputId, delta) {
+        const input = document.getElementById(inputId);
+        const min = parseInt(input.min) || 1;
+        const max = parseInt(input.max) || 999;
+        let val = parseInt(input.value) || 1;
+        val = Math.min(max, Math.max(min, val + delta));
+        input.value = val;
+        if (inputId === 'inputJoin') updateJoinPreview();
+    }
+
+    // Live preview for join/rowspan
+    function updateJoinPreview() {
+        const join = parseInt(document.getElementById('inputJoin').value) || 1;
+        const tbody = document.getElementById('joinPreviewBody');
+        const mapelName = document.getElementById('modalMapelName').textContent;
+        tbody.innerHTML = '';
+
+        // Simulasi: tampilkan bahwa mapel ini akan bergabung dengan mapel lain
+        // yang memiliki angka join sama
+        if (join === 0) {
+            // join 0 = berdiri sendiri (tidak dikelompokkan)
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+            <td class="border border-gray-200 px-2 py-1 text-center font-bold bg-indigo-50 text-indigo-700">1</td>
+            <td class="border border-gray-200 px-2 py-1">${mapelName}</td>
+            <td class="border border-gray-200 px-2 py-1 text-center bg-indigo-50 text-indigo-700 font-bold">85</td>
+        `;
+            tbody.appendChild(tr);
+        } else {
+            // Simulasi 2 mapel bergabung (mapel ini + 1 mapel lain dengan join sama)
+            const samplePair = [mapelName, '(mapel lain dengan Join=' + join + ')'];
+            samplePair.forEach((name, i) => {
+                const tr = document.createElement('tr');
+                if (i === 0) {
+                    tr.innerHTML = `
+                    <td class="border border-gray-200 px-2 py-1 text-center align-middle font-bold bg-indigo-50 text-indigo-700"
+                        rowspan="2">1</td>
+                    <td class="border border-gray-200 px-2 py-1">${name}</td>
+                    <td class="border border-gray-200 px-2 py-1 text-center align-middle bg-indigo-50 text-indigo-700 font-bold"
+                        rowspan="2">85</td>
+                `;
+                } else {
+                    tr.innerHTML = `
+                    <td class="border border-gray-200 px-2 py-1 text-xs text-gray-400 italic">${name}</td>
+                `;
+                }
+                tbody.appendChild(tr);
+            });
+        }
+    }
+
+    document.getElementById('inputJoin').addEventListener('input', updateJoinPreview);
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeOrderJoinModal();
+    });
+
+    async function saveOrderJoin() {
+        if (!_currentMapelUuid) return;
+
+        const order = parseInt(document.getElementById('inputOrder').value);
+        const join = parseInt(document.getElementById('inputJoin').value);
+        const btn = document.getElementById('saveOrderJoinBtn');
+        const container = document.querySelector('.mapel-table-container');
+        const updateUrl = container.dataset.routeUpdateOrder;
+
+        if (!order || order < 1) {
+            alert('Urutan harus angka minimal 1');
+            return;
+        }
+        if (!join || join < 1) {
+            alert('Join baris harus angka minimal 1');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = `
+            <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            Menyimpan…
+        `;
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+                '{{ csrf_token() }}';
+
+            const res = await fetch(updateUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    uuid: _currentMapelUuid,
+                    order,
+                    join
+                }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                // Update local data array so badge refreshes without full reload
+                const container2 = document.querySelector('.mapel-table-container');
+                const allMapels = JSON.parse(container2.dataset.allMapels);
+                const idx = allMapels.findIndex(m => (m.uuid ?? m.id) === _currentMapelUuid);
+                if (idx !== -1) {
+                    allMapels[idx].order = order;
+                    allMapels[idx].join = join;
+                    container2.dataset.allMapels = JSON.stringify(allMapels);
+                }
+                closeOrderJoinModal();
+                // Re-trigger table render by dispatching a dummy input event
+                document.getElementById('mapelSearchInput').dispatchEvent(new Event('input'));
+            } else {
+                alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));
+            }
+        } catch (err) {
+            alert('Gagal menyimpan: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Simpan
+            `;
+        }
+    }
 
     // Delete confirmation + form submit
     function confirmDeleteMapel(deleteUrl, mapelName) {
