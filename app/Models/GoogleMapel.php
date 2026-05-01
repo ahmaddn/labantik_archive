@@ -14,13 +14,17 @@ class GoogleMapel extends Model
     protected $primaryKey = 'uuid'; // FIX: primary key adalah uuid, bukan id
     public $incrementing = false;
     protected $keyType = 'string';
+
     protected $fillable = [
         'class_id',
         'expertise_id',
         'name',
         'type',
-        'score'
+        'score',
+        'order', // FIX: diperlukan agar updateOrder AJAX bisa tersimpan
+        'join',  // FIX: diperlukan agar updateOrder AJAX bisa tersimpan
     ];
+
     public function graduations()
     {
         return $this->hasMany(GoogleGraduationMapel::class, 'mapel_id', 'uuid');

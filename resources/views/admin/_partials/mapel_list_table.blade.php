@@ -28,7 +28,6 @@
     {{-- Search bar --}}
     <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex flex-1 flex-wrap items-center gap-2">
-            {{-- Search input --}}
             <div class="relative min-w-[200px] flex-1">
                 <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none"
                     stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +38,6 @@
                     class="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
             </div>
 
-            {{-- Filter Kelas --}}
             <div class="relative">
                 <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none"
                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,30 +47,22 @@
                 <select id="mapelClassFilter"
                     class="cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-8 text-sm font-medium text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
                     <option value="">Semua Kelas</option>
-                    {{-- Opsi diisi oleh JS --}}
                 </select>
             </div>
 
-            {{-- Clear button --}}
             <button id="mapelClearSearch" style="display:none;"
-                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-50">✕
-                Reset</button>
+                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-50">✕ Reset</button>
         </div>
 
-        {{-- Total count --}}
         <p class="flex-shrink-0 text-sm text-gray-500">
-            <span class="font-semibold text-gray-700" id="mapelTotalCount">{{ count($allMapelsData) }}</span> data
-            ditemukan
+            <span class="font-semibold text-gray-700" id="mapelTotalCount">{{ count($allMapelsData) }}</span> data ditemukan
         </p>
     </div>
 
-    {{-- ══════════════════════════════════════════════════════════
-         BULK ACTION BAR — muncul saat ada checkbox dicentang
-    ══════════════════════════════════════════════════════════ --}}
+    {{-- Bulk action bar --}}
     <div id="bulkActionBar"
         class="mb-3 hidden items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
         <div class="flex items-center gap-2.5">
-            {{-- Icon warning --}}
             <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-red-100">
                 <svg class="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -83,7 +73,6 @@
                 <span id="bulkSelectedCount" class="font-bold">0</span> mapel dipilih
             </p>
         </div>
-
         <div class="flex items-center gap-2">
             <button type="button" id="bulkCancelBtn" onclick="clearAllCheckboxes()"
                 class="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-50">
@@ -116,7 +105,6 @@
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
                     <tr>
-                        {{-- Checkbox Select All --}}
                         <th class="w-10 px-4 py-3">
                             <div class="flex items-center justify-center">
                                 <input type="checkbox" id="selectAllCheckbox"
@@ -125,12 +113,67 @@
                             </div>
                         </th>
                         <th class="px-6 py-3 text-left font-semibold">#</th>
-                        <th class="px-6 py-3 text-left font-semibold">Nama Mapel</th>
-                        <th class="hidden px-6 py-3 text-left font-semibold sm:table-cell">Kelas</th>
-                        <th class="hidden px-6 py-3 text-left font-semibold md:table-cell">Jurusan</th>
-                        <th class="hidden px-6 py-3 text-left font-semibold md:table-cell">Tipe</th>
-                        <th class="hidden px-6 py-3 text-center font-semibold lg:table-cell">Urutan</th>
-                        <th class="hidden px-6 py-3 text-center font-semibold lg:table-cell">Join</th>
+
+                        {{-- Sortable: Nama Mapel --}}
+                        <th class="px-6 py-3 text-left font-semibold">
+                            <button type="button" class="mapel-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group" data-col="name">
+                                Nama Mapel
+                                <span class="mapel-sort-icon text-gray-300 group-hover:text-[#1b84ff]" data-col="name">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+                                </span>
+                            </button>
+                        </th>
+
+                        {{-- Sortable: Kelas --}}
+                        <th class="hidden px-6 py-3 text-left font-semibold sm:table-cell">
+                            <button type="button" class="mapel-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group" data-col="class_name">
+                                Kelas
+                                <span class="mapel-sort-icon text-gray-300 group-hover:text-[#1b84ff]" data-col="class_name">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+                                </span>
+                            </button>
+                        </th>
+
+                        {{-- Sortable: Jurusan --}}
+                        <th class="hidden px-6 py-3 text-left font-semibold md:table-cell">
+                            <button type="button" class="mapel-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group" data-col="expertise_name">
+                                Jurusan
+                                <span class="mapel-sort-icon text-gray-300 group-hover:text-[#1b84ff]" data-col="expertise_name">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+                                </span>
+                            </button>
+                        </th>
+
+                        {{-- Sortable: Tipe --}}
+                        <th class="hidden px-6 py-3 text-left font-semibold md:table-cell">
+                            <button type="button" class="mapel-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group" data-col="type">
+                                Tipe
+                                <span class="mapel-sort-icon text-gray-300 group-hover:text-[#1b84ff]" data-col="type">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+                                </span>
+                            </button>
+                        </th>
+
+                        {{-- Sortable: Urutan --}}
+                        <th class="hidden px-6 py-3 text-center font-semibold lg:table-cell">
+                            <button type="button" class="mapel-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group" data-col="order">
+                                Urutan
+                                <span class="mapel-sort-icon text-gray-300 group-hover:text-[#1b84ff]" data-col="order">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+                                </span>
+                            </button>
+                        </th>
+
+                        {{-- Sortable: Join --}}
+                        <th class="hidden px-6 py-3 text-center font-semibold lg:table-cell">
+                            <button type="button" class="mapel-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group" data-col="join">
+                                Join
+                                <span class="mapel-sort-icon text-gray-300 group-hover:text-[#1b84ff]" data-col="join">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+                                </span>
+                            </button>
+                        </th>
+
                         <th class="px-6 py-3 text-center font-semibold">Aksi</th>
                     </tr>
                 </thead>
@@ -141,7 +184,6 @@
         {{-- Pagination --}}
         <div id="mapelPaginationContainer" style="display:none;"
             class="flex flex-col items-center justify-between gap-3 border-t border-gray-100 px-6 py-4 sm:flex-row">
-
             <div class="flex items-center gap-2">
                 <select id="mapelPerPageSelect"
                     class="cursor-pointer rounded-xl border border-gray-200 bg-white py-1.5 pl-3 pr-8 text-sm font-medium text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
@@ -152,9 +194,7 @@
                 </select>
                 <span class="text-xs text-gray-500">per halaman</span>
             </div>
-
             <div class="flex items-center gap-1" id="mapelPaginationButtons"></div>
-
             <p class="text-xs text-gray-400">
                 <span id="mapelRangeStart">1</span>–<span id="mapelRangeEnd">10</span>
                 dari <span id="mapelTotalData">0</span>
@@ -164,32 +204,19 @@
 
 </div>
 
-{{-- ══════════════════════════════════════════════════════════
-     HIDDEN FORM — untuk bulk delete (POST)
-══════════════════════════════════════════════════════════ --}}
 <form id="bulkDeleteForm" method="POST" style="display:none;">
     @csrf
-    {{-- UUID fields diisi oleh JS sebelum submit --}}
 </form>
 
-{{-- ══════════════════════════════════════════════════════════
-     MODAL: Edit Urutan & Join
-══════════════════════════════════════════════════════════ --}}
+{{-- Modal: Edit Urutan & Join --}}
 <div id="orderJoinModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
     <div class="flex min-h-screen items-center justify-center px-4 py-8">
-        {{-- Backdrop --}}
-        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" onclick="closeOrderJoinModal()">
-        </div>
-
-        {{-- Panel --}}
+        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" onclick="closeOrderJoinModal()"></div>
         <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200">
-
-            {{-- Header --}}
             <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                 <div class="flex items-center gap-3">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50">
-                        <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
                         </svg>
@@ -202,26 +229,18 @@
                 <button onclick="closeOrderJoinModal()"
                     class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
-            {{-- Body --}}
             <div class="px-6 py-5 space-y-5">
-
-                {{-- Info box --}}
                 <div class="rounded-xl bg-blue-50 border border-blue-100 p-3.5 text-xs text-blue-700 leading-relaxed">
                     <p class="font-semibold text-blue-800 mb-1">💡 Tentang kolom ini:</p>
-                    <p><strong>Urutan</strong>: Nomor urut mapel dalam surat kelulusan (1, 2, 3, …). Semakin kecil
-                        angka, semakin atas posisinya.</p>
-                    <p class="mt-1"><strong>Join Baris</strong>: Kode pengelompokan mapel. Mapel-mapel dengan angka
-                        Join yang <em>sama</em> akan digabung — berbagi satu nomor & satu nilai bersama (rowspan).
-                        Gunakan angka unik (misal 0) jika mapel tidak perlu digabung.</p>
+                    <p><strong>Urutan</strong>: Nomor urut mapel dalam surat kelulusan (1, 2, 3, …). Semakin kecil angka, semakin atas posisinya.</p>
+                    <p class="mt-1"><strong>Join Baris</strong>: Kode pengelompokan mapel. Mapel-mapel dengan angka Join yang <em>sama</em> akan digabung — berbagi satu nomor & satu nilai bersama (rowspan). Gunakan angka unik (misal 0) jika mapel tidak perlu digabung.</p>
                 </div>
 
-                {{-- Urutan --}}
                 <div>
                     <label for="inputOrder" class="block text-sm font-medium text-gray-700 mb-1.5">
                         Urutan <span class="text-red-500">*</span>
@@ -230,23 +249,17 @@
                     <div class="flex items-center gap-2">
                         <button type="button" onclick="adjustValue('inputOrder', -1)"
                             class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:border-gray-300 active:scale-95">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                            </svg>
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
                         </button>
                         <input type="number" id="inputOrder" min="1" max="999" value="1"
                             class="w-full rounded-xl border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-800 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100">
                         <button type="button" onclick="adjustValue('inputOrder', 1)"
                             class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:border-gray-300 active:scale-95">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                         </button>
                     </div>
                 </div>
 
-                {{-- Join --}}
                 <div>
                     <label for="inputJoin" class="block text-sm font-medium text-gray-700 mb-1.5">
                         Join Baris (Rowspan) <span class="text-red-500">*</span>
@@ -255,25 +268,18 @@
                     <div class="flex items-center gap-2">
                         <button type="button" onclick="adjustValue('inputJoin', -1)"
                             class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:border-gray-300 active:scale-95">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                            </svg>
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
                         </button>
                         <input type="number" id="inputJoin" min="1" max="10" value="1"
                             class="w-full rounded-xl border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-800 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100">
                         <button type="button" onclick="adjustValue('inputJoin', 1)"
                             class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:border-gray-300 active:scale-95">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                         </button>
                     </div>
 
-                    {{-- Visual preview join --}}
                     <div class="mt-3 overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
-                        <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">Preview
-                            rowspan:</div>
+                        <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">Preview rowspan:</div>
                         <div class="p-3">
                             <table class="w-full text-xs border-collapse" id="joinPreviewTable">
                                 <thead>
@@ -288,10 +294,8 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            {{-- Footer --}}
             <div class="flex items-center justify-end gap-3 border-t border-gray-100 px-6 py-4">
                 <button type="button" onclick="closeOrderJoinModal()"
                     class="rounded-xl border border-gray-200 bg-white px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
@@ -308,6 +312,39 @@
         </div>
     </div>
 </div>
+
+{{-- ── Toast Notification ──────────────────────────────────── --}}
+<div id="mapelToast"
+    class="fixed bottom-6 right-6 z-[9999] hidden items-center gap-3 rounded-2xl px-5 py-3.5 shadow-2xl text-sm font-semibold text-white"
+    style="transition: opacity 0.35s ease, transform 0.35s ease;">
+    <svg id="mapelToastIcon" class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="mapelToastMsg"></span>
+</div>
+
+<style>
+    /* Sorting header styles */
+    .mapel-sort-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: inherit;
+        color: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+    }
+
+    .mapel-sort-btn.sort-active {
+        color: #1b84ff;
+    }
+
+    .mapel-sort-btn.sort-active .mapel-sort-icon {
+        color: #1b84ff;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -335,15 +372,84 @@
         let perPage = 10;
         let filteredData = [...allMapelsData];
 
+        // ── Sort state ───────────────────────────────────────────────────
+        let sortCol = null;
+        let sortDir = null;
+
+        const iconBoth = `<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>`;
+        const iconAsc  = `<svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 4l-4 4h3v12h2V8h3L7 4zm10 16l4-4h-3V4h-2v12h-3l4 4z" opacity=".3"/><path d="M7 4l-4 4h3v12h2V8h3L7 4z"/></svg>`;
+        const iconDesc = `<svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 4l-4 4h3v12h2V8h3L7 4z" opacity=".3"/><path d="M17 20l4-4h-3V4h-2v12h-3l4 4z"/></svg>`;
+
+        function updateSortIcons() {
+            document.querySelectorAll('.mapel-sort-btn').forEach(btn => {
+                const col = btn.dataset.col;
+                const iconEl = btn.querySelector('.mapel-sort-icon');
+                if (col === sortCol) {
+                    btn.classList.add('sort-active');
+                    iconEl.innerHTML = sortDir === 'asc' ? iconAsc : iconDesc;
+                } else {
+                    btn.classList.remove('sort-active');
+                    iconEl.innerHTML = iconBoth;
+                }
+            });
+        }
+
+        function applySort(data) {
+            if (!sortCol || !sortDir) return data;
+            return [...data].sort((a, b) => {
+                let valA = a[sortCol] ?? '';
+                let valB = b[sortCol] ?? '';
+
+                // Numeric sort
+                if (sortCol === 'order' || sortCol === 'join') {
+                    valA = Number(valA) || 0;
+                    valB = Number(valB) || 0;
+                    return sortDir === 'asc' ? valA - valB : valB - valA;
+                }
+
+                // class_name: sort by academic + name combined
+                if (sortCol === 'class_name') {
+                    valA = String(`${a.class_academic} ${a.class_name}`).toLowerCase();
+                    valB = String(`${b.class_academic} ${b.class_name}`).toLowerCase();
+                } else {
+                    valA = String(valA).toLowerCase();
+                    valB = String(valB).toLowerCase();
+                }
+
+                if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+                if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        // Attach sort button listeners
+        document.querySelectorAll('.mapel-sort-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const col = this.dataset.col;
+                if (sortCol === col) {
+                    if (sortDir === 'asc') {
+                        sortDir = 'desc';
+                    } else if (sortDir === 'desc') {
+                        sortCol = null;
+                        sortDir = null;
+                    }
+                } else {
+                    sortCol = col;
+                    sortDir = 'asc';
+                }
+                currentPage = 1;
+                clearAllCheckboxes();
+                updateSortIcons();
+                updateDisplay();
+            });
+        });
+
         // ── Populate class filter options ────────────────────────────────────────
         const classMap = {};
         allMapelsData.forEach(mapel => {
             const key = `${mapel.class_academic} ${mapel.class_name}`.trim();
             if (key && key !== ' ' && !classMap[key]) {
-                classMap[key] = {
-                    academic: mapel.class_academic,
-                    name: mapel.class_name
-                };
+                classMap[key] = { academic: mapel.class_academic, name: mapel.class_name };
             }
         });
         Object.keys(classMap).sort().forEach(label => {
@@ -382,7 +488,8 @@
 
         // ── Display ──────────────────────────────────────────────────────────────
         function updateDisplay() {
-            const total = filteredData.length;
+            const sortedData = applySort(filteredData);
+            const total = sortedData.length;
             totalCountSpan.textContent = total;
             totalDataSpan.textContent = total;
 
@@ -394,20 +501,20 @@
                 emptyState.style.display = 'none';
                 tableContainer.style.display = 'block';
                 paginationContainer.style.display = 'flex';
-                renderTable();
-                renderPagination();
+                renderTable(sortedData);
+                renderPagination(sortedData);
             }
         }
 
         // ── Table ─────────────────────────────────────────────────────────────────
-        function renderTable() {
+        function renderTable(sortedData) {
             tableBody.innerHTML = '';
             const start = (currentPage - 1) * perPage;
             const end = start + perPage;
-            const pageData = filteredData.slice(start, end);
+            const pageData = sortedData.slice(start, end);
 
             rangeStartSpan.textContent = start + 1;
-            rangeEndSpan.textContent = Math.min(end, filteredData.length);
+            rangeEndSpan.textContent = Math.min(end, sortedData.length);
 
             pageData.forEach((mapel, idx) => {
                 const rowNum = start + idx + 1;
@@ -426,8 +533,7 @@
                 const editUrl = routeEdit.replace(':id', uuid);
                 const deleteUrl = routeDelete.replace(':id', uuid);
 
-                const safeName = (mapel.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(
-                    /"/g, '&quot;');
+                const safeName = (mapel.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                 const joinBadge = joinVal == 0 ?
                     `<span class="inline-flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-gray-100 px-2 text-xs font-bold text-gray-400">—</span>` :
@@ -466,20 +572,18 @@
                     <td class="px-6 py-4">
                         <div class="flex items-center justify-center gap-1.5 flex-wrap">
                             <button type="button"
-                                onclick="openOrderJoinModal('${uuid}', '${safeName}', ${mapel.order ?? 999}, ${mapel.join ?? 0})"
+                                onclick="openOrderJoinModal('${uuid}', '${safeName}', ${mapel.order ?? 1}, ${mapel.join ?? 1})"
                                 class="flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-xs font-medium text-indigo-700 transition-colors hover:bg-indigo-100"
                                 title="Edit urutan & join">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
                                 </svg>
                                 Urutan
                             </button>
                             <a href="${editUrl}"
                                class="flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                                 Edit
                             </a>
@@ -487,8 +591,7 @@
                                 onclick="confirmDeleteMapel('${deleteUrl}', '${safeName}')"
                                 class="flex items-center gap-1 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
                                 Hapus
                             </button>
@@ -498,24 +601,29 @@
                 tableBody.appendChild(row);
             });
 
-            // Pasang event listener checkbox tiap baris
             tableBody.querySelectorAll('.row-checkbox').forEach(cb => {
                 cb.addEventListener('change', onRowCheckboxChange);
             });
 
-            // Sinkronkan state select-all setelah render
+            // Re-apply checked state for selected UUIDs
+            tableBody.querySelectorAll('.row-checkbox').forEach(cb => {
+                if (selectedUuids.has(cb.value)) {
+                    cb.checked = true;
+                    highlightRow(cb);
+                }
+            });
+
             syncSelectAll();
         }
 
         // ── Pagination ────────────────────────────────────────────────────────────
-        function renderPagination() {
+        function renderPagination(sortedData) {
             paginationButtons.innerHTML = '';
-            const lastPage = Math.ceil(filteredData.length / perPage);
+            const lastPage = Math.ceil(sortedData.length / perPage);
 
             function makeNavBtn(isDisabled, direction, onClick) {
                 const svgPath = direction === 'prev' ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7';
-                const svg =
-                    `<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${svgPath}"/></svg>`;
+                const svg = `<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${svgPath}"/></svg>`;
                 if (isDisabled) {
                     const span = document.createElement('span');
                     span.className = 'flex h-8 w-8 items-center justify-center rounded-lg text-gray-300';
@@ -524,24 +632,18 @@
                 }
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className =
-                    'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-50';
+                btn.className = 'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-50';
                 btn.innerHTML = svg;
                 btn.addEventListener('click', onClick);
                 return btn;
             }
 
-            paginationButtons.appendChild(makeNavBtn(currentPage === 1, 'prev', () => {
-                currentPage--;
-                renderTable();
-                renderPagination();
-            }));
+            paginationButtons.appendChild(makeNavBtn(currentPage === 1, 'prev', () => { currentPage--; updateDisplay(); }));
 
             const windowSize = 2;
             const pages = [];
             for (let i = 1; i <= lastPage; i++) {
-                if (i === 1 || i === lastPage || (i >= currentPage - windowSize && i <= currentPage +
-                        windowSize)) pages.push(i);
+                if (i === 1 || i === lastPage || (i >= currentPage - windowSize && i <= currentPage + windowSize)) pages.push(i);
             }
 
             let prevPage = null;
@@ -554,47 +656,30 @@
                 }
                 if (page === currentPage) {
                     const activeBtn = document.createElement('span');
-                    activeBtn.className =
-                        'flex h-8 w-8 items-center justify-center rounded-lg bg-[#1b84ff] text-xs font-bold text-white';
+                    activeBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg bg-[#1b84ff] text-xs font-bold text-white';
                     activeBtn.textContent = page;
                     paginationButtons.appendChild(activeBtn);
                 } else {
                     const pageBtn = document.createElement('button');
                     pageBtn.type = 'button';
-                    pageBtn.className =
-                        'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-[#1b84ff] hover:border-blue-200';
+                    pageBtn.className = 'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-[#1b84ff] hover:border-blue-200';
                     pageBtn.textContent = page;
-                    pageBtn.addEventListener('click', () => {
-                        currentPage = page;
-                        renderTable();
-                        renderPagination();
-                    });
+                    pageBtn.addEventListener('click', () => { currentPage = page; updateDisplay(); });
                     paginationButtons.appendChild(pageBtn);
                 }
                 prevPage = page;
             });
 
-            paginationButtons.appendChild(makeNavBtn(currentPage === lastPage, 'next', () => {
-                currentPage++;
-                renderTable();
-                renderPagination();
-            }));
+            paginationButtons.appendChild(makeNavBtn(currentPage === lastPage, 'next', () => { currentPage++; updateDisplay(); }));
         }
 
-        // ──────────────────────────────────────────────────────────
-        // CHECKBOX LOGIC
-        // ──────────────────────────────────────────────────────────
-
-        // Kumpulan UUID yang sudah dicentang (cross-page)
+        // ── Checkbox logic ────────────────────────────────────────────────────────
         const selectedUuids = new Set();
 
         function onRowCheckboxChange(e) {
             const cb = e.target;
-            if (cb.checked) {
-                selectedUuids.add(cb.value);
-            } else {
-                selectedUuids.delete(cb.value);
-            }
+            if (cb.checked) selectedUuids.add(cb.value);
+            else selectedUuids.delete(cb.value);
             syncSelectAll();
             updateBulkBar();
             highlightRow(cb);
@@ -603,7 +688,6 @@
         function syncSelectAll() {
             const allOnPage = tableBody.querySelectorAll('.row-checkbox');
             const checkedOnPage = tableBody.querySelectorAll('.row-checkbox:checked');
-
             if (allOnPage.length === 0) {
                 selectAllCheckbox.checked = false;
                 selectAllCheckbox.indeterminate = false;
@@ -622,100 +706,91 @@
         function highlightRow(cb) {
             const row = cb.closest('tr');
             if (!row) return;
-            if (cb.checked) {
-                row.classList.add('bg-red-50');
-                row.classList.remove('hover:bg-gray-50');
-            } else {
-                row.classList.remove('bg-red-50');
-                row.classList.add('hover:bg-gray-50');
-            }
+            if (cb.checked) { row.classList.add('bg-red-50'); row.classList.remove('hover:bg-gray-50'); }
+            else { row.classList.remove('bg-red-50'); row.classList.add('hover:bg-gray-50'); }
         }
 
         function updateBulkBar() {
             const bar = document.getElementById('bulkActionBar');
             const countEl = document.getElementById('bulkSelectedCount');
             const count = selectedUuids.size;
-
             countEl.textContent = count;
-            if (count > 0) {
-                bar.classList.remove('hidden');
-                bar.classList.add('flex');
-            } else {
-                bar.classList.add('hidden');
-                bar.classList.remove('flex');
-            }
+            if (count > 0) { bar.classList.remove('hidden'); bar.classList.add('flex'); }
+            else { bar.classList.add('hidden'); bar.classList.remove('flex'); }
         }
 
-        // Select-all checkbox pada thead
         selectAllCheckbox.addEventListener('change', function() {
             const allOnPage = tableBody.querySelectorAll('.row-checkbox');
             allOnPage.forEach(cb => {
                 cb.checked = this.checked;
-                if (this.checked) {
-                    selectedUuids.add(cb.value);
-                } else {
-                    selectedUuids.delete(cb.value);
-                }
+                if (this.checked) selectedUuids.add(cb.value);
+                else selectedUuids.delete(cb.value);
                 highlightRow(cb);
             });
             selectAllCheckbox.indeterminate = false;
             updateBulkBar();
         });
 
-        // Expose ke global agar tombol "Batal" di bulk bar bisa memanggil
         window.clearAllCheckboxes = function() {
             selectedUuids.clear();
-            tableBody.querySelectorAll('.row-checkbox').forEach(cb => {
-                cb.checked = false;
-                highlightRow(cb);
-            });
+            tableBody.querySelectorAll('.row-checkbox').forEach(cb => { cb.checked = false; highlightRow(cb); });
             selectAllCheckbox.checked = false;
             selectAllCheckbox.indeterminate = false;
             updateBulkBar();
         };
 
-        // Expose selectedUuids agar confirmBulkDelete bisa mengaksesnya
         window._getSelectedUuids = () => selectedUuids;
 
-        // ── Event listeners ───────────────────────────────────────────────────────
+        // ── Events ───────────────────────────────────────────────────────
         searchInput.addEventListener('input', filterData);
         classFilter.addEventListener('change', filterData);
-        clearSearchBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            classFilter.value = '';
-            filterData();
-        });
-        perPageSelect.addEventListener('change', (e) => {
-            perPage = parseInt(e.target.value);
-            currentPage = 1;
-            updateDisplay();
-        });
+        clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; classFilter.value = ''; filterData(); });
+        perPageSelect.addEventListener('change', (e) => { perPage = parseInt(e.target.value); currentPage = 1; updateDisplay(); });
 
+        updateSortIcons();
         updateDisplay();
+
+        // ── Expose updater ke luar closure ────────────────────────────────────
+        // Diperlukan oleh saveOrderJoin (yang berada di luar DOMContentLoaded)
+        // agar bisa memperbarui allMapelsData & filteredData secara langsung
+        // tanpa harus mem-parse ulang dari dataset (yang sudah stale).
+        window._mapelUpdateItem = function(uuid, newOrder, newJoin) {
+            let updated = false;
+            
+            // Update sumber data utama
+            for (let i = 0; i < allMapelsData.length; i++) {
+                if (String(allMapelsData[i].uuid ?? allMapelsData[i].id) === String(uuid)) {
+                    allMapelsData[i].order = newOrder;
+                    allMapelsData[i].join  = newJoin;
+                    updated = true;
+                    break;
+                }
+            }
+
+            if (updated) {
+                // Perbarui juga data di DOM dataset
+                const container = document.querySelector('.mapel-table-container');
+                if (container) container.dataset.allMapels = JSON.stringify(allMapelsData);
+            }
+            
+            // Panggil filterData() yang akan memfilter ulang dari allMapelsData dan memanggil updateDisplay()
+            filterData();
+        };
     });
 
-    // ══════════════════════════════════════════════════════════
-    // BULK DELETE
-    // ══════════════════════════════════════════════════════════
+    // ── Bulk delete ───────────────────────────────────────────────────────
     function confirmBulkDelete() {
         const selected = window._getSelectedUuids ? window._getSelectedUuids() : new Set();
         if (selected.size === 0) return;
 
-        const confirmed = confirm(
-            `Hapus ${selected.size} mapel yang dipilih?\n\nTindakan ini tidak dapat dibatalkan.`
-        );
+        const confirmed = confirm(`Hapus ${selected.size} mapel yang dipilih?\n\nTindakan ini tidak dapat dibatalkan.`);
         if (!confirmed) return;
 
         const container = document.querySelector('.mapel-table-container');
         const bulkDeleteUrl = container.dataset.routeDeleteBulk;
-
         const form = document.getElementById('bulkDeleteForm');
         form.action = bulkDeleteUrl;
-
-        // Hapus input uuid lama (jika ada dari sebelumnya)
         form.querySelectorAll('input[name="uuids[]"]').forEach(el => el.remove());
-
-        // Tambahkan satu input per UUID
         selected.forEach(uuid => {
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -723,19 +798,16 @@
             input.value = uuid;
             form.appendChild(input);
         });
-
         form.submit();
     }
 
-    // ══════════════════════════════════════════════════════════
-    // ORDER / JOIN MODAL
-    // ══════════════════════════════════════════════════════════
+    // ── Order / Join modal ────────────────────────────────────────────────
     let _currentMapelUuid = null;
 
     function openOrderJoinModal(uuid, name, order, join) {
         _currentMapelUuid = uuid;
         document.getElementById('modalMapelName').textContent = name;
-        document.getElementById('inputOrder').value = order || 999;
+        document.getElementById('inputOrder').value = order || 1;
         document.getElementById('inputJoin').value = join || 1;
         document.getElementById('orderJoinModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
@@ -751,7 +823,7 @@
     function adjustValue(inputId, delta) {
         const input = document.getElementById(inputId);
         const min = parseInt(input.min) || 1;
-        const max = parseInt(input.max) || 999;
+        const max = parseInt(input.max) || 1;
         let val = parseInt(input.value) || 1;
         val = Math.min(max, Math.max(min, val + delta));
         input.value = val;
@@ -783,9 +855,7 @@
                         <td class="border border-gray-200 px-2 py-1 text-center align-middle bg-indigo-50 text-indigo-700 font-bold" rowspan="2">85</td>
                     `;
                 } else {
-                    tr.innerHTML = `
-                        <td class="border border-gray-200 px-2 py-1 text-xs text-gray-400 italic">${name}</td>
-                    `;
+                    tr.innerHTML = `<td class="border border-gray-200 px-2 py-1 text-xs text-gray-400 italic">${name}</td>`;
                 }
                 tbody.appendChild(tr);
             });
@@ -793,9 +863,7 @@
     }
 
     document.getElementById('inputJoin').addEventListener('input', updateJoinPreview);
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeOrderJoinModal();
-    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOrderJoinModal(); });
 
     async function saveOrderJoin() {
         if (!_currentMapelUuid) return;
@@ -806,54 +874,27 @@
         const container = document.querySelector('.mapel-table-container');
         const updateUrl = container.dataset.routeUpdateOrder;
 
-        if (!order || order < 1) {
-            alert('Urutan harus angka minimal 1');
-            return;
-        }
-        if (!join || join < 1) {
-            alert('Join baris harus angka minimal 1');
-            return;
-        }
+        if (!order || order < 1) { alert('Urutan harus angka minimal 1'); return; }
+        if (!join || join < 1) { alert('Join baris harus angka minimal 1'); return; }
 
         btn.disabled = true;
-        btn.innerHTML = `
-            <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-            Menyimpan…
-        `;
+        btn.innerHTML = `<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Menyimpan…`;
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
-
             const res = await fetch(updateUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    uuid: _currentMapelUuid,
-                    order,
-                    join
-                }),
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                body: JSON.stringify({ uuid: _currentMapelUuid, order, join }),
             });
-
             const data = await res.json();
-
             if (data.success) {
-                const container2 = document.querySelector('.mapel-table-container');
-                const allMapels = JSON.parse(container2.dataset.allMapels);
-                const idx = allMapels.findIndex(m => (m.uuid ?? m.id) === _currentMapelUuid);
-                if (idx !== -1) {
-                    allMapels[idx].order = order;
-                    allMapels[idx].join = join;
-                    container2.dataset.allMapels = JSON.stringify(allMapels);
+                // Perbarui array dalam closure & re-render langsung SEBELUM modal ditutup
+                if (window._mapelUpdateItem) {
+                    window._mapelUpdateItem(_currentMapelUuid, order, join);
                 }
-                closeOrderJoinModal();
-                document.getElementById('mapelSearchInput').dispatchEvent(new Event('input'));
+                closeOrderJoinModal(); // Menutup modal akan men-set _currentMapelUuid jadi null
+                showMapelToast('Urutan & join berhasil diperbarui!');
             } else {
                 alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));
             }
@@ -861,26 +902,47 @@
             alert('Gagal menyimpan: ' + err.message);
         } finally {
             btn.disabled = false;
-            btn.innerHTML = `
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                Simpan
-            `;
+            btn.innerHTML = `<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Simpan`;
         }
     }
 
-    // Delete single
+    // ── Toast helper ──────────────────────────────────────────────────────
+    function showMapelToast(message, type = 'success') {
+        const toast  = document.getElementById('mapelToast');
+        const msgEl  = document.getElementById('mapelToastMsg');
+        const iconEl = document.getElementById('mapelToastIcon');
+
+        msgEl.textContent = message;
+        toast.style.background = type === 'success'
+            ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+            : 'linear-gradient(135deg, #ef4444, #dc2626)';
+        iconEl.innerHTML = type === 'success'
+            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />'
+            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />';
+
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(12px)';
+        toast.classList.remove('hidden');
+        toast.classList.add('flex');
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        });
+
+        clearTimeout(toast._hideTimer);
+        toast._hideTimer = setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(12px)';
+            setTimeout(() => { toast.classList.add('hidden'); toast.classList.remove('flex'); }, 350);
+        }, 3000);
+    }
+
     function confirmDeleteMapel(deleteUrl, mapelName) {
         if (!confirm(`Hapus mapel "${mapelName}"? Tindakan ini tidak dapat dibatalkan.`)) return;
-
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = deleteUrl;
-        form.innerHTML = `
-            @csrf
-            @method('DELETE')
-        `;
+        form.innerHTML = `@csrf @method('DELETE')`;
         document.body.appendChild(form);
         form.submit();
     }

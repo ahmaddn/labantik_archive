@@ -315,7 +315,7 @@ class GraduationMapelController extends Controller
             \DB::beginTransaction();
 
             // Coba cari by uuid dulu, fallback ke id jika tidak ketemu
-            $mapels = GoogleMapel::whereIn('uuid', $validated['uuids'])->get(); 
+            $mapels = GoogleMapel::whereIn('uuid', $validated['uuids'])->get();
 
             if ($mapels->isEmpty()) {
                 // Fallback: mungkin yang dikirim adalah integer id

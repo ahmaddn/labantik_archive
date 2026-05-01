@@ -59,7 +59,7 @@
                 data ditemukan
             </p>
 
-            {{-- Export Surat — masing-masing punya dropdown sendiri --}}
+            {{-- Export Surat --}}
             <div class="flex items-center gap-2 flex-wrap" id="suratExportGroup">
 
                 {{-- ── Surat Kelulusan ───────────────────────────────── --}}
@@ -81,7 +81,6 @@
                         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export sebagai
                         </p>
 
-                        {{-- Semua --}}
                         <button onclick="doExport('kelulusan', 'all')"
                             class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-colors">
                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +90,6 @@
                             Semua
                         </button>
 
-                        {{-- Per Jurusan --}}
                         <div>
                             <button onclick="toggleSubFilter('kelulusan','jurusan')"
                                 class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-colors">
@@ -118,13 +116,10 @@
                                     @endforeach
                                 </select>
                                 <button onclick="doExport('kelulusan', 'jurusan')"
-                                    class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">
-                                    Export
-                                </button>
+                                    class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">Export</button>
                             </div>
                         </div>
 
-                        {{-- Per Kelas --}}
                         <div>
                             <button onclick="toggleSubFilter('kelulusan','kelas')"
                                 class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-colors">
@@ -152,9 +147,7 @@
                                     @endforeach
                                 </select>
                                 <button onclick="doExport('kelulusan', 'kelas')"
-                                    class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">
-                                    Export
-                                </button>
+                                    class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">Export</button>
                             </div>
                         </div>
                     </div>
@@ -180,7 +173,6 @@
                         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export
                             sebagai</p>
 
-                        {{-- Semua --}}
                         <button onclick="doExport('pernyataan', 'all')"
                             class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors">
                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
@@ -191,7 +183,6 @@
                             Semua
                         </button>
 
-                        {{-- Per Jurusan --}}
                         <div>
                             <button onclick="toggleSubFilter('pernyataan','jurusan')"
                                 class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors">
@@ -218,13 +209,10 @@
                                     @endforeach
                                 </select>
                                 <button onclick="doExport('pernyataan', 'jurusan')"
-                                    class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors">
-                                    Export
-                                </button>
+                                    class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors">Export</button>
                             </div>
                         </div>
 
-                        {{-- Per Kelas --}}
                         <div>
                             <button onclick="toggleSubFilter('pernyataan','kelas')"
                                 class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors">
@@ -252,9 +240,7 @@
                                     @endforeach
                                 </select>
                                 <button onclick="doExport('pernyataan', 'kelas')"
-                                    class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors">
-                                    Export
-                                </button>
+                                    class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors">Export</button>
                             </div>
                         </div>
                     </div>
@@ -297,7 +283,7 @@
     </div>
 
     {{-- ============================================================ --}}
-    {{-- TABLE VIEW (default on desktop, optional on mobile)          --}}
+    {{-- TABLE VIEW                                                    --}}
     {{-- ============================================================ --}}
     <div id="graduationTableWrapper" style="display:none;">
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -306,11 +292,82 @@
                     <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
                         <tr>
                             <th class="px-4 sm:px-6 py-3 text-left font-semibold w-10">#</th>
-                            <th class="px-4 sm:px-6 py-3 text-left font-semibold">Nama Siswa</th>
-                            <th class="px-4 sm:px-6 py-3 text-left font-semibold">No. Surat</th>
-                            <th class="hidden sm:table-cell px-4 sm:px-6 py-3 text-left font-semibold">Kelas</th>
-                            <th class="hidden md:table-cell px-4 sm:px-6 py-3 text-left font-semibold">Tgl Lulus</th>
-                            <th class="hidden lg:table-cell px-4 sm:px-6 py-3 text-left font-semibold">Jml Mapel</th>
+                            {{-- Sortable headers --}}
+                            <th class="px-4 sm:px-6 py-3 text-left font-semibold">
+                                <button type="button"
+                                    class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
+                                    data-col="user_name">
+                                    Nama Siswa
+                                    <span class="grad-sort-icon text-gray-300 group-hover:text-[#1b84ff]"
+                                        data-col="user_name">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 text-left font-semibold">
+                                <button type="button"
+                                    class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
+                                    data-col="letter_number">
+                                    No. Surat
+                                    <span class="grad-sort-icon text-gray-300 group-hover:text-[#1b84ff]"
+                                        data-col="letter_number">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </th>
+                            <th class="hidden sm:table-cell px-4 sm:px-6 py-3 text-left font-semibold">
+                                <button type="button"
+                                    class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
+                                    data-col="class_name">
+                                    Kelas
+                                    <span class="grad-sort-icon text-gray-300 group-hover:text-[#1b84ff]"
+                                        data-col="class_name">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </th>
+                            <th class="hidden md:table-cell px-4 sm:px-6 py-3 text-left font-semibold">
+                                <button type="button"
+                                    class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
+                                    data-col="graduation_date">
+                                    Tgl Lulus
+                                    <span class="grad-sort-icon text-gray-300 group-hover:text-[#1b84ff]"
+                                        data-col="graduation_date">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </th>
+                            <th class="hidden lg:table-cell px-4 sm:px-6 py-3 text-left font-semibold">
+                                <button type="button"
+                                    class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
+                                    data-col="mapel_count">
+                                    Jml Mapel
+                                    <span class="grad-sort-icon text-gray-300 group-hover:text-[#1b84ff]"
+                                        data-col="mapel_count">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </th>
                             <th class="px-4 sm:px-6 py-3 text-center font-semibold">Aksi</th>
                         </tr>
                     </thead>
@@ -346,7 +403,6 @@
     <div id="graduationCardWrapper" style="display:none;">
         <div class="space-y-3" id="graduationCardBody"></div>
 
-        {{-- Card pagination --}}
         <div id="graduationCardPaginationContainer" style="display:none;"
             class="flex items-center justify-between gap-3 pt-3">
             <div class="flex items-center gap-2">
@@ -376,6 +432,27 @@
         #viewModeTable {
             display: none !important;
         }
+    }
+
+    /* Sorting header styles */
+    .grad-sort-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: inherit;
+        color: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+    }
+
+    .grad-sort-btn.sort-active {
+        color: #1b84ff;
+    }
+
+    .grad-sort-btn.sort-active .grad-sort-icon {
+        color: #1b84ff;
     }
 </style>
 
@@ -409,8 +486,83 @@
         let currentPage = 1;
         let perPage = 10;
         let filteredData = [...allData];
-        // Detect mobile default: card view on <640px
         let viewMode = window.innerWidth < 640 ? 'card' : 'table';
+
+        // ── Sort state ───────────────────────────────────────────────────
+        let sortCol = null; // 'user_name' | 'letter_number' | 'class_name' | 'graduation_date' | 'mapel_count'
+        let sortDir = null; // 'asc' | 'desc' | null
+
+        // SVG icons
+        const iconBoth =
+            `<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>`;
+        const iconAsc =
+            `<svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 4l-4 4h3v12h2V8h3L7 4zm10 16l4-4h-3V4h-2v12h-3l4 4z" opacity=".3"/><path d="M7 4l-4 4h3v12h2V8h3L7 4z"/></svg>`;
+        const iconDesc =
+            `<svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 4l-4 4h3v12h2V8h3L7 4z" opacity=".3"/><path d="M17 20l4-4h-3V4h-2v12h-3l4 4z"/></svg>`;
+
+        function updateSortIcons() {
+            document.querySelectorAll('.grad-sort-btn').forEach(btn => {
+                const col = btn.dataset.col;
+                const iconEl = btn.querySelector('.grad-sort-icon');
+                if (col === sortCol) {
+                    btn.classList.add('sort-active');
+                    iconEl.innerHTML = sortDir === 'asc' ? iconAsc : iconDesc;
+                } else {
+                    btn.classList.remove('sort-active');
+                    iconEl.innerHTML = iconBoth;
+                }
+            });
+        }
+
+        function applySort(data) {
+            if (!sortCol || !sortDir) return data;
+            return [...data].sort((a, b) => {
+                let valA = a[sortCol] ?? '';
+                let valB = b[sortCol] ?? '';
+
+                // Numeric sort for mapel_count
+                if (sortCol === 'mapel_count') {
+                    valA = Number(valA) || 0;
+                    valB = Number(valB) || 0;
+                    return sortDir === 'asc' ? valA - valB : valB - valA;
+                }
+
+                // Date sort for graduation_date
+                if (sortCol === 'graduation_date') {
+                    valA = valA ? new Date(valA).getTime() : 0;
+                    valB = valB ? new Date(valB).getTime() : 0;
+                    return sortDir === 'asc' ? valA - valB : valB - valA;
+                }
+
+                // String sort
+                valA = String(valA).toLowerCase();
+                valB = String(valB).toLowerCase();
+                if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+                if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        // Attach sort button listeners
+        document.querySelectorAll('.grad-sort-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const col = this.dataset.col;
+                if (sortCol === col) {
+                    if (sortDir === 'asc') {
+                        sortDir = 'desc';
+                    } else if (sortDir === 'desc') {
+                        sortCol = null;
+                        sortDir = null;
+                    }
+                } else {
+                    sortCol = col;
+                    sortDir = 'asc';
+                }
+                currentPage = 1;
+                updateSortIcons();
+                updateDisplay();
+            });
+        });
 
         // ── Helpers ──────────────────────────────────────────────────────
         function fmtDate(dateStr) {
@@ -442,18 +594,18 @@
         window.setViewMode = function(mode) {
             viewMode = mode;
             document.querySelectorAll('.view-mode-btn').forEach(b => b.classList.remove('active-view'));
-            document.getElementById(mode === 'table' ? 'viewModeTable' : 'viewModeCard')
-                .classList.add('active-view');
+            document.getElementById(mode === 'table' ? 'viewModeTable' : 'viewModeCard').classList.add(
+                'active-view');
             updateDisplay();
         };
 
         // ── Main render ──────────────────────────────────────────────────
         function updateDisplay() {
-            const total = filteredData.length;
+            const sortedData = applySort(filteredData);
+            const total = sortedData.length;
             totalCount.textContent = total;
             if (totalData) totalData.textContent = total;
 
-            // On ≥sm always show table
             const effectiveMode = window.innerWidth >= 640 ? 'table' : viewMode;
 
             if (total === 0) {
@@ -468,24 +620,24 @@
             if (effectiveMode === 'card') {
                 tableWrapper.style.display = 'none';
                 cardWrapper.style.display = 'block';
-                renderCards();
+                renderCards(sortedData);
             } else {
                 cardWrapper.style.display = 'none';
                 tableWrapper.style.display = 'block';
                 paginCont.style.display = 'flex';
-                renderTable();
-                renderPagination();
+                renderTable(sortedData);
+                renderPagination(sortedData);
             }
         }
 
         // ── Table render ─────────────────────────────────────────────────
-        function renderTable() {
+        function renderTable(sortedData) {
             tableBody.innerHTML = '';
             const start = (currentPage - 1) * perPage;
-            const pageData = filteredData.slice(start, start + perPage);
+            const pageData = sortedData.slice(start, start + perPage);
 
             if (rangeStart) rangeStart.textContent = start + 1;
-            if (rangeEnd) rangeEnd.textContent = Math.min(start + perPage, filteredData.length);
+            if (rangeEnd) rangeEnd.textContent = Math.min(start + perPage, sortedData.length);
 
             pageData.forEach((g, idx) => {
                 const row = document.createElement('tr');
@@ -561,12 +713,12 @@
         }
 
         // ── Card render (mobile) ─────────────────────────────────────────
-        function renderCards() {
+        function renderCards(sortedData) {
             cardBody.innerHTML = '';
             const start = (currentPage - 1) * perPage;
-            const pageData = filteredData.slice(start, start + perPage);
+            const pageData = sortedData.slice(start, start + perPage);
 
-            pageData.forEach((g, idx) => {
+            pageData.forEach((g) => {
                 const detailUrl = routeShow.replace(':id', g.uuid);
                 const card = document.createElement('div');
                 card.className = 'bg-white border border-gray-200 rounded-2xl p-4 shadow-sm';
@@ -580,34 +732,27 @@
                         <p class="font-semibold text-gray-900 text-sm truncate">${g.user_name ?? 'User Terhapus'}</p>
                         <p class="text-xs text-gray-500 mt-0.5">${fmtDate(g.graduation_date)}</p>
                     </div>
-                    <a href="${detailUrl}"
-                       class="flex-shrink-0 inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors">
+                    <a href="${detailUrl}" class="flex-shrink-0 inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors">
                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
                         Detail
                     </a>
                 </div>
                 <div class="mt-3 flex items-center gap-2 flex-wrap">
                     <code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600 max-w-full truncate">${g.letter_number ?? '-'}</code>
-                    <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                        ${g.class_name ?? '-'}
-                    </span>
+                    <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">${g.class_name ?? '-'}</span>
                     <span class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
                         <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                         ${g.mapel_count ?? 0} Mapel
                     </span>
                 </div>
                 <div class="mt-3 flex items-center gap-2 flex-wrap">
-                    <a href="${detailUrl}"
-                       class="flex-1 text-center inline-flex items-center justify-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors">
+                    <a href="${detailUrl}" class="flex-1 text-center inline-flex items-center justify-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors">
                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
                         Detail
                     </a>
@@ -640,8 +785,7 @@
                 cardBody.appendChild(card);
             });
 
-            // card pagination
-            const lastPage = Math.ceil(filteredData.length / perPage);
+            const lastPage = Math.ceil(sortedData.length / perPage);
             if (lastPage > 1) {
                 cardPaginCont.style.display = 'flex';
                 renderCardPagination(lastPage);
@@ -670,9 +814,9 @@
             return b;
         }
 
-        function buildPageButtons(container, lastPage, onPageClick) {
-            container.innerHTML = '';
-            container.appendChild(makeNavBtn(currentPage === 1, 'prev', () => {
+        function buildPageButtons(cont, lastPage) {
+            cont.innerHTML = '';
+            cont.appendChild(makeNavBtn(currentPage === 1, 'prev', () => {
                 currentPage--;
                 updateDisplay();
             }));
@@ -685,14 +829,14 @@
                         const d = document.createElement('span');
                         d.className = 'flex h-8 items-center px-1 text-gray-400 text-xs';
                         d.textContent = '…';
-                        container.appendChild(d);
+                        cont.appendChild(d);
                     }
                     if (i === currentPage) {
                         const s = document.createElement('span');
                         s.className =
                             'flex h-8 w-8 items-center justify-center rounded-lg bg-[#1b84ff] text-xs font-bold text-white';
                         s.textContent = i;
-                        container.appendChild(s);
+                        cont.appendChild(s);
                     } else {
                         const b = document.createElement('button');
                         b.type = 'button';
@@ -703,19 +847,19 @@
                             currentPage = i;
                             updateDisplay();
                         });
-                        container.appendChild(b);
+                        cont.appendChild(b);
                     }
                     prev = i;
                 }
             }
-            container.appendChild(makeNavBtn(currentPage === lastPage, 'next', () => {
+            cont.appendChild(makeNavBtn(currentPage === lastPage, 'next', () => {
                 currentPage++;
                 updateDisplay();
             }));
         }
 
-        function renderPagination() {
-            buildPageButtons(paginBtns, Math.ceil(filteredData.length / perPage));
+        function renderPagination(sortedData) {
+            buildPageButtons(paginBtns, Math.ceil(sortedData.length / perPage));
         }
 
         function renderCardPagination(lastPage) {
@@ -741,37 +885,33 @@
 
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 640) {
-                // force table on desktop
                 if (viewMode !== 'table') setViewMode('table');
                 else updateDisplay();
             }
         });
 
-        // Init view mode buttons
         if (viewMode === 'card') {
             document.getElementById('viewModeCard')?.classList.add('active-view');
             document.getElementById('viewModeTable')?.classList.remove('active-view');
         }
 
+        updateSortIcons();
         updateDisplay();
     });
 </script>
 <script>
-    // ── Toggle buka/tutup dropdown utama ─────────────────────────────────
     function toggleExportDropdown(type) {
         const other = type === 'kelulusan' ? 'Pernyataan' : 'Kelulusan';
         document.getElementById('dropdown' + other)?.classList.add('hidden');
         document.getElementById('dropdown' + capitalize(type))?.classList.toggle('hidden');
     }
 
-    // ── Toggle sub-filter (akordeon) ─────────────────────────────────────
     function toggleSubFilter(type, filter) {
         const key = capitalize(type) + capitalize(filter);
         const sub = document.getElementById('sub' + key);
         const arrow = document.getElementById('arrow' + key);
         const isHidden = sub.classList.contains('hidden');
 
-        // Tutup sub-filter lain pada dropdown yang sama
         ['Jurusan', 'Kelas'].forEach(f => {
             const k = capitalize(type) + f;
             document.getElementById('sub' + k)?.classList.add('hidden');
@@ -785,7 +925,6 @@
         }
     }
 
-    // ── Eksekusi export ───────────────────────────────────────────────────
     function doExport(type, mode) {
         const baseUrl = type === 'kelulusan' ?
             '{{ route('admin.graduation.showSuratKelulusan', ['id' => 'all']) }}' :
@@ -811,11 +950,9 @@
 
         const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
         window.open(url, '_blank');
-
         document.getElementById('dropdown' + capitalize(type))?.classList.add('hidden');
     }
 
-    // ── Tutup dropdown jika klik di luar ─────────────────────────────────
     document.addEventListener('click', function(e) {
         ['Kelulusan', 'Pernyataan'].forEach(type => {
             const wrapper = document.getElementById('dropdownWrapper' + type);

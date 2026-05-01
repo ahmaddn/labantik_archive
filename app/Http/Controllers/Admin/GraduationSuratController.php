@@ -26,8 +26,8 @@ class GraduationSuratController extends Controller
         $letter     = $graduation->letter;
         $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
 
-        $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? 999)->values();
-        $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? 999)->values();
+        $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+        $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
 
         $scores   = $mapelsData->whereNotNull('score')->pluck('score');
         $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
@@ -106,8 +106,8 @@ class GraduationSuratController extends Controller
             $letter     = $graduation->letter;
             $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
 
-            $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? 999)->values();
-            $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? 999)->values();
+            $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+            $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
 
             $scores   = $mapelsData->whereNotNull('score')->pluck('score');
             $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';

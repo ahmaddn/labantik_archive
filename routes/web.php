@@ -143,4 +143,6 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::post('/graduation/store',             [GraduationController::class, 'store'])->name('graduation.store');
     Route::get('/graduation/{id}',               [GraduationController::class, 'show'])->name('graduation.show');
     Route::delete('/graduation/{id}',            [GraduationController::class, 'destroy'])->name('graduation.destroy');
+    Route::post('graduation/score/update',      [GraduationController::class, 'updateScore'])->name('graduation.updateScore');
+    Route::post('graduation/score/update-bulk', [GraduationController::class, 'updateScoreBulk'])->name('graduation.updateScoreBulk');
 });

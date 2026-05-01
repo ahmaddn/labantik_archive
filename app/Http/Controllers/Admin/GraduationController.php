@@ -273,4 +273,98 @@ class GraduationController extends Controller
             ], 500);
         }
     }
+
+    public function updateScore(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'uuid'  => 'required|string',
+                'score' => 'nullable|numeric|min:0|max:100',
+            ], [
+                'score.numeric' => 'Nilai harus berupa angka.',
+                'score.min'     => 'Nilai minimal 0.',
+                'score.max'     => 'Nilai maksimal 100.',
+            ]);
+
+            $graduationMapel = GoogleGraduationMapel::where('uuid', $validated['uuid'])->firstOrFail();
+
+            $graduationMapel->update([
+                'score' => $validated['score'] ?? null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Nilai berhasil diperbarui.',
+                'data'    => [
+                    'uuid'  => $graduationMapel->uuid,
+                    'score' => $graduationMapel->score,
+                ],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => collect($e->errors())->flatten()->first(),
+            ], 422);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data mapel kelulusan tidak ditemukan.',
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('updateScore error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui nilai: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update nilai semua mapel sekaligus (AJAX)
+     * POST /admin/graduation/score/update-bulk
+     */
+    public function updateScoreBulk(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'scores'         => 'required|array|min:1',
+                'scores.*.uuid'  => 'required|string',
+                'scores.*.score' => 'nullable|numeric|min:0|max:100',
+            ], [
+                'scores.*.score.numeric' => 'Nilai harus berupa angka.',
+                'scores.*.score.min'     => 'Nilai minimal 0.',
+                'scores.*.score.max'     => 'Nilai maksimal 100.',
+            ]);
+
+            \DB::beginTransaction();
+
+            $updatedCount = 0;
+            foreach ($validated['scores'] as $item) {
+                $rows = GoogleGraduationMapel::where('uuid', $item['uuid'])->update([
+                    'score' => $item['score'] ?? null,
+                ]);
+                $updatedCount += $rows;
+            }
+
+            \DB::commit();
+
+            return response()->json([
+                'success'       => true,
+                'message'       => "Nilai berhasil diperbarui untuk {$updatedCount} mapel.",
+                'updated_count' => $updatedCount,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => collect($e->errors())->flatten()->first(),
+            ], 422);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('updateScoreBulk error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui nilai: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }
