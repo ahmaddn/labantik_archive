@@ -312,13 +312,15 @@
         const templateSelectDropdown = document.getElementById('templateSelectDropdown');
         const applyTemplateBtn = document.getElementById('applyTemplateBtn');
 
-        templateSelectDropdown.addEventListener('change', function() {
-            const has = this.value !== '';
-            applyTemplateBtn.disabled = !has;
-            applyTemplateBtn.classList.toggle('opacity-50', !has);
-            applyTemplateBtn.classList.toggle('cursor-not-allowed', !has);
-            applyTemplateBtn.classList.toggle('hover:scale-[1.02]', has);
-        });
+        if (templateSelectDropdown && applyTemplateBtn) {
+            templateSelectDropdown.addEventListener('change', function() {
+                const has = this.value !== '';
+                applyTemplateBtn.disabled = !has;
+                applyTemplateBtn.classList.toggle('opacity-50', !has);
+                applyTemplateBtn.classList.toggle('cursor-not-allowed', !has);
+                applyTemplateBtn.classList.toggle('hover:scale-[1.02]', has);
+            });
+        }
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeDownloadModal();

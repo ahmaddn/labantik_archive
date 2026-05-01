@@ -501,7 +501,7 @@
 
         const currentBlock = getCurrentBlock();
         const isEmpty = currentBlock &&
-            (currentBlock.innerText.trim() === '' || currentBlock.innerHTML === '<br>');
+            ((currentBlock.innerText || currentBlock.textContent || '').trim() === '' || currentBlock.innerHTML === '<br>');
 
         const newDiv = document.createElement('div');
         newDiv.innerHTML = '<br>';
