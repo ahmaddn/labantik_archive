@@ -107,27 +107,26 @@
         </div>
     </div>
 
+    {{-- GANTI script lama dengan ini --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const typeSelect = document.getElementById('type');
             const expertiseContainer = document.getElementById('expertise-container');
-            const expertiseSelect = document.getElementById('expertise_id');
 
             function toggleExpertiseField() {
                 if (typeSelect.value === 'jurusan') {
                     expertiseContainer.style.display = 'block';
-                    expertiseSelect.required = true;
                 } else {
                     expertiseContainer.style.display = 'none';
-                    expertiseSelect.required = false;
-                    expertiseSelect.value = '';
+                    // Reset semua checkbox jurusan saat tipe diubah ke umum
+                    expertiseContainer.querySelectorAll('.expertise-checkbox').forEach(cb => {
+                        cb.checked = false;
+                    });
                 }
             }
 
             typeSelect.addEventListener('change', toggleExpertiseField);
-
-            // Jalankan saat halaman load (jika ada old value dari form error)
-            toggleExpertiseField();
+            toggleExpertiseField(); // jalankan saat load (untuk old value)
         });
     </script>
 @endsection

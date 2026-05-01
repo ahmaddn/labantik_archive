@@ -182,208 +182,260 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-                    const classRadios = document.querySelectorAll('.class-radio');
-                    const classItems = document.querySelectorAll('.class-item');
-                    const classSearch = document.getElementById('classSearch');
-                    const levelFilters = document.querySelectorAll('.level-filter');
-                    const studentSection = document.getElementById('studentSection');
-                    const studentEmpty = document.getElementById('studentEmpty');
-                    const studentSelect = document.getElementById('student_id');
-                    const studentLoading = document.getElementById('studentLoading');
-                    const mapelEmpty = document.getElementById('mapelEmpty');
-                    const mapelLoading = document.getElementById('mapelLoading');
-                    const mapelList = document.getElementById('mapelList');
-                    const mapelCountBadge = document.getElementById('mapelCountBadge');
-                    const selectedCount = document.getElementById('selectedCount');
+            const classRadios = document.querySelectorAll('.class-radio');
+            const classItems = document.querySelectorAll('.class-item');
+            const classSearch = document.getElementById('classSearch');
+            const levelFilters = document.querySelectorAll('.level-filter');
+            const studentSection = document.getElementById('studentSection');
+            const studentEmpty = document.getElementById('studentEmpty');
+            const studentSelect = document.getElementById('student_id');
+            const studentLoading = document.getElementById('studentLoading');
+            const mapelEmpty = document.getElementById('mapelEmpty');
+            const mapelLoading = document.getElementById('mapelLoading');
+            const mapelList = document.getElementById('mapelList');
+            const mapelCountBadge = document.getElementById('mapelCountBadge');
+            const selectedCount = document.getElementById('selectedCount');
 
-                    let activeLevel = '';
+            let activeLevel = '';
 
-                    // ── Filter level ──────────────────────────────────────────────────
-                    levelFilters.forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            activeLevel = btn.dataset.level;
-                            levelFilters.forEach(b => b.classList.remove('active-level', 'bg-blue-100',
-                                'text-blue-700', 'border-blue-300'));
-                            btn.classList.add('active-level', 'bg-blue-100', 'text-blue-700',
-                                'border-blue-300');
-                            filterClasses();
+            // ── Escape HTML untuk mencegah XSS & syntax error ─────────────────
+            function escHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            // ── Filter level ───────────────────────────────────────────────────
+            levelFilters.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeLevel = btn.dataset.level;
+                    levelFilters.forEach(b => b.classList.remove('active-level', 'bg-blue-100',
+                        'text-blue-700', 'border-blue-300'));
+                    btn.classList.add('active-level', 'bg-blue-100', 'text-blue-700',
+                        'border-blue-300');
+                    filterClasses();
+                });
+            });
+
+            // ── Filter search ──────────────────────────────────────────────────
+            classSearch.addEventListener('input', filterClasses);
+
+            function filterClasses() {
+                const q = classSearch.value.toLowerCase().trim();
+                classItems.forEach(item => {
+                    const matchLevel = !activeLevel || item.dataset.level == activeLevel;
+                    const matchName = !q || item.dataset.name.includes(q);
+                    item.style.display = (matchLevel && matchName) ? '' : 'none';
+                });
+            }
+
+            // ── Pilih kelas → load siswa & mapel ──────────────────────────────
+            classRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const classId = this.value;
+                    loadStudents(classId);
+                    loadMapels(classId);
+                });
+            });
+
+            function loadStudents(classId) {
+                studentEmpty.classList.add('hidden');
+                studentSection.classList.remove('hidden');
+                studentLoading.classList.remove('hidden');
+                studentSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+                studentSelect.disabled = true;
+
+                fetch(`{{ route('admin.graduation.studentsByClass') }}?class_id=${classId}`)
+                    .then(r => r.json())
+                    .then(students => {
+                        studentLoading.classList.add('hidden');
+                        studentSelect.disabled = false;
+                        if (students.length === 0) {
+                            studentSelect.innerHTML = '<option value="">Tidak ada siswa di kelas ini</option>';
+                            return;
+                        }
+                        students.forEach(s => {
+                            const opt = document.createElement('option');
+                            opt.value = s.id;
+                            opt.textContent = `${s.full_name} (${s.student_number})`;
+                            studentSelect.appendChild(opt);
                         });
+                    })
+                    .catch(() => {
+                        studentLoading.classList.add('hidden');
+                        studentSelect.disabled = false;
+                        studentSelect.innerHTML = '<option value="">Gagal memuat siswa</option>';
                     });
+            }
 
-                    // ── Filter search ────────────────────────────────────────────────
-                    classSearch.addEventListener('input', filterClasses);
+            function loadMapels(classId) {
+                mapelEmpty.classList.add('hidden');
+                mapelList.classList.add('hidden');
+                mapelLoading.classList.remove('hidden');
 
-                    function filterClasses() {
-                        const q = classSearch.value.toLowerCase().trim();
-                        classItems.forEach(item => {
-                            const matchLevel = !activeLevel || item.dataset.level == activeLevel;
-                            const matchName = !q || item.dataset.name.includes(q);
-                            item.style.display = (matchLevel && matchName) ? '' : 'none';
+                fetch(`{{ route('admin.graduation.mapelsByClass') }}?class_id=${classId}`)
+                    .then(r => {
+                        if (!r.ok) {
+                            return r.json().then(err => {
+                                throw new Error(err.error || 'HTTP ' + r.status);
+                            });
+                        }
+                        return r.json();
+                    })
+                    .then(mapels => {
+                        mapelLoading.classList.add('hidden');
+                        mapelList.innerHTML = '';
+
+                        if (mapels.length === 0) {
+                            mapelEmpty.classList.remove('hidden');
+                            mapelCountBadge.textContent = '0 Mapel';
+                            return;
+                        }
+
+                        // Group by expertise_name
+                        const groups = {};
+                        mapels.forEach(m => {
+                            const key = m.expertise_name || 'Umum';
+                            if (!groups[key]) groups[key] = [];
+                            groups[key].push(m);
                         });
-                    }
 
-                    // ── Pilih kelas → load siswa & mapel ────────────────────────────
-                    classRadios.forEach(radio => {
-                        radio.addEventListener('change', function() {
-                            const classId = this.value;
-                            loadStudents(classId);
-                            loadMapels(classId);
-                        });
-                    });
+                        Object.entries(groups).forEach(([expertiseName, items]) => {
+                            const safeId = 'acc-' + expertiseName
+                                .toLowerCase()
+                                .replace(/[^a-z0-9]+/g, '-')
+                                .replace(/^-+|-+$/g, '');
 
-                    function loadStudents(classId) {
-                        studentEmpty.classList.add('hidden');
-                        studentSection.classList.remove('hidden');
-                        studentLoading.classList.remove('hidden');
-                        studentSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
-                        studentSelect.disabled = true;
+                            const gridAttr = 'grid-' + safeId;
 
-                        fetch(`{{ route('admin.graduation.studentsByClass') }}?class_id=${classId}`)
-                            .then(r => r.json())
-                            .then(students => {
-                                studentLoading.classList.add('hidden');
-                                studentSelect.disabled = false;
-                                if (students.length === 0) {
-                                    studentSelect.innerHTML = '<option value="">Tidak ada siswa di kelas ini</option>';
-                                    return;
-                                }
-                                students.forEach(s => {
-                                    const opt = document.createElement('option');
-                                    opt.value = s.id;
-                                    opt.textContent = `${s.full_name} (${s.student_number})`;
-                                    studentSelect.appendChild(opt);
+                            // ✅ Gunakan DOM API untuk header, bukan innerHTML dengan variabel langsung
+                            const section = document.createElement('div');
+                            section.className =
+                                'group/accordion flex flex-col border border-gray-200 rounded-xl overflow-hidden';
+
+                            // Buat elemen header pakai DOM — aman dari special chars
+                            const headerLabel = document.createElement('label');
+                            headerLabel.htmlFor = safeId;
+                            headerLabel.className =
+                                'flex items-center justify-between px-5 py-3 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 cursor-pointer transition-all border-b border-gray-200';
+                            headerLabel.innerHTML = `
+                                <div class="flex items-center gap-3">
+                                    <div class="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-blue-600 font-bold text-xs shadow-xs">
+                                        ${items.length}
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-800"></span>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-500 transition-transform duration-300 group-has-[:checked]/accordion:rotate-180"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            `;
+                            // ✅ Set teks nama jurusan secara aman (textContent, bukan innerHTML)
+                            headerLabel.querySelector('span').textContent = expertiseName;
+
+                            const toggleInput = document.createElement('input');
+                            toggleInput.type = 'checkbox';
+                            toggleInput.id = safeId;
+                            toggleInput.className = 'peer hidden';
+                            toggleInput.checked = true;
+
+                            const collapseDiv = document.createElement('div');
+                            collapseDiv.className =
+                                'max-h-0 overflow-hidden transition-all duration-300 ease-in-out peer-checked:max-h-[2000px]';
+
+                            const grid = document.createElement('div');
+                            grid.className =
+                                'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-5 bg-white';
+                            grid.dataset.grid = gridAttr;
+
+                            collapseDiv.appendChild(grid);
+                            section.appendChild(headerLabel);
+                            section.appendChild(toggleInput);
+                            section.appendChild(collapseDiv);
+                            mapelList.appendChild(section);
+
+                            // Render tiap mapel
+                            items.forEach(m => {
+                                const label = document.createElement('label');
+                                label.className =
+                                    'group flex items-start p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer';
+
+                                // Checkbox
+                                const checkbox = document.createElement('input');
+                                checkbox.name = 'mapel_ids[]';
+                                checkbox.value = m.uuid;
+                                checkbox.type = 'checkbox';
+                                checkbox.className =
+                                    'mapel-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded-md focus:ring-blue-500 transition-all flex-shrink-0 mt-0.5';
+
+                                // Wrapper teks
+                                const textDiv = document.createElement('div');
+                                textDiv.className = 'ml-3 flex-1';
+
+                                const nameSpan = document.createElement('span');
+                                nameSpan.className =
+                                    'block font-semibold text-gray-800 group-hover:text-blue-700 transition-colors text-sm';
+                                nameSpan.textContent = m.name; // ✅ textContent aman
+
+                                const typeBadge = document.createElement('span');
+                                typeBadge.className =
+                                    'text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded inline-block mt-1.5 mb-2 font-medium uppercase tracking-wide';
+                                typeBadge.textContent = m.type; // ✅ textContent aman
+
+                                const scoreWrapper = document.createElement('div');
+                                scoreWrapper.className = 'score-wrapper hidden mt-2';
+
+                                const scoreInput = document.createElement('input');
+                                scoreInput.type = 'number';
+                                scoreInput.name = `scores[${m.uuid}]`;
+                                scoreInput.min = '0';
+                                scoreInput.max = '100';
+                                scoreInput.step = '0.01';
+                                scoreInput.placeholder = 'Nilai (0-100)';
+                                scoreInput.className =
+                                    'score-input w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent';
+                                scoreInput.addEventListener('click', e => e.stopPropagation());
+
+                                scoreWrapper.appendChild(scoreInput);
+                                textDiv.appendChild(nameSpan);
+                                textDiv.appendChild(typeBadge);
+                                textDiv.appendChild(scoreWrapper);
+                                label.appendChild(checkbox);
+                                label.appendChild(textDiv);
+                                grid.appendChild(label);
+
+                                // Toggle score input
+                                checkbox.addEventListener('change', function() {
+                                    scoreWrapper.classList.toggle('hidden', !this
+                                        .checked);
+                                    updateSelectedCount();
                                 });
-                            })
-                            .catch(() => {
-                                studentLoading.classList.add('hidden');
-                                studentSelect.disabled = false;
-                                studentSelect.innerHTML = '<option value="">Gagal memuat siswa</option>';
                             });
-                    }
+                        });
 
-                    function loadMapels(classId) {
-                        mapelEmpty.classList.add('hidden');
-                        mapelList.classList.add('hidden');
-                        mapelLoading.classList.remove('hidden');
+                        mapelList.classList.remove('hidden');
+                        mapelCountBadge.textContent = `${mapels.length} Mapel`;
 
-                        fetch(`{{ route('admin.graduation.mapelsByClass') }}?class_id=${classId}`)
-                            .then(r => {
-                                if (!r.ok) {
-                                    return r.json().then(err => {
-                                        throw new Error(err.error || 'HTTP ' + r.status);
-                                    });
-                                }
-                                return r.json();
-                            })
-                            .then(mapels => {
-                                    mapelLoading.classList.add('hidden');
-                                    mapelList.innerHTML = '';
+                        mapelList.querySelectorAll('.mapel-checkbox').forEach(cb => {
+                            cb.addEventListener('change', updateSelectedCount);
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Fetch error:', err);
+                        mapelLoading.classList.add('hidden');
+                        mapelEmpty.classList.remove('hidden');
+                        mapelEmpty.querySelector('p').textContent = 'Gagal memuat mapel.';
+                    });
+            }
 
-                                    if (mapels.length === 0) {
-                                        mapelEmpty.classList.remove('hidden');
-                                        mapelCountBadge.textContent = '0 Mapel';
-                                        return;
-                                    }
-
-                                    // Group by expertise_name
-                                    const groups = {};
-                                    mapels.forEach(m => {
-                                        if (!groups[m.expertise_name]) groups[m.expertise_name] = [];
-                                        groups[m.expertise_name].push(m);
-                                    });
-
-                                    // Ganti bagian ini di loadMapels:
-
-                                    Object.entries(groups).forEach(([expertiseName, items]) => {
-                                            const section = document.createElement('div');
-                                            section.className =
-                                                'group/accordion flex flex-col border border-gray-200 rounded-xl overflow-hidden';
-
-                                            // ← Sanitize: hapus semua karakter selain huruf, angka, dash
-                                            const safeId = 'acc-' + expertiseName
-                                                .toLowerCase()
-                                                .replace(/[^a-z0-9]+/g, '-') // ganti semua non-alphanumeric jadi dash
-                                                .replace(/^-+|-+$/g, ''); // trim dash di awal/akhir
-
-                                            // Gunakan data attribute, BUKAN querySelector dengan ID
-                                            const gridId = `grid-${safeId}`;
-
-                                            section.innerHTML = `
-        <label for="${safeId}"
-            class="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 cursor-pointer transition-all border-b border-gray-200">
-            <div class="flex items-center gap-3">
-                <div class="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-blue-600 font-bold text-xs shadow-xs">
-                    ${items.length}
-                </div>
-                <span class="text-sm font-semibold text-gray-800">${expertiseName}</span>
-            </div>
-            <svg class="w-5 h-5 text-gray-500 transition-transform duration-300 group-has-[:checked]/accordion:rotate-180"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-        </label>
-        <input type="checkbox" id="${safeId}" class="peer hidden" checked>
-        <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out peer-checked:max-h-[2000px]">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-5 bg-white" data-grid="${gridId}"></div>
-        </div>
-    `;
-
-                                            mapelList.appendChild(section);
-
-                                            // ← Pakai querySelector dengan data attribute, bukan ID
-                                            const grid = section.querySelector(`[data-grid="${gridId}"]`);
-
-                                            items.forEach(m => {
-                                                const label = document.createElement('label');
-                                                label.className =
-                                                    'group flex items-start p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer';
-                                                label.innerHTML = `
-                                                    <input name="mapel_ids[]" value="${m.uuid}" type="checkbox"
-                                                        class="mapel-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded-md focus:ring-blue-500 transition-all flex-shrink-0 mt-0.5">
-                                                    <div class="ml-3 flex-1">
-                                                        <span class="block font-semibold text-gray-800 group-hover:text-blue-700 transition-colors text-sm">${m.name}</span>
-                                                        <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded inline-block mt-1.5 mb-2 font-medium uppercase tracking-wide">${m.type}</span>
-                                                        <div class="score-wrapper hidden mt-2">
-                                                            <input type="number" name="scores[${m.uuid}]" min="0" max="100" step="0.01"
-                                                                placeholder="Nilai (0-100)"
-                                                                class="score-input w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                                onclick="event.stopPropagation()">
-                                                        </div>
-                                                    </div>
-                                                `;
-                                                grid.appendChild(label);
-
-                                                // Toggle score input visibility saat checkbox berubah
-                                                const checkbox = label.querySelector('.mapel-checkbox');
-                                                const scoreWrapper = label.querySelector('.score-wrapper');
-                                                checkbox.addEventListener('change', function() {
-                                                    scoreWrapper.classList.toggle('hidden', !this
-                                                        .checked);
-                                                    updateSelectedCount();
-                                                });
-                                            });
-
-                                            mapelList.classList.remove('hidden');
-                                            mapelCountBadge.textContent = `${mapels.length} Mapel`;
-
-                                            // Update counter saat checkbox berubah
-                                            mapelList.querySelectorAll('.mapel-checkbox').forEach(cb => {
-                                                cb.addEventListener('change', updateSelectedCount);
-                                            });
-                                        })
-                                        .catch(err => {
-                                            console.error('Fetch error:', err);
-                                            mapelLoading.classList.add('hidden');
-                                            mapelEmpty.classList.remove('hidden');
-                                            mapelEmpty.querySelector('p').textContent = 'Gagal memuat mapel.';
-                                        });
-                                }
-
-                                function updateSelectedCount() {
-                                    const checked = document.querySelectorAll('.mapel-checkbox:checked').length;
-                                    selectedCount.textContent = checked;
-                                }
-                            });
+            function updateSelectedCount() {
+                const checked = document.querySelectorAll('.mapel-checkbox:checked').length;
+                selectedCount.textContent = checked;
+            }
+        });
     </script>
 
     <style>

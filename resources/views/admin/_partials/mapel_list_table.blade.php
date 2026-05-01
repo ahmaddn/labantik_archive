@@ -2,8 +2,9 @@
     resources/views/admin/_partials/mapel_list_table.blade.php
 
     Variables expected (passed via @include):
-    - $routeEdit   : string  (e.g. 'admin.graduation.editMapel')
-    - $routeDelete : string  (e.g. 'admin.graduation.destroyMapel')
+    - $routeEdit       : string  (e.g. 'admin.graduation.editMapel')
+    - $routeDelete     : string  (e.g. 'admin.graduation.destroyMapel')
+    - $routeDeleteBulk : string  (e.g. 'admin.graduation.destroyMapelBulk')
 --}}
 
 @php
@@ -21,7 +22,7 @@
 
 <div class="mapel-table-container" data-all-mapels="{{ json_encode($allMapelsData) }}"
     data-route-edit="{{ route($routeEdit, ['id' => ':id']) }}"
-    data-route-delete="{{ route($routeDelete, ['id' => ':id']) }}"
+    data-route-delete="{{ route($routeDelete, ['id' => ':id']) }}" data-route-delete-bulk="{{ route($routeDeleteBulk) }}"
     data-route-update-order="{{ route('admin.graduation.updateMapelOrder') }}">
 
     {{-- Search bar --}}
@@ -65,6 +66,40 @@
         </p>
     </div>
 
+    {{-- ══════════════════════════════════════════════════════════
+         BULK ACTION BAR — muncul saat ada checkbox dicentang
+    ══════════════════════════════════════════════════════════ --}}
+    <div id="bulkActionBar"
+        class="mb-3 hidden items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+        <div class="flex items-center gap-2.5">
+            {{-- Icon warning --}}
+            <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-red-100">
+                <svg class="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-red-800">
+                <span id="bulkSelectedCount" class="font-bold">0</span> mapel dipilih
+            </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button type="button" id="bulkCancelBtn" onclick="clearAllCheckboxes()"
+                class="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-50">
+                Batal
+            </button>
+            <button type="button" id="bulkDeleteBtn" onclick="confirmBulkDelete()"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-red-700 active:scale-[0.98]">
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Hapus yang Dipilih
+            </button>
+        </div>
+    </div>
+
     {{-- Table --}}
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div id="mapelEmptyState" style="display:none;" class="py-20 text-center text-gray-400">
@@ -81,6 +116,14 @@
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
                     <tr>
+                        {{-- Checkbox Select All --}}
+                        <th class="w-10 px-4 py-3">
+                            <div class="flex items-center justify-center">
+                                <input type="checkbox" id="selectAllCheckbox"
+                                    class="h-4 w-4 cursor-pointer rounded border-gray-300 text-red-600 accent-red-600 focus:ring-red-500"
+                                    title="Pilih semua">
+                            </div>
+                        </th>
                         <th class="px-6 py-3 text-left font-semibold">#</th>
                         <th class="px-6 py-3 text-left font-semibold">Nama Mapel</th>
                         <th class="hidden px-6 py-3 text-left font-semibold sm:table-cell">Kelas</th>
@@ -122,6 +165,14 @@
 </div>
 
 {{-- ══════════════════════════════════════════════════════════
+     HIDDEN FORM — untuk bulk delete (POST)
+══════════════════════════════════════════════════════════ --}}
+<form id="bulkDeleteForm" method="POST" style="display:none;">
+    @csrf
+    {{-- UUID fields diisi oleh JS sebelum submit --}}
+</form>
+
+{{-- ══════════════════════════════════════════════════════════
      MODAL: Edit Urutan & Join
 ══════════════════════════════════════════════════════════ --}}
 <div id="orderJoinModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
@@ -137,7 +188,8 @@
             <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                 <div class="flex items-center gap-3">
                     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50">
-                        <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
                         </svg>
@@ -277,6 +329,7 @@
         const rangeStartSpan = document.getElementById('mapelRangeStart');
         const rangeEndSpan = document.getElementById('mapelRangeEnd');
         const paginationButtons = document.getElementById('mapelPaginationButtons');
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
 
         let currentPage = 1;
         let perPage = 10;
@@ -293,7 +346,6 @@
                 };
             }
         });
-        // Sort by academic level then name
         Object.keys(classMap).sort().forEach(label => {
             const opt = document.createElement('option');
             opt.value = label;
@@ -321,6 +373,7 @@
             });
 
             currentPage = 1;
+            clearAllCheckboxes();
             updateDisplay();
 
             const hasFilter = search || selectedClass;
@@ -358,8 +411,10 @@
 
             pageData.forEach((mapel, idx) => {
                 const rowNum = start + idx + 1;
+                const uuid = mapel.uuid ?? mapel.id;
                 const row = document.createElement('tr');
                 row.className = 'transition-colors hover:bg-gray-50';
+                row.dataset.uuid = uuid;
 
                 const typeBadge = mapel.type === 'umum' ?
                     `<span class="inline-block px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg">Umum</span>` :
@@ -368,73 +423,88 @@
                 const orderVal = mapel.order !== null && mapel.order !== undefined ? mapel.order : '—';
                 const joinVal = mapel.join !== null && mapel.join !== undefined ? mapel.join : 0;
 
-                const editUrl = routeEdit.replace(':id', mapel.uuid ?? mapel.id);
-                const deleteUrl = routeDelete.replace(':id', mapel.uuid ?? mapel.id);
+                const editUrl = routeEdit.replace(':id', uuid);
+                const deleteUrl = routeDelete.replace(':id', uuid);
 
                 const safeName = (mapel.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(
                     /"/g, '&quot;');
 
-                // Join badge: 0 = solo, >0 = grouped
                 const joinBadge = joinVal == 0 ?
                     `<span class="inline-flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-gray-100 px-2 text-xs font-bold text-gray-400">—</span>` :
                     `<span class="inline-flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-amber-50 px-2 text-xs font-bold text-amber-700">${joinVal}</span>`;
 
                 row.innerHTML = `
-                <td class="px-6 py-4 text-gray-400 font-medium">${rowNum}</td>
-                <td class="px-6 py-4">
-                    <div class="flex items-center gap-3">
-                        <span class="font-semibold text-gray-800">${mapel.name}</span>
-                    </div>
-                </td>
-                <td class="hidden px-6 py-4 text-gray-500 sm:table-cell">
-                    <span class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">${mapel.class_academic} ${mapel.class_name}</span>
-                </td>
-                <td class="hidden px-6 py-4 text-xs font-medium text-gray-700 md:table-cell">
-                    ${mapel.expertise_name}
-                </td>
-                <td class="hidden px-6 py-4 md:table-cell">
-                    ${typeBadge}
-                </td>
-                <td class="hidden px-6 py-4 text-center lg:table-cell">
-                    <span class="inline-flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-indigo-50 px-2 text-xs font-bold text-indigo-700">${orderVal}</span>
-                </td>
-                <td class="hidden px-6 py-4 text-center lg:table-cell">
-                    ${joinBadge}
-                </td>
-                <td class="px-6 py-4">
-                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                        <button type="button"
-                            onclick="openOrderJoinModal('${mapel.uuid ?? mapel.id}', '${safeName}', ${mapel.order ?? 999}, ${mapel.join ?? 0})"
-                            class="flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-xs font-medium text-indigo-700 transition-colors hover:bg-indigo-100"
-                            title="Edit urutan & join">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
-                            </svg>
-                            Urutan
-                        </button>
-                        <a href="${editUrl}"
-                           class="flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                            Edit
-                        </a>
-                        <button type="button"
-                            onclick="confirmDeleteMapel('${deleteUrl}', '${safeName}')"
-                            class="flex items-center gap-1 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            Hapus
-                        </button>
-                    </div>
-                </td>
-            `;
+                    <td class="w-10 px-4 py-4">
+                        <div class="flex items-center justify-center">
+                            <input type="checkbox"
+                                class="row-checkbox h-4 w-4 cursor-pointer rounded border-gray-300 text-red-600 accent-red-600 focus:ring-red-500"
+                                value="${uuid}"
+                                data-name="${safeName}">
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-gray-400 font-medium">${rowNum}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <span class="font-semibold text-gray-800">${mapel.name}</span>
+                        </div>
+                    </td>
+                    <td class="hidden px-6 py-4 text-gray-500 sm:table-cell">
+                        <span class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">${mapel.class_academic} ${mapel.class_name}</span>
+                    </td>
+                    <td class="hidden px-6 py-4 text-xs font-medium text-gray-700 md:table-cell">
+                        ${mapel.expertise_name}
+                    </td>
+                    <td class="hidden px-6 py-4 md:table-cell">
+                        ${typeBadge}
+                    </td>
+                    <td class="hidden px-6 py-4 text-center lg:table-cell">
+                        <span class="inline-flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-indigo-50 px-2 text-xs font-bold text-indigo-700">${orderVal}</span>
+                    </td>
+                    <td class="hidden px-6 py-4 text-center lg:table-cell">
+                        ${joinBadge}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                            <button type="button"
+                                onclick="openOrderJoinModal('${uuid}', '${safeName}', ${mapel.order ?? 999}, ${mapel.join ?? 0})"
+                                class="flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-xs font-medium text-indigo-700 transition-colors hover:bg-indigo-100"
+                                title="Edit urutan & join">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                                </svg>
+                                Urutan
+                            </button>
+                            <a href="${editUrl}"
+                               class="flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Edit
+                            </a>
+                            <button type="button"
+                                onclick="confirmDeleteMapel('${deleteUrl}', '${safeName}')"
+                                class="flex items-center gap-1 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Hapus
+                            </button>
+                        </div>
+                    </td>
+                `;
                 tableBody.appendChild(row);
             });
+
+            // Pasang event listener checkbox tiap baris
+            tableBody.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.addEventListener('change', onRowCheckboxChange);
+            });
+
+            // Sinkronkan state select-all setelah render
+            syncSelectAll();
         }
 
         // ── Pagination ────────────────────────────────────────────────────────────
@@ -511,6 +581,102 @@
             }));
         }
 
+        // ──────────────────────────────────────────────────────────
+        // CHECKBOX LOGIC
+        // ──────────────────────────────────────────────────────────
+
+        // Kumpulan UUID yang sudah dicentang (cross-page)
+        const selectedUuids = new Set();
+
+        function onRowCheckboxChange(e) {
+            const cb = e.target;
+            if (cb.checked) {
+                selectedUuids.add(cb.value);
+            } else {
+                selectedUuids.delete(cb.value);
+            }
+            syncSelectAll();
+            updateBulkBar();
+            highlightRow(cb);
+        }
+
+        function syncSelectAll() {
+            const allOnPage = tableBody.querySelectorAll('.row-checkbox');
+            const checkedOnPage = tableBody.querySelectorAll('.row-checkbox:checked');
+
+            if (allOnPage.length === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedOnPage.length === allOnPage.length) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedOnPage.length > 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
+        }
+
+        function highlightRow(cb) {
+            const row = cb.closest('tr');
+            if (!row) return;
+            if (cb.checked) {
+                row.classList.add('bg-red-50');
+                row.classList.remove('hover:bg-gray-50');
+            } else {
+                row.classList.remove('bg-red-50');
+                row.classList.add('hover:bg-gray-50');
+            }
+        }
+
+        function updateBulkBar() {
+            const bar = document.getElementById('bulkActionBar');
+            const countEl = document.getElementById('bulkSelectedCount');
+            const count = selectedUuids.size;
+
+            countEl.textContent = count;
+            if (count > 0) {
+                bar.classList.remove('hidden');
+                bar.classList.add('flex');
+            } else {
+                bar.classList.add('hidden');
+                bar.classList.remove('flex');
+            }
+        }
+
+        // Select-all checkbox pada thead
+        selectAllCheckbox.addEventListener('change', function() {
+            const allOnPage = tableBody.querySelectorAll('.row-checkbox');
+            allOnPage.forEach(cb => {
+                cb.checked = this.checked;
+                if (this.checked) {
+                    selectedUuids.add(cb.value);
+                } else {
+                    selectedUuids.delete(cb.value);
+                }
+                highlightRow(cb);
+            });
+            selectAllCheckbox.indeterminate = false;
+            updateBulkBar();
+        });
+
+        // Expose ke global agar tombol "Batal" di bulk bar bisa memanggil
+        window.clearAllCheckboxes = function() {
+            selectedUuids.clear();
+            tableBody.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.checked = false;
+                highlightRow(cb);
+            });
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+            updateBulkBar();
+        };
+
+        // Expose selectedUuids agar confirmBulkDelete bisa mengaksesnya
+        window._getSelectedUuids = () => selectedUuids;
+
         // ── Event listeners ───────────────────────────────────────────────────────
         searchInput.addEventListener('input', filterData);
         classFilter.addEventListener('change', filterData);
@@ -527,6 +693,39 @@
 
         updateDisplay();
     });
+
+    // ══════════════════════════════════════════════════════════
+    // BULK DELETE
+    // ══════════════════════════════════════════════════════════
+    function confirmBulkDelete() {
+        const selected = window._getSelectedUuids ? window._getSelectedUuids() : new Set();
+        if (selected.size === 0) return;
+
+        const confirmed = confirm(
+            `Hapus ${selected.size} mapel yang dipilih?\n\nTindakan ini tidak dapat dibatalkan.`
+        );
+        if (!confirmed) return;
+
+        const container = document.querySelector('.mapel-table-container');
+        const bulkDeleteUrl = container.dataset.routeDeleteBulk;
+
+        const form = document.getElementById('bulkDeleteForm');
+        form.action = bulkDeleteUrl;
+
+        // Hapus input uuid lama (jika ada dari sebelumnya)
+        form.querySelectorAll('input[name="uuids[]"]').forEach(el => el.remove());
+
+        // Tambahkan satu input per UUID
+        selected.forEach(uuid => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'uuids[]';
+            input.value = uuid;
+            form.appendChild(input);
+        });
+
+        form.submit();
+    }
 
     // ══════════════════════════════════════════════════════════
     // ORDER / JOIN MODAL
@@ -559,41 +758,34 @@
         if (inputId === 'inputJoin') updateJoinPreview();
     }
 
-    // Live preview for join/rowspan
     function updateJoinPreview() {
         const join = parseInt(document.getElementById('inputJoin').value) || 1;
         const tbody = document.getElementById('joinPreviewBody');
         const mapelName = document.getElementById('modalMapelName').textContent;
         tbody.innerHTML = '';
 
-        // Simulasi: tampilkan bahwa mapel ini akan bergabung dengan mapel lain
-        // yang memiliki angka join sama
         if (join === 0) {
-            // join 0 = berdiri sendiri (tidak dikelompokkan)
             const tr = document.createElement('tr');
             tr.innerHTML = `
-            <td class="border border-gray-200 px-2 py-1 text-center font-bold bg-indigo-50 text-indigo-700">1</td>
-            <td class="border border-gray-200 px-2 py-1">${mapelName}</td>
-            <td class="border border-gray-200 px-2 py-1 text-center bg-indigo-50 text-indigo-700 font-bold">85</td>
-        `;
+                <td class="border border-gray-200 px-2 py-1 text-center font-bold bg-indigo-50 text-indigo-700">1</td>
+                <td class="border border-gray-200 px-2 py-1">${mapelName}</td>
+                <td class="border border-gray-200 px-2 py-1 text-center bg-indigo-50 text-indigo-700 font-bold">85</td>
+            `;
             tbody.appendChild(tr);
         } else {
-            // Simulasi 2 mapel bergabung (mapel ini + 1 mapel lain dengan join sama)
             const samplePair = [mapelName, '(mapel lain dengan Join=' + join + ')'];
             samplePair.forEach((name, i) => {
                 const tr = document.createElement('tr');
                 if (i === 0) {
                     tr.innerHTML = `
-                    <td class="border border-gray-200 px-2 py-1 text-center align-middle font-bold bg-indigo-50 text-indigo-700"
-                        rowspan="2">1</td>
-                    <td class="border border-gray-200 px-2 py-1">${name}</td>
-                    <td class="border border-gray-200 px-2 py-1 text-center align-middle bg-indigo-50 text-indigo-700 font-bold"
-                        rowspan="2">85</td>
-                `;
+                        <td class="border border-gray-200 px-2 py-1 text-center align-middle font-bold bg-indigo-50 text-indigo-700" rowspan="2">1</td>
+                        <td class="border border-gray-200 px-2 py-1">${name}</td>
+                        <td class="border border-gray-200 px-2 py-1 text-center align-middle bg-indigo-50 text-indigo-700 font-bold" rowspan="2">85</td>
+                    `;
                 } else {
                     tr.innerHTML = `
-                    <td class="border border-gray-200 px-2 py-1 text-xs text-gray-400 italic">${name}</td>
-                `;
+                        <td class="border border-gray-200 px-2 py-1 text-xs text-gray-400 italic">${name}</td>
+                    `;
                 }
                 tbody.appendChild(tr);
             });
@@ -633,8 +825,7 @@
         `;
 
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
-                '{{ csrf_token() }}';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
 
             const res = await fetch(updateUrl, {
                 method: 'POST',
@@ -653,7 +844,6 @@
             const data = await res.json();
 
             if (data.success) {
-                // Update local data array so badge refreshes without full reload
                 const container2 = document.querySelector('.mapel-table-container');
                 const allMapels = JSON.parse(container2.dataset.allMapels);
                 const idx = allMapels.findIndex(m => (m.uuid ?? m.id) === _currentMapelUuid);
@@ -663,7 +853,6 @@
                     container2.dataset.allMapels = JSON.stringify(allMapels);
                 }
                 closeOrderJoinModal();
-                // Re-trigger table render by dispatching a dummy input event
                 document.getElementById('mapelSearchInput').dispatchEvent(new Event('input'));
             } else {
                 alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));
@@ -681,7 +870,7 @@
         }
     }
 
-    // Delete confirmation + form submit
+    // Delete single
     function confirmDeleteMapel(deleteUrl, mapelName) {
         if (!confirm(`Hapus mapel "${mapelName}"? Tindakan ini tidak dapat dibatalkan.`)) return;
 
@@ -689,9 +878,9 @@
         form.method = 'POST';
         form.action = deleteUrl;
         form.innerHTML = `
-        @csrf
-        @method('DELETE')
-    `;
+            @csrf
+            @method('DELETE')
+        `;
         document.body.appendChild(form);
         form.submit();
     }

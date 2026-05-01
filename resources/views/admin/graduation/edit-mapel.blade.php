@@ -49,9 +49,9 @@
                 </div>
 
                 {{-- Jurusan/Expertise --}}
-                <div>
+                <div id="expertise-container">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Jurusan/Konsentrasi Keahlian <span class="text-red-500">*</span>
+                        Jurusan/Konsentrasi Keahlian
                     </label>
                     <div class="border border-gray-300 rounded-lg divide-y divide-gray-100 overflow-hidden">
                         @foreach ($expertise as $exp)
@@ -129,23 +129,50 @@
                         Batal
                     </a>
 
-                    {{-- Delete Button --}}
-                    <form method="POST" action="{{ route('admin.graduation.destroyMapel', $mapel->uuid) }}"
-                        class="ml-auto"
-                        onsubmit="return confirm('Hapus mapel {{ addslashes($mapel->name) }}? Tindakan ini tidak dapat dibatalkan.')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                            class="inline-flex items-center gap-2 px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-xl transition-colors border border-red-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Hapus
-                        </button>
-                    </form>
+                    {{-- ✅ Satu onclick saja: konfirmasi dulu, baru submit form delete --}}
+                    <button type="button" id="btnHapusMapel"
+                        class="ml-auto inline-flex items-center gap-2 px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-xl transition-colors border border-red-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Hapus
+                    </button>
                 </div>
             </form>
         </div>
+
+        {{-- Form DELETE di luar form EDIT --}}
+        <form id="form-delete-mapel" method="POST" action="{{ route('admin.graduation.destroyMapel', $mapel->uuid) }}"
+            class="hidden">
+            @csrf
+            @method('DELETE')
+        </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Hapus mapel
+            document.getElementById('btnHapusMapel').addEventListener('click', function() {
+                if (confirm(
+                        'Hapus mapel "{{ addslashes($mapel->name) }}"? Tindakan ini tidak dapat dibatalkan.'
+                    )) {
+                    document.getElementById('form-delete-mapel').submit();
+                }
+            });
+
+            // Toggle jurusan berdasarkan tipe
+            var typeSelect = document.getElementById('type');
+            var expertiseContainer = document.getElementById('expertise-container');
+
+            function toggleExpertise() {
+                expertiseContainer.style.display = typeSelect.value === 'jurusan' ? 'block' : 'none';
+            }
+
+            typeSelect.addEventListener('change', toggleExpertise);
+            toggleExpertise();
+
+        });
+    </script>
 @endsection

@@ -8,7 +8,7 @@
 --}}
 
 @php
-    $allGraduationsData = \App\Models\GoogleGraduation::with(['user', 'mapels'])
+    $allGraduationsData = \App\Models\GoogleGraduation::with(['user', 'mapels', 'user.academicYears.class'])
         ->get()
         ->map(function ($graduation) {
             $arr = $graduation->toArray();
@@ -16,6 +16,13 @@
             $arr['letter_number'] = $graduation->letter->letter_number ?? '-';
             $arr['graduation_date'] = $graduation->letter->graduation_date ?? null;
             $arr['mapel_count'] = $graduation->mapels->count();
+
+            // Ambil kelas dari academic year terbaru
+            $latestYear = $graduation->user->academicYears->first();
+            $arr['class_name'] = $latestYear?->class
+                ? $latestYear->class->academic_level . ' ' . $latestYear->class->name
+                : '-';
+
             return $arr;
         })
         ->toArray();
@@ -52,42 +59,207 @@
                 data ditemukan
             </p>
 
-            {{-- Export Surat Dropdown --}}
-            <div class="relative group">
-                <button
-                    class="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-indigo-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span>Surat</span>
-                    <svg class="w-3 h-3 group-hover:rotate-180 transition-transform" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                </button>
-                <div
-                    class="absolute right-0 mt-0 w-48 bg-white border border-gray-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-40">
-                    <a href="javascript:void(0)"
-                        onclick="window.open('{{ route('admin.graduation.showSuratKelulusan', ['id' => 'all']) }}', '_blank')"
-                        class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors first:rounded-t-xl">
-                        <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                        Export Semua Surat Kelulusan
-                    </a>
-                    <a href="javascript:void(0)"
-                        onclick="window.open('{{ route('admin.graduation.showSuratPernyataan', ['id' => 'all']) }}', '_blank')"
-                        class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors last:rounded-b-xl border-t border-gray-100">
-                        <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {{-- Export Surat — masing-masing punya dropdown sendiri --}}
+            <div class="flex items-center gap-2 flex-wrap" id="suratExportGroup">
+
+                {{-- ── Surat Kelulusan ───────────────────────────────── --}}
+                <div class="relative" id="dropdownWrapperKelulusan">
+                    <button onclick="toggleExportDropdown('kelulusan')"
+                        class="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-indigo-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Export Semua Surat Pernyataan
-                    </a>
+                        <span>Surat Kelulusan</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div id="dropdownKelulusan"
+                        class="hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-3 space-y-1">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export sebagai
+                        </p>
+
+                        {{-- Semua --}}
+                        <button onclick="doExport('kelulusan', 'all')"
+                            class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-colors">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                            Semua
+                        </button>
+
+                        {{-- Per Jurusan --}}
+                        <div>
+                            <button onclick="toggleSubFilter('kelulusan','jurusan')"
+                                class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-colors">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    Per Jurusan
+                                </span>
+                                <svg class="w-3 h-3 transition-transform" id="arrowKelulusanJurusan" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="subKelulusanJurusan" class="hidden px-3 pt-1 pb-2 space-y-2">
+                                <select id="selectKelulusanJurusan"
+                                    class="w-full rounded-xl border border-gray-200 bg-white py-2 px-3 text-sm text-gray-700 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-200">
+                                    <option value="">-- Pilih Jurusan --</option>
+                                    @foreach ($expertise as $exp)
+                                        <option value="{{ $exp->id }}">{{ $exp->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="doExport('kelulusan', 'jurusan')"
+                                    class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- Per Kelas --}}
+                        <div>
+                            <button onclick="toggleSubFilter('kelulusan','kelas')"
+                                class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-colors">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Per Kelas
+                                </span>
+                                <svg class="w-3 h-3 transition-transform" id="arrowKelulusanKelas" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="subKelulusanKelas" class="hidden px-3 pt-1 pb-2 space-y-2">
+                                <select id="selectKelulusanKelas"
+                                    class="w-full rounded-xl border border-gray-200 bg-white py-2 px-3 text-sm text-gray-700 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-200">
+                                    <option value="">-- Pilih Kelas --</option>
+                                    @foreach ($classes as $class)
+                                        <option value="{{ $class->id }}">{{ $class->academic_level }}
+                                            {{ $class->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="doExport('kelulusan', 'kelas')"
+                                    class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                {{-- ── Surat Pernyataan ───────────────────────────────── --}}
+                <div class="relative" id="dropdownWrapperPernyataan">
+                    <button onclick="toggleExportDropdown('pernyataan')"
+                        class="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-purple-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        <span>Surat Pernyataan</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div id="dropdownPernyataan"
+                        class="hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-3 space-y-1">
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export
+                            sebagai</p>
+
+                        {{-- Semua --}}
+                        <button onclick="doExport('pernyataan', 'all')"
+                            class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                            Semua
+                        </button>
+
+                        {{-- Per Jurusan --}}
+                        <div>
+                            <button onclick="toggleSubFilter('pernyataan','jurusan')"
+                                class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    Per Jurusan
+                                </span>
+                                <svg class="w-3 h-3 transition-transform" id="arrowPernyataanJurusan" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="subPernyataanJurusan" class="hidden px-3 pt-1 pb-2 space-y-2">
+                                <select id="selectPernyataanJurusan"
+                                    class="w-full rounded-xl border border-gray-200 bg-white py-2 px-3 text-sm text-gray-700 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-200">
+                                    <option value="">-- Pilih Jurusan --</option>
+                                    @foreach ($expertise as $exp)
+                                        <option value="{{ $exp->id }}">{{ $exp->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="doExport('pernyataan', 'jurusan')"
+                                    class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors">
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- Per Kelas --}}
+                        <div>
+                            <button onclick="toggleSubFilter('pernyataan','kelas')"
+                                class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-colors">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Per Kelas
+                                </span>
+                                <svg class="w-3 h-3 transition-transform" id="arrowPernyataanKelas" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="subPernyataanKelas" class="hidden px-3 pt-1 pb-2 space-y-2">
+                                <select id="selectPernyataanKelas"
+                                    class="w-full rounded-xl border border-gray-200 bg-white py-2 px-3 text-sm text-gray-700 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-200">
+                                    <option value="">-- Pilih Kelas --</option>
+                                    @foreach ($classes as $class)
+                                        <option value="{{ $class->id }}">{{ $class->academic_level }}
+                                            {{ $class->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="doExport('pernyataan', 'kelas')"
+                                    class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors">
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             {{-- View mode toggle (mobile only) --}}
@@ -136,6 +308,7 @@
                             <th class="px-4 sm:px-6 py-3 text-left font-semibold w-10">#</th>
                             <th class="px-4 sm:px-6 py-3 text-left font-semibold">Nama Siswa</th>
                             <th class="px-4 sm:px-6 py-3 text-left font-semibold">No. Surat</th>
+                            <th class="hidden sm:table-cell px-4 sm:px-6 py-3 text-left font-semibold">Kelas</th>
                             <th class="hidden md:table-cell px-4 sm:px-6 py-3 text-left font-semibold">Tgl Lulus</th>
                             <th class="hidden lg:table-cell px-4 sm:px-6 py-3 text-left font-semibold">Jml Mapel</th>
                             <th class="px-4 sm:px-6 py-3 text-center font-semibold">Aksi</th>
@@ -332,6 +505,11 @@
                 <td class="px-4 sm:px-6 py-4">
                     <code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600 break-all">${g.letter_number ?? '-'}</code>
                 </td>
+                <td class="hidden sm:table-cell px-4 sm:px-6 py-4">
+                    <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                        ${g.class_name ?? '-'}
+                    </span>
+                </td>
                 <td class="hidden md:table-cell px-4 sm:px-6 py-4 text-xs text-gray-500">${fmtDate(g.graduation_date)}</td>
                 <td class="hidden lg:table-cell px-4 sm:px-6 py-4">
                     <span class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
@@ -413,6 +591,9 @@
                 </div>
                 <div class="mt-3 flex items-center gap-2 flex-wrap">
                     <code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600 max-w-full truncate">${g.letter_number ?? '-'}</code>
+                    <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                        ${g.class_name ?? '-'}
+                    </span>
                     <span class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
                         <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -574,4 +755,77 @@
 
         updateDisplay();
     });
+</script>
+<script>
+    // ── Toggle buka/tutup dropdown utama ─────────────────────────────────
+    function toggleExportDropdown(type) {
+        const other = type === 'kelulusan' ? 'Pernyataan' : 'Kelulusan';
+        document.getElementById('dropdown' + other)?.classList.add('hidden');
+        document.getElementById('dropdown' + capitalize(type))?.classList.toggle('hidden');
+    }
+
+    // ── Toggle sub-filter (akordeon) ─────────────────────────────────────
+    function toggleSubFilter(type, filter) {
+        const key = capitalize(type) + capitalize(filter);
+        const sub = document.getElementById('sub' + key);
+        const arrow = document.getElementById('arrow' + key);
+        const isHidden = sub.classList.contains('hidden');
+
+        // Tutup sub-filter lain pada dropdown yang sama
+        ['Jurusan', 'Kelas'].forEach(f => {
+            const k = capitalize(type) + f;
+            document.getElementById('sub' + k)?.classList.add('hidden');
+            const a = document.getElementById('arrow' + k);
+            if (a) a.style.transform = 'rotate(0deg)';
+        });
+
+        if (isHidden) {
+            sub.classList.remove('hidden');
+            if (arrow) arrow.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // ── Eksekusi export ───────────────────────────────────────────────────
+    function doExport(type, mode) {
+        const baseUrl = type === 'kelulusan' ?
+            '{{ route('admin.graduation.showSuratKelulusan', ['id' => 'all']) }}' :
+            '{{ route('admin.graduation.showSuratPernyataan', ['id' => 'all']) }}';
+
+        const params = new URLSearchParams();
+
+        if (mode === 'jurusan') {
+            const val = document.getElementById('select' + capitalize(type) + 'Jurusan')?.value;
+            if (!val) {
+                alert('Pilih jurusan terlebih dahulu.');
+                return;
+            }
+            params.set('expertise_id', val);
+        } else if (mode === 'kelas') {
+            const val = document.getElementById('select' + capitalize(type) + 'Kelas')?.value;
+            if (!val) {
+                alert('Pilih kelas terlebih dahulu.');
+                return;
+            }
+            params.set('class_id', val);
+        }
+
+        const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+        window.open(url, '_blank');
+
+        document.getElementById('dropdown' + capitalize(type))?.classList.add('hidden');
+    }
+
+    // ── Tutup dropdown jika klik di luar ─────────────────────────────────
+    document.addEventListener('click', function(e) {
+        ['Kelulusan', 'Pernyataan'].forEach(type => {
+            const wrapper = document.getElementById('dropdownWrapper' + type);
+            if (wrapper && !wrapper.contains(e.target)) {
+                document.getElementById('dropdown' + type)?.classList.add('hidden');
+            }
+        });
+    });
+
+    function capitalize(s) {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
 </script>
