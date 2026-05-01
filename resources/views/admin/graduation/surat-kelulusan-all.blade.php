@@ -520,7 +520,7 @@
                     Kepala SMK Negeri 1 Talaga,
                     <div class="ttd-space"></div>
                     <div class="nama">Muchamad Eki S.A., S.Kom.</div>
-                    <div>Pembina Tingkat I/IVb</div>
+                    <div>Penata Tingkat I, III/d</div>
                     <div>NIP. 197610012006041011</div>
                 </div>
             </div>
