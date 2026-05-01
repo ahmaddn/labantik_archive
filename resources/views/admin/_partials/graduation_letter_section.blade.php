@@ -489,37 +489,19 @@
         }).join('');
     }
 
-    // Handle Enter
+    // Set default paragraph separator to div
+    document.execCommand('defaultParagraphSeparator', false, 'div');
+
+    // Handle Enter natively, just sync
     editor.addEventListener('keydown', function(e) {
-        if (e.key !== 'Enter') return;
-        e.preventDefault();
-
-        const sel = window.getSelection();
-        if (!sel.rangeCount) return;
-        const range = sel.getRangeAt(0);
-        range.deleteContents();
-
-        const currentBlock = getCurrentBlock();
-        const isEmpty = currentBlock &&
-            ((currentBlock.innerText || currentBlock.textContent || '').trim() === '' || currentBlock.innerHTML === '<br>');
-
-        const newDiv = document.createElement('div');
-        newDiv.innerHTML = '<br>';
-
-        if (currentBlock && currentBlock.parentNode === editor) {
-            editor.insertBefore(newDiv, currentBlock.nextSibling);
-        } else {
-            editor.appendChild(newDiv);
+        if (e.key === 'Enter') {
+            // Let the browser handle the Enter key natively (it splits the text and creates a new div)
+            setTimeout(syncAndPreview, 10);
         }
+    });
 
-        // Pindah kursor
-        const r = document.createRange();
-        const s = window.getSelection();
-        r.setStart(newDiv, 0);
-        r.collapse(true);
-        s.removeAllRanges();
-        s.addRange(r);
-
+    // Also sync on input for regular typing
+    editor.addEventListener('input', function() {
         syncAndPreview();
     });
 
