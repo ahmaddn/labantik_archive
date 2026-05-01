@@ -46,23 +46,25 @@
 
                 {{-- Jurusan/Expertise (Conditional) --}}
                 <div id="expertise-container" style="display: none;">
-                    <label for="expertise_id" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         Jurusan/Konsentrasi Keahlian <span class="text-red-500">*</span>
                     </label>
-                    <select id="expertise_id" name="expertise_id"
-                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('expertise_id') border-red-500 @enderror">
-                        <option value="">-- Pilih Jurusan --</option>
+                    <div class="border border-gray-300 rounded-lg divide-y divide-gray-100 overflow-hidden">
                         @foreach ($expertise as $exp)
-                            <option value="{{ $exp->id }}" @selected(old('expertise_id') == $exp->id)>
-                                {{ $exp->name }}
-                            </option>
+                            <label
+                                class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors">
+                                <input type="checkbox" name="expertise_ids[]" value="{{ $exp->id }}"
+                                    id="expertise_{{ $exp->id }}"
+                                    class="expertise-checkbox w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    {{ in_array($exp->id, old('expertise_ids', [])) ? 'checked' : '' }}>
+                                <span class="text-sm text-gray-700">{{ $exp->name }}</span>
+                            </label>
                         @endforeach
-                    </select>
-                    @error('expertise_id')
+                    </div>
+                    @error('expertise_ids')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-gray-500 text-xs mt-2">Mapel akan ditambahkan ke semua kelas dengan jurusan yang dipilih.
-                    </p>
+                    <p class="text-xs text-gray-400 mt-1.5">Pilih satu atau lebih jurusan yang akan mendapat mapel ini.</p>
                 </div>
 
                 {{-- Nama Mapel --}}

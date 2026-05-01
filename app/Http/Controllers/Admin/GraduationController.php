@@ -195,17 +195,13 @@ class GraduationController extends Controller
     public function editMapel($id)
     {
         $mapel = GoogleMapel::where('uuid', $id)->firstOrFail();
+        $classes = RefClass::where('academic_level', 12)->get();
+        $expertise = \App\Models\ExpertiseConcentration::all(); // sesuaikan model
 
-        $classes = RefClass::where('academic_level', 12)
-            ->select(['id', 'name', 'expertise_concentration_id', 'academic_level'])
-            ->orderBy('name')
-            ->get();
+        // Expertise yang sudah dipilih untuk mapel ini
+        $selectedExpertiseIds = $mapel->expertise_id ? [$mapel->expertise_id] : [];
 
-        $expertise = ExpertiseConcentration::select(['id', 'name'])
-            ->orderBy('name')
-            ->get();
-
-        return view('admin.graduation.edit-mapel', compact('mapel', 'classes', 'expertise'));
+        return view('admin.graduation.edit-mapel', compact('mapel', 'classes', 'expertise', 'selectedExpertiseIds'));
     }
 
     /**
@@ -216,62 +212,77 @@ class GraduationController extends Controller
         $mapel = GoogleMapel::where('uuid', $id)->firstOrFail();
 
         $validated = $request->validate([
-            'class_id' => 'required|exists:ref_classes,id',
-            'expertise_id' => 'nullable|exists:core_expertise_concentrations,id',
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:umum,jurusan',
-        ], [
-            'class_id.required' => 'Kelas harus dipilih',
-            'class_id.exists' => 'Kelas tidak ditemukan',
-            'expertise_id.exists' => 'Jurusan tidak ditemukan',
-            'name.required' => 'Nama mapel harus diisi',
-            'name.max' => 'Nama mapel maksimal 255 karakter',
-            'type.required' => 'Tipe mapel harus dipilih',
-            'type.in' => 'Tipe mapel harus: umum atau jurusan',
+            'class_id'      => 'required|exists:ref_classes,id',
+            'expertise_ids' => 'nullable|array',
+            'expertise_ids.*' => 'exists:core_expertise_concentrations,id',
+            'name'          => 'required|string|max:255',
+            'type'          => 'required|in:umum,jurusan',
         ]);
 
         try {
-            // Validasi: jika tipe jurusan, expertise_id wajib ada
-            if ($validated['type'] === 'jurusan' && !$validated['expertise_id']) {
-                return redirect()
-                    ->back()
-                    ->with('error', 'Jurusan harus dipilih untuk tipe mapel jurusan')
+            if ($validated['type'] === 'jurusan' && empty($validated['expertise_ids'])) {
+                return redirect()->back()
+                    ->with('error', 'Pilih minimal satu jurusan untuk tipe mapel jurusan')
                     ->withInput();
             }
 
-            // Cek apakah sudah ada mapel yang sama (untuk menghindari duplikat)
-            $exists = GoogleMapel::where('uuid', '!=', $id)
-                ->where('class_id', $validated['class_id'])
-                ->where('name', $validated['name'])
-                ->where('type', $validated['type']);
+            if ($validated['type'] === 'umum') {
+                // Cek duplikat
+                $exists = GoogleMapel::where('uuid', '!=', $id)
+                    ->where('class_id', $validated['class_id'])
+                    ->where('name', $validated['name'])
+                    ->where('type', 'umum')
+                    ->whereNull('expertise_id')
+                    ->exists();
 
-            if ($validated['expertise_id']) {
-                $exists->where('expertise_id', $validated['expertise_id']);
+                if ($exists) {
+                    return redirect()->back()
+                        ->with('error', 'Mapel dengan nama dan kelas yang sama sudah ada')
+                        ->withInput();
+                }
+
+                $mapel->update([
+                    'class_id'     => $validated['class_id'],
+                    'expertise_id' => null,
+                    'name'         => $validated['name'],
+                    'type'         => 'umum',
+                ]);
             } else {
-                $exists->whereNull('expertise_id');
+                // Tipe jurusan: update mapel ini untuk expertise pertama,
+                // tambahkan mapel baru untuk expertise tambahan
+                $expertiseIds = $validated['expertise_ids'];
+                $firstExpertise = array_shift($expertiseIds);
+
+                $mapel->update([
+                    'class_id'     => $validated['class_id'],
+                    'expertise_id' => $firstExpertise,
+                    'name'         => $validated['name'],
+                    'type'         => 'jurusan',
+                ]);
+
+                // Expertise tambahan → buat mapel baru jika belum ada
+                foreach ($expertiseIds as $expId) {
+                    $exists = GoogleMapel::where('class_id', $validated['class_id'])
+                        ->where('name', $validated['name'])
+                        ->where('type', 'jurusan')
+                        ->where('expertise_id', $expId)
+                        ->exists();
+
+                    if (!$exists) {
+                        GoogleMapel::create([
+                            'class_id'     => $validated['class_id'],
+                            'expertise_id' => $expId,
+                            'name'         => $validated['name'],
+                            'type'         => 'jurusan',
+                        ]);
+                    }
+                }
             }
 
-            if ($exists->exists()) {
-                return redirect()
-                    ->back()
-                    ->with('error', 'Mapel dengan nama, kelas, dan jurusan yang sama sudah ada')
-                    ->withInput();
-            }
-
-            // Update mapel
-            $mapel->update([
-                'class_id' => $validated['class_id'],
-                'expertise_id' => $validated['expertise_id'],
-                'name' => $validated['name'],
-                'type' => $validated['type'],
-            ]);
-
-            return redirect()
-                ->route('admin.graduation.index')
+            return redirect()->route('admin.graduation.index')
                 ->with('success', 'Mapel berhasil diperbarui!');
         } catch (\Exception $e) {
-            return redirect()
-                ->back()
+            return redirect()->back()
                 ->with('error', 'Gagal memperbarui mapel: ' . $e->getMessage())
                 ->withInput();
         }
@@ -366,24 +377,17 @@ class GraduationController extends Controller
     public function storeMapel(Request $request)
     {
         $validated = $request->validate([
-            'expertise_id' => 'nullable|exists:core_expertise_concentrations,id',
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:umum,jurusan',
-        ], [
-            'expertise_id.exists' => 'Jurusan tidak ditemukan',
-            'name.required' => 'Nama mapel harus diisi',
-            'name.max' => 'Nama mapel maksimal 255 karakter',
-            'type.required' => 'Tipe mapel harus dipilih',
-            'type.in' => 'Tipe mapel harus: umum atau jurusan',
+            'expertise_ids'   => 'nullable|array',
+            'expertise_ids.*' => 'exists:core_expertise_concentrations,id',
+            'name'            => 'required|string|max:255',
+            'type'            => 'required|in:umum,jurusan',
         ]);
 
         try {
-            // Ambil semua kelas level 12
             $allClasses = RefClass::where('academic_level', 12)->get();
 
             if ($allClasses->isEmpty()) {
-                return redirect()
-                    ->back()
+                return redirect()->back()
                     ->with('error', 'Tidak ada kelas level 12 di database')
                     ->withInput();
             }
@@ -391,9 +395,7 @@ class GraduationController extends Controller
             $successCount = 0;
             $skipCount = 0;
 
-            // Logika: Tipe umum vs jurusan
             if ($validated['type'] === 'umum') {
-                // Tipe umum: expertise_id = NULL, terapkan ke semua kelas 12
                 foreach ($allClasses as $class) {
                     $exists = GoogleMapel::where('class_id', $class->id)
                         ->where('name', $validated['name'])
@@ -407,67 +409,52 @@ class GraduationController extends Controller
                     }
 
                     GoogleMapel::create([
-                        'class_id' => $class->id,
+                        'class_id'     => $class->id,
                         'expertise_id' => null,
-                        'name' => $validated['name'],
-                        'type' => 'umum',
+                        'name'         => $validated['name'],
+                        'type'         => 'umum',
                     ]);
-
                     $successCount++;
                 }
             } else {
-                // Tipe jurusan: expertise_id wajib, terapkan ke kelas 12 dengan expertise tersebut
-                if (!$validated['expertise_id']) {
-                    return redirect()
-                        ->back()
-                        ->with('error', 'Jurusan harus dipilih untuk tipe mapel jurusan')
+                if (empty($validated['expertise_ids'])) {
+                    return redirect()->back()
+                        ->with('error', 'Pilih minimal satu jurusan untuk tipe mapel jurusan')
                         ->withInput();
                 }
 
-                // Ambil kelas yang memiliki expertise_concentration_id sesuai
-                $matchedClasses = $allClasses->where('expertise_concentration_id', $validated['expertise_id']);
+                foreach ($validated['expertise_ids'] as $expId) {
+                    $matchedClasses = $allClasses->where('expertise_concentration_id', $expId);
 
-                if ($matchedClasses->isEmpty()) {
-                    return redirect()
-                        ->back()
-                        ->with('error', 'Tidak ada kelas level 12 dengan jurusan yang dipilih')
-                        ->withInput();
-                }
+                    foreach ($matchedClasses as $class) {
+                        $exists = GoogleMapel::where('class_id', $class->id)
+                            ->where('name', $validated['name'])
+                            ->where('type', 'jurusan')
+                            ->where('expertise_id', $expId)
+                            ->exists();
 
-                foreach ($matchedClasses as $class) {
-                    $exists = GoogleMapel::where('class_id', $class->id)
-                        ->where('name', $validated['name'])
-                        ->where('type', 'jurusan')
-                        ->where('expertise_id', $validated['expertise_id'])
-                        ->exists();
+                        if ($exists) {
+                            $skipCount++;
+                            continue;
+                        }
 
-                    if ($exists) {
-                        $skipCount++;
-                        continue;
+                        GoogleMapel::create([
+                            'class_id'     => $class->id,
+                            'expertise_id' => $expId,
+                            'name'         => $validated['name'],
+                            'type'         => 'jurusan',
+                        ]);
+                        $successCount++;
                     }
-
-                    GoogleMapel::create([
-                        'class_id' => $class->id,
-                        'expertise_id' => $validated['expertise_id'],
-                        'name' => $validated['name'],
-                        'type' => 'jurusan',
-                    ]);
-
-                    $successCount++;
                 }
             }
 
             $message = "Mapel '{$validated['name']}' berhasil ditambahkan ke $successCount kelas!";
-            if ($skipCount > 0) {
-                $message .= " ($skipCount mapel sudah ada)";
-            }
+            if ($skipCount > 0) $message .= " ($skipCount mapel sudah ada)";
 
-            return redirect()
-                ->route('admin.graduation.index')
-                ->with('success', $message);
+            return redirect()->route('admin.graduation.index')->with('success', $message);
         } catch (\Exception $e) {
-            return redirect()
-                ->back()
+            return redirect()->back()
                 ->with('error', 'Gagal menambahkan mapel: ' . $e->getMessage())
                 ->withInput();
         }

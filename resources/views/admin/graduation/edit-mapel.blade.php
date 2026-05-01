@@ -50,21 +50,25 @@
 
                 {{-- Jurusan/Expertise --}}
                 <div>
-                    <label for="expertise_id" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         Jurusan/Konsentrasi Keahlian <span class="text-red-500">*</span>
                     </label>
-                    <select id="expertise_id" name="expertise_id" required
-                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('expertise_id') border-red-500 @enderror">
-                        <option value="">-- Pilih Jurusan --</option>
+                    <div class="border border-gray-300 rounded-lg divide-y divide-gray-100 overflow-hidden">
                         @foreach ($expertise as $exp)
-                            <option value="{{ $exp->id }}" @selected(old('expertise_id', $mapel->expertise_id) == $exp->id)>
-                                {{ $exp->name }}
-                            </option>
+                            <label
+                                class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors">
+                                <input type="checkbox" name="expertise_ids[]" value="{{ $exp->id }}"
+                                    class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    {{ in_array($exp->id, old('expertise_ids', $selectedExpertiseIds ?? [])) ? 'checked' : '' }}>
+                                <span class="text-sm text-gray-700">{{ $exp->name }}</span>
+                            </label>
                         @endforeach
-                    </select>
-                    @error('expertise_id')
+                    </div>
+                    @error('expertise_ids')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
+                    <p class="text-xs text-gray-400 mt-1.5">Untuk tipe <strong>Jurusan</strong>, pilih minimal satu jurusan.
+                    </p>
                 </div>
 
                 {{-- Nama Mapel --}}
