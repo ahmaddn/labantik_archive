@@ -135,8 +135,10 @@
         .doc-title h2 {
             font-size: 14pt;
             font-weight: bold;
+            text-decoration: underline;
             margin: 0;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .doc-title .nomor {
@@ -292,7 +294,7 @@
                     Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
                     Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
                     Telpon ☎ (0233) 319238 FAX ☎ (0233) 319238 POS ✉ 45463 NPSN: 20213872<br />
-                    Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
+                    Website www.smkn1talaga.sch.id - Email ✉ mail@smkn1talaga.sch.id
                 </div>
             </div>
             <div class="header-border-top"></div>
