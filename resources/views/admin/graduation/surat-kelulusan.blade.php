@@ -242,7 +242,7 @@
             position: absolute;
             left: 0px;
             top: 25px;
-            width: 50px;
+            width: 80px;
             z-index: 5;
             pointer-events: none;
         }

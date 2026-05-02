@@ -278,7 +278,7 @@
             position: absolute;
             left: 0px;
             top: 20px;
-            width: 70px;
+            width: 80px;
             z-index: 5;
             pointer-events: none;
         }
