@@ -242,14 +242,16 @@
             font-size: 7.5pt;
             font-family: Arial, sans-serif;
             position: absolute;
-            
+
             left: 15mm;
             right: 15mm;
         }
+
         .doc-qr-footer-text {
             line-height: 1.5;
             color: #222;
         }
+
         .doc-qr-footer-text strong {
             display: block;
             font-size: 8pt;
@@ -556,13 +558,17 @@
 
         {{-- TANDA TANGAN --}}
         <div class="ttd-section">
-                <div class="qr-block">
-                    @php
-                        $verifyUrl = route('graduation.verify', $graduation->uuid);
-                        $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl) . '&size=100&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
-                    @endphp
-                    <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
-                </div>
+            <div class="qr-block">
+                @php
+                    $verifyUrl = route('graduation.verify', $graduation->uuid);
+                    $qrUrl =
+                        'https://quickchart.io/qr?text=' .
+                        urlencode($verifyUrl) .
+                        '&size=100&margin=1&centerImageUrl=' .
+                        urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+                @endphp
+                <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
+            </div>
             <div class="ttd-block">
                 Talaga,
                 {{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
@@ -586,7 +592,8 @@
                 <div class="doc-qr-footer-text">
                     <strong>Verifikasi Keaslian Dokumen</strong>
                     Scan QR Code ini untuk memverifikasi keaslian Transkrip Nilai atas nama
-                    <strong style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+                    <strong
+                        style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
                     Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
                 </div>
             </div>
