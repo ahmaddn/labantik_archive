@@ -168,10 +168,11 @@
                                     </li>
                                     <li>3. <code class="bg-blue-100 px-1 rounded">expertise_name</code> — Nama jurusan
                                         (wajib jika tipe <em>jurusan</em>)</li>
+                                    <li>4. <code class="bg-blue-100 px-1 rounded">has_na</code> — Isi <strong>ya</strong> (1) jika mapel punya Nilai Akhir (NA), atau <strong>tidak</strong> (0) jika tidak.</li>
                                 </ul>
                                 <p class="text-xs text-blue-700 mt-3">Tipe <strong>umum</strong> tidak perlu
                                     <code>expertise_name</code> dan akan diaplikasikan ke <strong>semua kelas &
-                                        jurusan</strong>.
+                                        jurusan</strong>. Jika <code>has_na</code> kosong, defaultnya adalah <strong>ya</strong>.
                                 </p>
                             </div>
                         </div>
@@ -192,29 +193,34 @@
                                             <tr class="text-gray-500 border-b border-gray-100">
                                                 <th class="pr-3 py-1 text-left font-medium">name</th>
                                                 <th class="pr-3 py-1 text-left font-medium">type</th>
-                                                <th class="py-1 text-left font-medium">expertise_name</th>
+                                                <th class="pr-3 py-1 text-left font-medium">expertise_name</th>
+                                                <th class="py-1 text-left font-medium">has_na</th>
                                             </tr>
                                         </thead>
                                         <tbody class="text-gray-600">
                                             <tr class="border-b border-gray-50">
                                                 <td class="pr-3 py-1">Matematika</td>
                                                 <td class="pr-3 py-1">jurusan</td>
-                                                <td class="py-1">Rekayasa Perangkat Lunak (RPL)</td>
+                                                <td class="pr-3 py-1">Rekayasa Perangkat Lunak (RPL)</td>
+                                                <td class="py-1">ya</td>
                                             </tr>
                                             <tr class="border-b border-gray-50">
                                                 <td class="pr-3 py-1">Bahasa Indonesia</td>
                                                 <td class="pr-3 py-1">umum</td>
-                                                <td class="py-1 text-gray-400 italic">(kosong)</td>
+                                                <td class="pr-3 py-1 text-gray-400 italic">(kosong)</td>
+                                                <td class="py-1">ya</td>
                                             </tr>
                                             <tr class="border-b border-gray-50">
-                                                <td class="pr-3 py-1">Bahasa Inggris</td>
+                                                <td class="pr-3 py-1">Sikap</td>
                                                 <td class="pr-3 py-1">umum</td>
-                                                <td class="py-1 text-gray-400 italic">(kosong)</td>
+                                                <td class="pr-3 py-1 text-gray-400 italic">(kosong)</td>
+                                                <td class="py-1">tidak</td>
                                             </tr>
                                             <tr>
-                                                <td class="pr-3 py-1">Dasar Akuntansi</td>
+                                                <td class="pr-3 py-1">Praktik RPL</td>
                                                 <td class="pr-3 py-1">jurusan</td>
-                                                <td class="py-1">Akuntansi (AK)</td>
+                                                <td class="pr-3 py-1">Rekayasa Perangkat Lunak (RPL)</td>
+                                                <td class="py-1">ya</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -343,9 +349,10 @@
                                     <li>2. <code class="bg-blue-100 px-1 rounded">type</code> — <em>umum</em> /
                                         <em>jurusan</em>
                                     </li>
+                                    <li>3. <code class="bg-blue-100 px-1 rounded">has_na</code> — Isi <strong>ya</strong> (1) atau <strong>tidak</strong> (0).</li>
                                 </ul>
                                 <p class="text-xs text-blue-700 mt-3">Kelas & Jurusan dipilih dari form. Semua kombinasi
-                                    yang dipilih akan mendapat mapel dari file ini.</p>
+                                    yang dipilih akan mendapat mapel dari file ini. Jika <code>has_na</code> kosong, defaultnya adalah <strong>ya</strong>.</p>
                             </div>
                         </div>
                     </div>
@@ -364,25 +371,30 @@
                                         <thead>
                                             <tr class="text-gray-500 border-b border-gray-100">
                                                 <th class="pr-3 py-1 text-left font-medium">name</th>
-                                                <th class="py-1 text-left font-medium">type</th>
+                                                <th class="pr-3 py-1 text-left font-medium">type</th>
+                                                <th class="py-1 text-left font-medium">has_na</th>
                                             </tr>
                                         </thead>
                                         <tbody class="text-gray-600">
                                             <tr class="border-b border-gray-50">
                                                 <td class="pr-3 py-1">Matematika</td>
                                                 <td class="py-1">jurusan</td>
+                                                <td class="py-1">ya</td>
                                             </tr>
                                             <tr class="border-b border-gray-50">
                                                 <td class="pr-3 py-1">Bahasa Indonesia</td>
                                                 <td class="py-1">umum</td>
+                                                <td class="py-1">ya</td>
                                             </tr>
                                             <tr class="border-b border-gray-50">
-                                                <td class="pr-3 py-1">Bahasa Inggris</td>
+                                                <td class="pr-3 py-1">Sikap</td>
                                                 <td class="py-1">umum</td>
+                                                <td class="py-1">tidak</td>
                                             </tr>
                                             <tr>
                                                 <td class="pr-3 py-1">Dasar Akuntansi</td>
                                                 <td class="py-1">jurusan</td>
+                                                <td class="py-1">ya</td>
                                             </tr>
                                         </tbody>
                                     </table>

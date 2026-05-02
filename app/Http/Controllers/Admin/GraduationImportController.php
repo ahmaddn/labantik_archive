@@ -67,20 +67,14 @@ class GraduationImportController extends Controller
         if ($type === 'graduation') {
             fputcsv($fp, ['Nama Siswa', 'Kelas', 'Id Mapel', 'Nama Mapel', 'NA (Nilai Akhir)', 'NIS'], ';');
         } else {
-            fputcsv($fp, ['Nama Siswa', 'Kelas', 'Id Mapel', 'Nama Mapel', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'NR', 'NA', 'NIS'], ';');
+            fputcsv($fp, ['Nama Siswa', 'Kelas', 'Id Mapel', 'Nama Mapel', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'NA', 'NIS'], ';');
         }
 
-        $no = 1;
         foreach ($students->values() as $student) {
             $latestAcademicYear = $student->academicYears->first();
             $studentClassId     = $latestAcademicYear?->class_id;
             $studentMapels      = $studentClassId ? ($mapels->get($studentClassId) ?? collect()) : collect();
             $kelasLabel         = ($latestAcademicYear?->class?->academic_level ?? '') . ' ' . ($latestAcademicYear?->class?->name ?? '');
-
-            if ($studentMapels->isEmpty()) {
-                fputcsv($fp, [$no++, $student->student_number ?? '', $student->national_student_number ?? '', $student->full_name, $kelasLabel, $latestAcademicYear?->academic_year ?? '', '', '', ''], ';');
-                continue;
-            }
 
             foreach ($studentMapels as $mapel) {
                 // Get existing scores if any
@@ -94,7 +88,7 @@ class GraduationImportController extends Controller
                         $kelasLabel,
                         $mapel->uuid,
                         $mapel->name,
-                        $existing?->score ?? '',
+                        $mapel->has_na ? ($existing?->score ?? '') : 'N/A',
                         $student->student_number ?? '',
                     ], ';');
                 } else {
@@ -109,8 +103,7 @@ class GraduationImportController extends Controller
                         $existing?->sem_4 ?? '',
                         $existing?->sem_5 ?? '',
                         $existing?->sem_6 ?? '',
-                        $existing?->nr ?? '',
-                        $existing?->score ?? '',
+                        $mapel->has_na ? ($existing?->score ?? '') : 'N/A',
                         $student->student_number ?? '',
                     ], ';');
                 }
@@ -171,13 +164,13 @@ class GraduationImportController extends Controller
             $rows = \Maatwebsite\Excel\Facades\Excel::toArray([], $request->file('file'))[0] ?? [];
             if (empty($rows)) throw new \Exception('File kosong atau format tidak valid');
 
-            [$nameCol, $typeCol] = $this->parseMapelHeaders($rows[0]);
+            [$nameCol, $typeCol, $naCol] = $this->parseMapelHeaders($rows[0]);
 
             $successCount = 0;
             $skipCount    = 0;
             $errorCount   = 0;
             $errors       = [];
-            $mapelData    = $this->parseMapelRows(array_slice($rows, 1), $nameCol, $typeCol, $errors, $errorCount);
+            $mapelData    = $this->parseMapelRows(array_slice($rows, 1), $nameCol, $typeCol, $naCol, $errors, $errorCount);
 
             foreach ($mapelData as $mapel) {
                 foreach ($classIds as $classId) {
@@ -198,7 +191,13 @@ class GraduationImportController extends Controller
                                 continue;
                             }
 
-                            GoogleMapel::create(['class_id' => $classId, 'expertise_id' => $expertiseId, 'name' => $mapel['name'], 'type' => $mapel['type']]);
+                            GoogleMapel::create([
+                                'class_id'     => $classId,
+                                'expertise_id' => $expertiseId,
+                                'name'         => $mapel['name'],
+                                'type'         => $mapel['type'],
+                                'has_na'       => $mapel['has_na'] ?? true
+                            ]);
                             $successCount++;
                         } catch (\Exception $e) {
                             $errors[] = "Baris {$mapel['rowNumber']} ({$mapel['name']}): " . $e->getMessage();
@@ -233,7 +232,7 @@ class GraduationImportController extends Controller
             if (empty($rows)) throw new \Exception('File kosong atau format tidak valid');
 
             $headers          = $this->normalizeHeaders($rows[0]);
-            [$nameCol, $typeCol] = $this->parseMapelHeaders($rows[0]);
+            [$nameCol, $typeCol, $naCol] = $this->parseMapelHeaders($rows[0]);
             $expertiseNameCol = collect($headers)->search(
                 fn($h) => str_contains($h, 'expertise_name') || str_contains($h, 'nama_jurusan') || str_contains($h, 'jurusan')
             );
@@ -255,6 +254,14 @@ class GraduationImportController extends Controller
                 $name          = trim((string) ($row[$nameCol] ?? ''));
                 $type          = strtolower(trim((string) ($row[$typeCol] ?? '')));
                 $expertiseName = $expertiseNameCol !== false ? strtolower(trim((string) ($row[$expertiseNameCol] ?? ''))) : '';
+                
+                $hasNa = true;
+                if ($naCol !== false && isset($row[$naCol])) {
+                    $val = strtolower(trim((string)$row[$naCol]));
+                    if ($val === '0' || $val === 'tidak' || $val === 'no' || $val === 'false') {
+                        $hasNa = false;
+                    }
+                }
 
                 if (!$name || !$type) {
                     $errors[] = "Baris $rowNumber: Kolom name dan type tidak boleh kosong";
@@ -280,7 +287,13 @@ class GraduationImportController extends Controller
                     }
                 }
 
-                $mapelData[] = ['name' => $name, 'type' => $type, 'expertiseName' => $expertiseName, 'rowNumber' => $rowNumber];
+                $mapelData[] = [
+                    'name'          => $name,
+                    'type'          => $type,
+                    'expertiseName' => $expertiseName,
+                    'has_na'        => $hasNa,
+                    'rowNumber'     => $rowNumber
+                ];
             }
 
             foreach ($mapelData as $mapel) {
@@ -292,7 +305,13 @@ class GraduationImportController extends Controller
                                 $skipCount++;
                                 continue;
                             }
-                            GoogleMapel::create(['class_id' => $class->id, 'expertise_id' => null, 'name' => $mapel['name'], 'type' => 'umum']);
+                            GoogleMapel::create([
+                                'class_id'     => $class->id,
+                                'expertise_id' => null,
+                                'name'         => $mapel['name'],
+                                'type'         => 'umum',
+                                'has_na'       => $mapel['has_na'] ?? true
+                            ]);
                             $successCount++;
                         }
                     } else {
@@ -312,7 +331,13 @@ class GraduationImportController extends Controller
                                 $skipCount++;
                                 continue;
                             }
-                            GoogleMapel::create(['class_id' => $class->id, 'expertise_id' => $expertiseId, 'name' => $mapel['name'], 'type' => 'jurusan']);
+                            GoogleMapel::create([
+                                'class_id'     => $class->id,
+                                'expertise_id' => $expertiseId,
+                                'name'         => $mapel['name'],
+                                'type'         => 'jurusan',
+                                'has_na'       => $mapel['has_na'] ?? true
+                            ]);
                             $successCount++;
                         }
                     }
@@ -447,15 +472,16 @@ class GraduationImportController extends Controller
 
         $nameCol = collect($headers)->search(fn($h) => str_contains($h, 'name') || str_contains($h, 'nama'));
         $typeCol = collect($headers)->search(fn($h) => str_contains($h, 'type') || str_contains($h, 'tipe') || str_contains($h, 'jenis'));
+        $naCol   = collect($headers)->search(fn($h) => str_contains($h, 'has_na') || str_contains($h, 'ada_na') || str_contains($h, 'punya_na'));
 
         if ($nameCol === false || $typeCol === false) {
             throw new \Exception('Kolom name/nama dan type/tipe/jenis harus ada di file');
         }
 
-        return [$nameCol, $typeCol];
+        return [$nameCol, $typeCol, $naCol];
     }
 
-    private function parseMapelRows(array $rows, int $nameCol, int $typeCol, array &$errors, int &$errorCount): array
+    private function parseMapelRows(array $rows, int $nameCol, int $typeCol, $naCol, array &$errors, int &$errorCount): array
     {
         $mapelData = [];
 
@@ -478,7 +504,20 @@ class GraduationImportController extends Controller
                 continue;
             }
 
-            $mapelData[] = ['name' => $name, 'type' => $type, 'rowNumber' => $rowNumber];
+            $hasNa = true;
+            if ($naCol !== false && isset($row[$naCol])) {
+                $val = strtolower(trim((string)$row[$naCol]));
+                if ($val === '0' || $val === 'tidak' || $val === 'no' || $val === 'false') {
+                    $hasNa = false;
+                }
+            }
+
+            $mapelData[] = [
+                'name'   => $name,
+                'type'   => $type,
+                'has_na' => $hasNa,
+                'rowNumber' => $rowNumber
+            ];
         }
 
         return $mapelData;
@@ -553,22 +592,32 @@ class GraduationImportController extends Controller
                 }
 
                 $parseScore = function($val) {
-                    if ($val === '' || $val === null) return null;
+                    if ($val === '' || $val === null || strtoupper(trim((string)$val)) === 'N/A') return null;
                     $n = (float) str_replace(',', '.', $val);
                     return ($n >= 0 && $n <= 100) ? $n : null;
                 };
 
+                $s1 = $s1Col !== false ? $parseScore($row[$s1Col] ?? '') : null;
+                $s2 = $s2Col !== false ? $parseScore($row[$s2Col] ?? '') : null;
+                $s3 = $s3Col !== false ? $parseScore($row[$s3Col] ?? '') : null;
+                $s4 = $s4Col !== false ? $parseScore($row[$s4Col] ?? '') : null;
+                $s5 = $s5Col !== false ? $parseScore($row[$s5Col] ?? '') : null;
+                $s6 = $s6Col !== false ? $parseScore($row[$s6Col] ?? '') : null;
+
+                $semesters = array_filter([$s1, $s2, $s3, $s4, $s5, $s6], fn($v) => !is_null($v));
+                $nr = count($semesters) > 0 ? array_sum($semesters) / count($semesters) : null;
+
                 GoogleGraduationMapel::updateOrCreate(
                     ['graduation_id' => $graduationMap[$student->id]->uuid, 'mapel_id' => $mapel->uuid],
                     [
-                        'sem_1' => $s1Col !== false ? $parseScore($row[$s1Col] ?? '') : null,
-                        'sem_2' => $s2Col !== false ? $parseScore($row[$s2Col] ?? '') : null,
-                        'sem_3' => $s3Col !== false ? $parseScore($row[$s3Col] ?? '') : null,
-                        'sem_4' => $s4Col !== false ? $parseScore($row[$s4Col] ?? '') : null,
-                        'sem_5' => $s5Col !== false ? $parseScore($row[$s5Col] ?? '') : null,
-                        'sem_6' => $s6Col !== false ? $parseScore($row[$s6Col] ?? '') : null,
-                        'nr'    => $nrCol !== false ? $parseScore($row[$nrCol] ?? '') : null,
-                        'score' => $naCol !== false ? $parseScore($row[$naCol] ?? '') : null,
+                        'sem_1' => $s1,
+                        'sem_2' => $s2,
+                        'sem_3' => $s3,
+                        'sem_4' => $s4,
+                        'sem_5' => $s5,
+                        'sem_6' => $s6,
+                        'nr'    => $nr,
+                        'score' => ($mapel->has_na && $naCol !== false) ? $parseScore($row[$naCol] ?? '') : null,
                     ]
                 );
                 $successCount++;

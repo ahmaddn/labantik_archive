@@ -80,6 +80,21 @@
                     @enderror
                 </div>
 
+                {{-- Has NA Setting --}}
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <div class="relative inline-flex h-6 w-11 items-center">
+                            <input type="checkbox" name="has_na" value="1" @checked(old('has_na', true))
+                                class="peer sr-only">
+                            <div class="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300"></div>
+                        </div>
+                        <div>
+                            <span class="block text-sm font-bold text-gray-800">Aktifkan Nilai Akhir (NA)</span>
+                            <span class="block text-xs text-gray-500 mt-0.5">Jika diaktifkan, mapel ini akan menyertakan kolom Nilai Akhir (NA) di transkrip dan surat kelulusan.</span>
+                        </div>
+                    </label>
+                </div>
+
                 <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p class="text-sm text-blue-800"><strong>Catatan:</strong> Mapel akan otomatis ditambahkan ke semua
                         kelas 12.</p>

@@ -407,7 +407,7 @@
                 @foreach ($groupedUmum as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $score = $group[0]->score !== null ? $group[0]->score : '';
+                        $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
                     @endphp
                     @foreach ($group as $idx => $mapel)
                         <tr>
@@ -449,7 +449,7 @@
                 @foreach ($groupedJurusan as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $score = $group[0]->score !== null ? $group[0]->score : '';
+                        $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
                     @endphp
                     @foreach ($group as $idx => $mapel)
                         <tr>

@@ -401,7 +401,7 @@
                                 <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
                                 <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
                                 <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
-                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->score }}</td>
+                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
                             @endif
                         </tr>
                     @endforeach
@@ -443,7 +443,7 @@
                                 <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
                                 <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
                                 <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
-                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->score }}</td>
+                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
                             @endif
                         </tr>
                     @endforeach

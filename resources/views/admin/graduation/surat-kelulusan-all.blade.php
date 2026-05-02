@@ -403,11 +403,11 @@
                     @endphp
 
 
-                    @foreach ($groupedUmum as $key => $group)
-                        @php
-                            $rowspan = count($group);
-                            $score = $group[0]->score !== null ? $group[0]->score : '';
-                        @endphp
+                        @foreach ($groupedUmum as $key => $group)
+                            @php
+                                $rowspan = count($group);
+                                $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
+                            @endphp
                         @foreach ($group as $idx => $mapel)
                             <tr>
                                 @if ($idx === 0)
@@ -447,55 +447,26 @@
                     @foreach ($groupedJurusan as $key => $group)
                         @php
                             $rowspan = count($group);
-                            $score = $group[0]->score !== null ? $group[0]->score : '';
+                            $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
                         @endphp
 
-                        @foreach ($groupedJurusan as $key => $group)
-                            @php
-                                $rowspan = count($group);
-                                $score = $group[0]->score !== null ? $group[0]->score : '';
-                            @endphp
-                            @foreach ($group as $idx => $mapel)
-                                <tr>
-                                    @if ($idx === 0)
-                                        <td class="col-no" style="padding:0px; vertical-align:middle;"
-                                            @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                            {{ $noJurusan }}
-                                        </td>
-                                    @endif
-                                    <td style="padding:2px;">{{ $mapel->mapel->name }}</td>
-                                    @if ($idx === 0)
-                                        <td class="col-nilai" style="padding:0px; vertical-align:middle;"
-                                            @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                            {{ $score }}
-                                        </td>
-                                    @endif
-                                </tr>
-                            @endforeach
-                            @php $noJurusan++; @endphp
+                        @foreach ($group as $idx => $mapel)
+                            <tr>
+                                @if ($idx === 0)
+                                    <td class="col-no" style="padding:0px; vertical-align:middle;"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $noJurusan }}
+                                    </td>
+                                @endif
+                                <td style="padding:2px;">{{ $mapel->mapel->name }}</td>
+                                @if ($idx === 0)
+                                    <td class="col-nilai" style="padding:0px; vertical-align:middle;"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $score }}
+                                    </td>
+                                @endif
+                            </tr>
                         @endforeach
-                        @php
-                            $noUmum = 1;
-                            $groupedUmum = [];
-                            foreach ($item->mapelUmum as $m) {
-                                $joinVal = $m->mapel->join ?? 0;
-                                $key = $joinVal == 0 ? 'solo_' . $m->id : 'grp_' . $joinVal;
-                                $groupedUmum[$key][] = $m;
-                            }
-                        @endphp
-
-                        {{-- loop sama seperti di atas --}}
-
-                        @php
-                            $noJurusan = 1;
-                            $groupedJurusan = [];
-                            foreach ($item->mapelJurusan as $m) {
-                                $joinVal = $m->mapel->join ?? 0;
-                                $key = $joinVal == 0 ? 'solo_' . $m->id : 'grp_' . $joinVal;
-                                $groupedJurusan[$key][] = $m;
-                            }
-                        @endphp
-
                         @php $noJurusan++; @endphp
                     @endforeach
 

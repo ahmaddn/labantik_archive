@@ -32,6 +32,7 @@ class GraduationMapelController extends Controller
             'expertise_ids.*' => 'exists:core_expertise_concentrations,id',
             'name'            => 'required|string|max:255',
             'type'            => 'required|in:umum,jurusan',
+            'has_na'          => 'nullable|boolean',
         ]);
 
         try {
@@ -64,6 +65,7 @@ class GraduationMapelController extends Controller
                         'expertise_id' => null,
                         'name'         => $validated['name'],
                         'type'         => 'umum',
+                        'has_na'       => $request->has('has_na'),
                     ]);
                     $successCount++;
                 }
@@ -94,6 +96,7 @@ class GraduationMapelController extends Controller
                             'expertise_id' => $expId,
                             'name'         => $validated['name'],
                             'type'         => 'jurusan',
+                            'has_na'       => $request->has('has_na'),
                         ]);
                         $successCount++;
                     }
@@ -138,6 +141,7 @@ class GraduationMapelController extends Controller
             'expertise_ids.*' => 'exists:core_expertise_concentrations,id',
             'name'            => 'required|string|max:255',
             'type'            => 'required|in:umum,jurusan',
+            'has_na'          => 'nullable|boolean',
         ]);
 
         try {
@@ -166,6 +170,7 @@ class GraduationMapelController extends Controller
                     'expertise_id' => null,
                     'name'         => $validated['name'],
                     'type'         => 'umum',
+                    'has_na'       => $request->has('has_na'),
                 ]);
             } else {
                 $firstExpertiseId = $validated['expertise_ids'][0];
@@ -188,6 +193,7 @@ class GraduationMapelController extends Controller
                     'expertise_id' => $firstExpertiseId,
                     'name'         => $validated['name'],
                     'type'         => 'jurusan',
+                    'has_na'       => $request->has('has_na'),
                 ]);
 
                 if (count($validated['expertise_ids']) > 1) {
@@ -206,6 +212,7 @@ class GraduationMapelController extends Controller
                                 'expertise_id' => $expId,
                                 'name'         => $validated['name'],
                                 'type'         => 'jurusan',
+                                'has_na'       => $request->has('has_na'),
                             ]);
                         }
                     }

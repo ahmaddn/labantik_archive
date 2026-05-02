@@ -53,7 +53,6 @@ class GraduationStudentSheet implements FromCollection, WithTitle, WithHeadings,
             'S4',
             'S5',
             'S6',
-            'NR',
             'NA',
             'NIS'
         ];
@@ -75,7 +74,7 @@ class GraduationStudentSheet implements FromCollection, WithTitle, WithHeadings,
                 $kelasLabel,
                 $mapel->uuid,
                 $mapel->name,
-                $existing?->score ?? '',
+                $mapel->has_na ? ($existing?->score ?? '') : 'N/A',
                 $this->student->student_number ?? '',
             ];
         }
@@ -91,8 +90,7 @@ class GraduationStudentSheet implements FromCollection, WithTitle, WithHeadings,
             $existing?->sem_4 ?? '',
             $existing?->sem_5 ?? '',
             $existing?->sem_6 ?? '',
-            $existing?->nr ?? '',
-            $existing?->score ?? '',
+            $mapel->has_na ? ($existing?->score ?? '') : 'N/A',
             $this->student->student_number ?? '',
         ];
     }

@@ -162,7 +162,7 @@ class GraduationController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-            public function storeTranscript(Request $request)
+    public function storeTranscript(Request $request)
     {
         $validated = $request->validate([
             'student_id' => 'required|exists:ref_students,id',
@@ -173,7 +173,6 @@ class GraduationController extends Controller
             's4'         => 'nullable|array',
             's5'         => 'nullable|array',
             's6'         => 'nullable|array',
-            'nr'         => 'nullable|array',
             'na'         => 'nullable|array',
         ]);
 
@@ -184,16 +183,26 @@ class GraduationController extends Controller
             $graduation = GoogleGraduation::firstOrCreate(['user_id' => $student->id]);
 
             foreach ($validated['mapel_ids'] as $mapelUuid) {
+                $s1 = $validated['s1'][$mapelUuid] ?? null;
+                $s2 = $validated['s2'][$mapelUuid] ?? null;
+                $s3 = $validated['s3'][$mapelUuid] ?? null;
+                $s4 = $validated['s4'][$mapelUuid] ?? null;
+                $s5 = $validated['s5'][$mapelUuid] ?? null;
+                $s6 = $validated['s6'][$mapelUuid] ?? null;
+
+                $semesters = array_filter([$s1, $s2, $s3, $s4, $s5, $s6], fn($v) => !is_null($v) && $v !== '');
+                $nr = count($semesters) > 0 ? array_sum($semesters) / count($semesters) : null;
+
                 GoogleGraduationMapel::updateOrCreate(
                     ['graduation_id' => $graduation->uuid, 'mapel_id' => $mapelUuid],
                     [
-                        'sem_1' => $validated['s1'][$mapelUuid] ?? null,
-                        'sem_2' => $validated['s2'][$mapelUuid] ?? null,
-                        'sem_3' => $validated['s3'][$mapelUuid] ?? null,
-                        'sem_4' => $validated['s4'][$mapelUuid] ?? null,
-                        'sem_5' => $validated['s5'][$mapelUuid] ?? null,
-                        'sem_6' => $validated['s6'][$mapelUuid] ?? null,
-                        'nr'    => $validated['nr'][$mapelUuid] ?? null,
+                        'sem_1' => $s1,
+                        'sem_2' => $s2,
+                        'sem_3' => $s3,
+                        'sem_4' => $s4,
+                        'sem_5' => $s5,
+                        'sem_6' => $s6,
+                        'nr'    => $nr,
                         'score' => $validated['na'][$mapelUuid] ?? null,
                     ]
                 );
@@ -308,6 +317,7 @@ class GraduationController extends Controller
                     'name'           => $m->name,
                     'type'           => $m->type,
                     'expertise_name' => $m->expertise->name ?? 'Umum',
+                    'has_na'         => (bool) $m->has_na,
                 ]);
 
             return response()->json($mapels);
@@ -371,7 +381,6 @@ class GraduationController extends Controller
                 'sem_4' => 'nullable|numeric|min:0|max:100',
                 'sem_5' => 'nullable|numeric|min:0|max:100',
                 'sem_6' => 'nullable|numeric|min:0|max:100',
-                'nr'    => 'nullable|numeric|min:0|max:100',
                 'score' => 'nullable|numeric|min:0|max:100',
             ], [
                 'score.numeric' => 'Nilai harus berupa angka.',
@@ -381,14 +390,24 @@ class GraduationController extends Controller
 
             $graduationMapel = GoogleGraduationMapel::where('uuid', $validated['uuid'])->firstOrFail();
 
+            $s1 = $request->sem_1 ?? null;
+            $s2 = $request->sem_2 ?? null;
+            $s3 = $request->sem_3 ?? null;
+            $s4 = $request->sem_4 ?? null;
+            $s5 = $request->sem_5 ?? null;
+            $s6 = $request->sem_6 ?? null;
+
+            $semesters = array_filter([$s1, $s2, $s3, $s4, $s5, $s6], fn($v) => !is_null($v) && $v !== '');
+            $nr = count($semesters) > 0 ? array_sum($semesters) / count($semesters) : null;
+
             $graduationMapel->update([
-                'sem_1' => $request->sem_1 ?? null,
-                'sem_2' => $request->sem_2 ?? null,
-                'sem_3' => $request->sem_3 ?? null,
-                'sem_4' => $request->sem_4 ?? null,
-                'sem_5' => $request->sem_5 ?? null,
-                'sem_6' => $request->sem_6 ?? null,
-                'nr'    => $request->nr ?? null,
+                'sem_1' => $s1,
+                'sem_2' => $s2,
+                'sem_3' => $s3,
+                'sem_4' => $s4,
+                'sem_5' => $s5,
+                'sem_6' => $s6,
+                'nr'    => $nr,
                 'score' => $request->score ?? null,
             ]);
 

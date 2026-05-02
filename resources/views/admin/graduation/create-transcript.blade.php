@@ -8,7 +8,7 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h1 class="text-2xl font-extrabold text-gray-900">Input Transkrip Nilai</h1>
-                <p class="text-gray-500 text-sm mt-1">Daftarkan nilai semester lengkap (S1-S6) dan Nilai Rapor (NR) siswa.</p>
+                <p class="text-gray-500 text-sm mt-1">Daftarkan nilai semester lengkap (S1-S6) siswa. Nilai Rapor (NR) akan dihitung otomatis.</p>
             </div>
             <a href="{{ route('admin.graduation.index') }}"
                 class="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-colors text-sm shadow-sm border border-gray-200">
@@ -392,33 +392,33 @@
                                     <div class="grid grid-cols-4 gap-2 mb-3">
                                         <div>
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">S1</label>
-                                            <input type="number" name="s1[${m.uuid}]" min="0" max="100" step="0.01" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <input type="number" name="s1[${m.uuid}]" min="0" max="100" step="0.01" class="score-input w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
                                         </div>
                                         <div>
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">S2</label>
-                                            <input type="number" name="s2[${m.uuid}]" min="0" max="100" step="0.01" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <input type="number" name="s2[${m.uuid}]" min="0" max="100" step="0.01" class="score-input w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
                                         </div>
                                         <div>
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">S3</label>
-                                            <input type="number" name="s3[${m.uuid}]" min="0" max="100" step="0.01" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <input type="number" name="s3[${m.uuid}]" min="0" max="100" step="0.01" class="score-input w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
                                         </div>
                                         <div>
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">S4</label>
-                                            <input type="number" name="s4[${m.uuid}]" min="0" max="100" step="0.01" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <input type="number" name="s4[${m.uuid}]" min="0" max="100" step="0.01" class="score-input w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
                                         </div>
                                         <div>
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">S5</label>
-                                            <input type="number" name="s5[${m.uuid}]" min="0" max="100" step="0.01" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <input type="number" name="s5[${m.uuid}]" min="0" max="100" step="0.01" class="score-input w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
                                         </div>
                                         <div>
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">S6</label>
-                                            <input type="number" name="s6[${m.uuid}]" min="0" max="100" step="0.01" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <input type="number" name="s6[${m.uuid}]" min="0" max="100" step="0.01" class="score-input w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
                                         </div>
                                         <div>
-                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">NR</label>
-                                            <input type="number" name="nr[${m.uuid}]" min="0" max="100" step="0.01" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <label class="block text-[10px] font-bold text-blue-400 uppercase mb-1">NR (Auto)</label>
+                                            <input type="text" readonly class="nr-display w-full px-2 py-1.5 text-xs border border-blue-100 bg-blue-50/50 rounded-lg text-blue-600 font-bold" placeholder="-">
                                         </div>
-                                        <div>
+                                        <div class="${m.has_na ? '' : 'hidden'}">
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">NA</label>
                                             <input type="number" name="na[${m.uuid}]" min="0" max="100" step="0.01" class="w-full px-2 py-1.5 text-xs border border-blue-200 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500">
                                         </div>
@@ -428,6 +428,22 @@
                                 // Stop propagation on all inputs inside wrapper
                                 scoreWrapper.querySelectorAll('input').forEach(input => {
                                     input.addEventListener('click', e => e.stopPropagation());
+
+                                    // Auto calculate NR
+                                    if (input.classList.contains('score-input')) {
+                                        input.addEventListener('input', () => {
+                                            const inputs = scoreWrapper.querySelectorAll('.score-input');
+                                            let total = 0, count = 0;
+                                            inputs.forEach(inp => {
+                                                if (inp.value !== '') {
+                                                    total += parseFloat(inp.value);
+                                                    count++;
+                                                }
+                                            });
+                                            const nr = count > 0 ? (total / count).toFixed(2) : '-';
+                                            scoreWrapper.querySelector('.nr-display').value = nr;
+                                        });
+                                    }
                                 });
 
                                 textDiv.appendChild(nameSpan);

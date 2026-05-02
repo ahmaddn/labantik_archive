@@ -20,9 +20,9 @@ class GoogleMapel extends Model
         'expertise_id',
         'name',
         'type',
-        'score',
-        'order', // FIX: diperlukan agar updateOrder AJAX bisa tersimpan
-        'join',  // FIX: diperlukan agar updateOrder AJAX bisa tersimpan
+        'order',
+        'join',
+        'has_na',
     ];
 
     public function graduations()

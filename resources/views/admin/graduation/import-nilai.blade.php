@@ -168,7 +168,6 @@
                                             <th class="pr-3 py-1 text-left font-bold text-[10px] text-blue-600">S1</th>
                                             <th class="pr-3 py-1 text-left font-bold text-[10px] text-blue-600">...</th>
                                             <th class="pr-3 py-1 text-left font-bold text-[10px] text-blue-600">S6</th>
-                                            <th class="pr-3 py-1 text-left font-bold text-[10px] text-blue-600">NR</th>
                                             <th class="pr-3 py-1 text-left font-bold text-[10px] text-indigo-600">NA</th>
                                             <th class="py-1 text-left font-bold text-[10px]">NIS</th>
                                         </tr>
@@ -181,7 +180,6 @@
                                             <td class="pr-3 py-1">85</td>
                                             <td class="pr-3 py-1">...</td>
                                             <td class="pr-3 py-1">88</td>
-                                            <td class="pr-3 py-1">86</td>
                                             <td class="pr-3 py-1 font-bold text-indigo-600">87.5</td>
                                             <td class="py-1">25262189</td>
                                         </tr>
@@ -192,7 +190,6 @@
                                             <td class="pr-3 py-1">80</td>
                                             <td class="pr-3 py-1">...</td>
                                             <td class="pr-3 py-1">82</td>
-                                            <td class="pr-3 py-1">81</td>
                                             <td class="pr-3 py-1 font-bold text-indigo-600">81.0</td>
                                             <td class="py-1">25262189</td>
                                         </tr>

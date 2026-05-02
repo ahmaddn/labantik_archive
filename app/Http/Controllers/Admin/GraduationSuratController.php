@@ -29,7 +29,7 @@ class GraduationSuratController extends Controller
         $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
         $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
 
-        $scores   = $mapelsData->whereNotNull('score')->pluck('score');
+        $scores   = $mapelsData->filter(fn($m) => ($m->mapel->has_na ?? true) && $m->score !== null)->pluck('score');
         $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
 
         $latestAcademicYear = $student->academicYears->first();
@@ -103,7 +103,7 @@ class GraduationSuratController extends Controller
         $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
         $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
 
-        $scores   = $mapelsData->whereNotNull('score')->pluck('score');
+        $scores   = $mapelsData->filter(fn($m) => ($m->mapel->has_na ?? true) && $m->score !== null)->pluck('score');
         $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
 
         $latestAcademicYear = $student->academicYears->first();
@@ -153,7 +153,7 @@ class GraduationSuratController extends Controller
             $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
             $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
 
-            $scores   = $mapelsData->whereNotNull('score')->pluck('score');
+            $scores   = $mapelsData->filter(fn($m) => ($m->mapel->has_na ?? true) && $m->score !== null)->pluck('score');
             $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
 
             $latestAcademicYear = $student->academicYears->first();
@@ -225,7 +225,7 @@ class GraduationSuratController extends Controller
             $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
             $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
 
-            $scores   = $mapelsData->whereNotNull('score')->pluck('score');
+            $scores   = $mapelsData->filter(fn($m) => ($m->mapel->has_na ?? true) && $m->score !== null)->pluck('score');
             $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
 
             $latestAcademicYear = $student->academicYears->first();
