@@ -311,7 +311,11 @@
         <div class="pembuka">
             @if ($letter)
                 @php
-                    $displayStatement = str_replace('[TAHUN_PELAJARAN]', $letter->academic_year ?? '', $letter->statement);
+                    $displayStatement = str_replace(
+                        '[TAHUN_PELAJARAN]',
+                        $letter->academic_year ?? '',
+                        $letter->statement,
+                    );
                 @endphp
                 <p>{{ $displayStatement }}</p>
                 @php
@@ -371,7 +375,8 @@
             <tr>
                 <td class="label" style="padding:0;">Tahun Pelajaran</td>
                 <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
+                <td style="padding:0;">
+                    {{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
             </tr>
             <tr>
                 <td class="label" style="padding:0;">Dinyatakan</td>
@@ -507,8 +512,9 @@
                 @endif
                 Kepala SMK Negeri 1 Talaga,
                 <div class="ttd-space"></div>
-                <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                <div class="nama">
+                    {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                <div>{{ $principal->employee->functional_position ?? 'Penata Tingkat I/IIId' }}</div>
                 <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
             </div>
         </div>

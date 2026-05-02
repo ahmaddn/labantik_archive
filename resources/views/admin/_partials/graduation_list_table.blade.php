@@ -791,7 +791,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                 </svg>
                             </button>
-                            <div class="absolute right-0 mt-0 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-40">
+                            <div class="absolute left-0 mt-0 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-40">
                                 <a href="${routeSuratKelulusan.replace(':id', g.uuid)}" target="_blank"
                                     class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors first:rounded-t-lg">
                                     <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

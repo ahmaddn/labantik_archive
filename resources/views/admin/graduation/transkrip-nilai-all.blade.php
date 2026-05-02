@@ -295,12 +295,13 @@
                     Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
                 </div>
             </div>
-                        <div class="header-border-top"></div>
+            <div class="header-border-top"></div>
             <div class="header-border-thin"></div>
             {{-- JUDUL --}}
             <div class="doc-title">
                 <h2>TRANSKRIP NILAI</h2>
-                <div class="nomor">{{ $item->letter->transcript_letter_number ?? ($item->letter->letter_number ?? '—') }}
+                <div class="nomor">
+                    {{ $item->letter->transcript_letter_number ?? ($item->letter->letter_number ?? '—') }}
                 </div>
             </div>
 
@@ -356,7 +357,8 @@
                 <tr>
                     <td class="label">Tahun Pelajaran</td>
                     <td class="sep">:</td>
-                    <td>{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}</td>
+                    <td>{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}
+                    </td>
                 </tr>
             </table>
 
@@ -366,7 +368,8 @@
                     <tr>
                         <th rowspan="2" class="col-no">No</th>
                         <th rowspan="2">Mata Pelajaran</th>
-                        <th colspan="7">Nilai Rapor</th>
+                        <th colspan="6">Nilai Rapor</th>
+                        <th rowspan="2" class="col-nr">NR</th>
                     </tr>
                     <tr>
                         <th class="col-semester">1</th>
@@ -375,7 +378,6 @@
                         <th class="col-semester">4</th>
                         <th class="col-semester">5</th>
                         <th class="col-semester">6</th>
-                        <th class="col-nr">NR</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -396,7 +398,10 @@
                     @foreach ($groupedUmum as $key => $group)
                         @php
                             $rowspan = count($group);
-                            $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
+                            $g =
+                                collect($group)->first(
+                                    fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
+                                ) ?? $group[0];
                         @endphp
                         @foreach ($group as $idx => $m)
                             <tr>
@@ -452,7 +457,10 @@
                     @foreach ($groupedJurusan as $key => $group)
                         @php
                             $rowspan = count($group);
-                            $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
+                            $g =
+                                collect($group)->first(
+                                    fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
+                                ) ?? $group[0];
                         @endphp
                         @foreach ($group as $idx => $m)
                             <tr>
@@ -492,7 +500,7 @@
                     @endforeach
 
                     <tr class="rata-rata">
-                        <td colspan="8"  style="text-align: center;">Rata-rata</td>
+                        <td colspan="8" style="text-align: center;">Rata-rata</td>
                         <td class="col-nr">{{ $item->rataRata }}</td>
                     </tr>
                 </tbody>
@@ -509,8 +517,10 @@
                     {{ $item->letter ? \Carbon\Carbon::parse($item->letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
                     Kepala SMK Negeri 1 Talaga,
                     <div class="ttd-space"></div>
-                    <div class="ttd-name">{{ $item->principal->employee->full_name ?? ($item->principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-                    <div>{{ $item->principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                    <div class="ttd-name">
+                        {{ $item->principal->employee->full_name ?? ($item->principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}
+                    </div>
+                    <div>{{ $item->principal->employee->functional_position ?? 'Penata Tingkat I/IIId' }}</div>
                     <div>NIP. {{ $item->principal->employee->nip ?? '197610012006041011' }}</div>
                 </div>
             </div>

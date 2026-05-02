@@ -312,7 +312,11 @@
             <div class="pembuka">
                 @if ($item->letter)
                     @php
-                        $displayStatement = str_replace('[TAHUN_PELAJARAN]', $item->letter->academic_year ?? '', $item->letter->statement);
+                        $displayStatement = str_replace(
+                            '[TAHUN_PELAJARAN]',
+                            $item->letter->academic_year ?? '',
+                            $item->letter->statement,
+                        );
                     @endphp
                     <p>{{ $displayStatement }}</p>
                     @php
@@ -372,7 +376,9 @@
                 <tr>
                     <td class="label" style="padding:0;">Tahun Pelajaran</td>
                     <td class="sep" style="padding:0;">:</td>
-                    <td style="padding:0;">{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}</td>
+                    <td style="padding:0;">
+                        {{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}
+                    </td>
                 </tr>
                 <tr>
                     <td class="label" style="padding:0;">Dinyatakan</td>
@@ -507,8 +513,10 @@
                     @endif
                     Kepala SMK Negeri 1 Talaga,
                     <div class="ttd-space"></div>
-                    <div class="nama">{{ $item->principal->employee->full_name ?? ($item->principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-                    <div>{{ $item->principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                    <div class="nama">
+                        {{ $item->principal->employee->full_name ?? ($item->principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}
+                    </div>
+                    <div>{{ $item->principal->employee->functional_position ?? 'Penata Tingkat I/IIId' }}</div>
                     <div>NIP. {{ $item->principal->employee->nip ?? '197610012006041011' }}</div>
                 </div>
             </div>

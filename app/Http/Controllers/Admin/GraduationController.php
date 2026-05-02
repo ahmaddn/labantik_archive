@@ -550,8 +550,13 @@ class GraduationController extends Controller
             $updatedCount = 0;
             \DB::beginTransaction();
             foreach ($graduations as $graduation) {
-                // Generate a random 6 character uppercase alphanumeric token
-                $token = strtoupper(\Illuminate\Support\Str::random(6));
+                // Generate a random 4 character uppercase alphabetic token (letters only)
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $token = '';
+                for ($i = 0; $i < 4; $i++) {
+                    $token .= $chars[rand(0, strlen($chars) - 1)];
+                }
+                
                 $graduation->update(['token' => $token]);
                 $updatedCount++;
             }
