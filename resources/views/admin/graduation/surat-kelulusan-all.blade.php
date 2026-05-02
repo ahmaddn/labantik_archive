@@ -62,8 +62,9 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 20px auto;
-            padding: 8mm 15mm 10mm 15mm;
+            padding: 8mm 15mm 40mm 15mm;
             box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            position: relative;
         }
 
         /* ═══════════════════════════════════════════
@@ -213,10 +214,11 @@
 
         .ttd-section {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
             margin-top: 10px;
             font-size: 10pt;
-            margin-left: 480px;
         }
 
         .ttd-block {
@@ -231,6 +233,32 @@
         .ttd-block .nama {
             font-weight: bold;
             text-decoration: underline;
+        }
+
+        .qr-block {
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        /* ── QR FOOTER ── */
+        .doc-qr-footer {
+            margin-top: 14px;
+            padding: 10px 0;
+            font-size: 7.5pt;
+            font-family: Arial, sans-serif;
+            position: absolute;
+            
+            left: 15mm;
+            right: 15mm;
+        }
+        .doc-qr-footer-text {
+            line-height: 1.5;
+            color: #222;
+        }
+        .doc-qr-footer-text strong {
+            display: block;
+            font-size: 8pt;
+            margin-bottom: 2px;
         }
 
         /* ── PRINT ── */
@@ -249,7 +277,7 @@
                 margin: 0;
                 box-shadow: none;
                 width: 100%;
-                padding: 8mm 15mm 10mm 15mm;
+                padding: 8mm 15mm 0mm 15mm;
                 page-break-after: always;
                 break-after: page;
             }
@@ -497,6 +525,13 @@
 
             {{-- TANDA TANGAN --}}
             <div class="ttd-section">
+                <div class="qr-block">
+                    @php
+                        $verifyUrl = route('graduation.verify', $item->graduation->uuid);
+                        $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl) . '&size=100&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+                    @endphp
+                    <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
+                </div>
                 <div class="ttd-block">
                     @if ($item->letter)
                         Talaga,
@@ -509,6 +544,16 @@
                     <div class="nama">{{ $item->principal->employee->full_name ?? ($item->principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
                     <div>{{ $item->principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
                     <div>NIP. {{ $item->principal->employee->nip ?? '197610012006041011' }}</div>
+                </div>
+            </div>
+
+            {{-- QR CODE FOOTER --}}
+            <div class="doc-qr-footer">
+                <div class="doc-qr-footer-text">
+                    <strong>Verifikasi Keaslian Dokumen</strong>
+                    Scan QR Code ini untuk memverifikasi keaslian Surat Kelulusan atas nama
+                    <strong style="display:inline; font-size:inherit;">{{ strtoupper($item->student->full_name ?? '—') }}</strong>.
+                    Atau kunjungi: <em>{{ route('graduation.verify', $item->graduation->uuid) }}</em>
                 </div>
             </div>
 

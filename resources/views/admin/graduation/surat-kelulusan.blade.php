@@ -13,7 +13,7 @@
 
         body {
             font-family: "Times New Roman", Times, serif;
-            line-height: 1.3;
+            line-height: 1.2;
             margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
@@ -62,19 +62,17 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 20px auto;
-            padding: 8mm 15mm 10mm 15mm;
+            padding: 8mm 15mm 40mm 15mm;
             box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            position: relative;
         }
 
         /* ═══════════════════════════════════════════
            SURAT KETERANGAN LULUS
         ═══════════════════════════════════════════ */
-        /* KOP SURAT */
         .header {
             text-align: center;
-            padding-bottom: 5px;
             padding-left: 90px;
-            margin-bottom: 10px;
             position: relative;
             min-height: 100px;
         }
@@ -124,10 +122,9 @@
             margin-top: 2px;
         }
 
-        /* JUDUL */
         .doc-title {
             text-align: center;
-            margin: 12px 0 4px 0;
+            margin: 0px 0 4px 0;
         }
 
         .doc-title h2 {
@@ -143,7 +140,6 @@
             margin: 0 0 8px 0;
         }
 
-        /* TEKS PEMBUKA */
         .pembuka {
             font-size: 10pt;
             line-height: 1.5;
@@ -151,7 +147,6 @@
             text-align: justify;
         }
 
-        /* INFO SISWA */
         .info-table {
             width: 100%;
             border-collapse: collapse;
@@ -177,7 +172,6 @@
             font-weight: bold;
         }
 
-        /* TABEL NILAI */
         .nilai-table {
             width: 100%;
             border-collapse: collapse;
@@ -200,11 +194,13 @@
         .nilai-table .col-no {
             width: 35px;
             text-align: center;
+
         }
 
         .nilai-table .col-nilai {
             width: 70px;
             text-align: center;
+            font-weight: normal;
         }
 
         .nilai-table .section-header td {
@@ -216,13 +212,13 @@
             text-align: center;
         }
 
-        /* TANDA TANGAN KELULUSAN */
         .ttd-section {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
             margin-top: 10px;
             font-size: 10pt;
-            margin-left: 480px;
         }
 
         .ttd-block {
@@ -237,6 +233,32 @@
         .ttd-block .nama {
             font-weight: bold;
             text-decoration: underline;
+        }
+
+        .qr-block {
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        /* ── QR FOOTER ── */
+        .doc-qr-footer {
+            margin-top: 14px;
+            padding: 10px 0;
+            font-size: 7.5pt;
+            font-family: Arial, sans-serif;
+            position: absolute;
+            
+            left: 15mm;
+            right: 15mm;
+        }
+        .doc-qr-footer-text {
+            line-height: 1.5;
+            color: #222;
+        }
+        .doc-qr-footer-text strong {
+            display: block;
+            font-size: 8pt;
+            margin-bottom: 2px;
         }
 
         /* ── PRINT ── */
@@ -255,7 +277,14 @@
                 margin: 0;
                 box-shadow: none;
                 width: 100%;
-                padding: 8mm 15mm 10mm 15mm;
+                padding: 8mm 15mm 0mm 15mm;
+                page-break-after: always;
+                break-after: page;
+            }
+
+            .page:last-child {
+                page-break-after: auto;
+                break-after: auto;
             }
         }
 
@@ -497,22 +526,38 @@
         </table>
 
         {{-- TANDA TANGAN KEPALA SEKOLAH --}}
-        <div class="ttd-section">
-            <div class="ttd-block">
-                @if ($letter)
-                    Talaga, {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
-                @else
-                    Talaga, ___________________<br />
-                @endif
-                Kepala SMK Negeri 1 Talaga,
-                <div class="ttd-space"></div>
-                <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
-                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
-            </div>
-        </div>
+<div class="ttd-section">
+    <div class="qr-block">
+        @php
+            $verifyUrl = route('graduation.verify', $graduation->uuid);
+            $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl) . '&size=100&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+        @endphp
+        <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
+    </div>
+    <div class="ttd-block">
+        @if ($letter)
+            Talaga,
+            {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+        @else
+            Talaga, ___________________<br />
+        @endif
+        Kepala SMK Negeri 1 Talaga,
+        <div class="ttd-space"></div>
+        <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+        <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+        <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
+    </div>
+</div>
 
-    </div>{{-- end .page --}}
+{{-- QR CODE FOOTER --}}
+<div class="doc-qr-footer">
+    <div class="doc-qr-footer-text">
+        <strong>Verifikasi Keaslian Dokumen</strong>
+        Scan QR Code ini untuk memverifikasi keaslian Surat Kelulusan atas nama
+        <strong style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+        Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
+    </div>
+</div>
 
 </body>
 
