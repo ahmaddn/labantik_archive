@@ -228,10 +228,31 @@
         .ttd-block {
             text-align: left;
             width: 260px;
+            position: relative;
+        }
+
+        .stamp-image {
+            position: absolute;
+            left: -60px;
+            top: -30px;
+            width: 120px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .signature-image {
+            position: absolute;
+            left: 0px;
+            top: 25px;
+            width: 80px;
+            z-index: 5;
+            pointer-events: none;
         }
 
         .ttd-space {
             height: 60px;
+            position: relative;
         }
 
         .ttd-block .nama {
@@ -850,9 +871,16 @@
             Talaga, ___________________<br />
         @endif
         Kepala SMK Negeri 1 Talaga,
-        <div class="ttd-space"></div>
+        <div class="ttd-space">
+            @if (in_array($sigMode ?? 'both', ['sig', 'both']) && $letter && $letter->signature_image)
+                <img src="{{ url('storage', $letter->signature_image) }}" class="signature-image">
+            @endif
+            @if (($sigMode ?? 'both') === 'both' && $letter && $letter->stamp_image)
+                <img src="{{ url('storage/', $letter->stamp_image) }}" class="stamp-image">
+            @endif
+        </div>
         <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-        <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+        <div>{{ $principal->employee->functional_position ?? 'Penata Tingkat I/IIId' }}</div>
         <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
     </div>
 </div>
@@ -1120,9 +1148,16 @@
             Talaga, ___________________<br />
         @endif
         Kepala SMK Negeri 1 Talaga,
-        <div class="ttd-space"></div>
+        <div class="ttd-space">
+            @if (in_array($sigMode ?? 'both', ['sig', 'both']) && $letter && $letter->signature_image)
+                <img src="{{ url('storage/', $letter->signature_image) }}" class="signature-image">
+            @endif
+            @if (($sigMode ?? 'both') === 'both' && $letter && $letter->stamp_image)
+                <img src="{{ url('storage/', $letter->stamp_image) }}" class="stamp-image">
+            @endif
+        </div>
         <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-        <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+        <div>{{ $principal->employee->functional_position ?? 'Penata Tingkat I/IIId' }}</div>
         <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
     </div>
 </div>
