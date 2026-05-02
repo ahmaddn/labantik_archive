@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: "Times New Roman", Times, serif;
-            line-height: 1.3;
+    font-family: "Times New Roman", Times, serif;
+            line-height: 1.2;
             margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
@@ -62,7 +62,7 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 20px auto;
-            padding: 8mm 15mm 10mm 15mm;
+            padding: 8mm 15mm 40mm 15mm;
             box-shadow: 0 0 10px rgba(0, 0, 0, .1);
             position: relative;
         }
@@ -216,13 +216,13 @@
             text-align: center;
         }
 
-        /* TANDA TANGAN KELULUSAN */
         .ttd-section {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
             margin-top: 10px;
             font-size: 10pt;
-            margin-left: 480px;
         }
 
         .ttd-block {
@@ -239,6 +239,33 @@
             text-decoration: underline;
         }
 
+        .qr-block {
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        /* ── QR FOOTER ── */
+        .doc-qr-footer {
+            margin-top: 14px;
+            padding: 10px 0;
+            font-size: 7.5pt;
+            font-family: Arial, sans-serif;
+            position: absolute;
+            
+            left: 15mm;
+            right: 15mm;
+        }
+        .doc-qr-footer-text {
+            line-height: 1.5;
+            color: #222;
+        }
+        .doc-qr-footer-text strong {
+            display: block;
+            font-size: 8pt;
+            margin-bottom: 2px;
+        }
+
+
         /* ═══════════════════════════════════════════
            HALAMAN 2 — SURAT PERNYATAAN/FAKTA INTEGRITAS
            PAGE BREAK sebelum halaman ini
@@ -248,7 +275,7 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto;
-            padding: 20mm 20mm 20mm 25mm;
+            padding: 20mm 20mm 40mm 25mm;
             box-shadow: 0 0 10px rgba(0, 0, 0, .1);
             position: relative;
         }
@@ -302,8 +329,14 @@
         .ttd-pernyataan {
             display: flex;
             justify-content: flex-end;
+            align-items: flex-end;
+            gap: 20px;
             margin-top: 30px;
-            padding-left: 400px;
+        }
+
+        .qr-block-pernyataan {
+            text-align: left;
+            margin-bottom: 5px;
         }
 
         .ttd-pernyataan-block {
@@ -333,7 +366,7 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 20px auto;
-            padding: 10mm 15mm;
+            padding: 8mm 15mm 40mm 15mm;
             box-shadow: 0 0 10px rgba(0, 0, 0, .1);
             position: relative;
         }
@@ -485,7 +518,14 @@
             width: 100%;
             display: flex;
             justify-content: flex-end;
+            align-items: flex-end;
+            gap: 20px;
             font-size: 9pt;
+        }
+
+        .qr-block-transkrip {
+            text-align: left;
+            margin-bottom: 5px;
         }
 
         .transkrip-ttd-block {
@@ -518,7 +558,7 @@
                 margin: 0;
                 box-shadow: none;
                 width: 100%;
-                padding: 8mm 15mm 10mm 15mm;
+                padding: 8mm 15mm 0mm 15mm;
             }
 
             .page-transkrip {
@@ -545,39 +585,6 @@
         @page {
             size: A4 portrait;
             margin: 0;
-        }
-
-        /* ── QR FOOTER ── */
-        .doc-qr-footer {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 14px;
-            padding: 10px 12px;
-            border-top: 1.5px solid #000;
-            font-size: 7.5pt;
-            font-family: Arial, sans-serif;
-            position: absolute;
-            bottom: 10mm;
-            left: 15mm;
-            right: 15mm;
-        }
-
-        .doc-qr-footer img {
-            width: 64px;
-            height: 64px;
-            flex-shrink: 0;
-        }
-
-        .doc-qr-footer-text {
-            line-height: 1.5;
-            color: #222;
-        }
-
-        .doc-qr-footer-text strong {
-            display: block;
-            font-size: 8pt;
-            margin-bottom: 2px;
         }
 
         .page-pernyataan .doc-qr-footer {
@@ -826,25 +833,40 @@
 
 
 
-        {{-- TANDA TANGAN KEPALA SEKOLAH --}}
-        <div class="ttd-section">
-            <div class="ttd-block">
-                @if ($letter)
-                    Talaga,
-                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
-                @else
-                    Talaga, ___________________<br />
-                @endif
-                Kepala SMK Negeri 1 Talaga,
-                <div class="ttd-space"></div>
-                <div class="nama">
-                    {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
-                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
-            </div>
-        </div>
+        {{-- TANDA TANGAN --}}
+<div class="ttd-section">
+    <div class="qr-block">
+        @php
+            $verifyUrl = route('graduation.verify', $graduation->uuid);
+            $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl) . '&size=100&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+        @endphp
+        <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
+    </div>
+    <div class="ttd-block">
+        @if ($letter)
+            Talaga,
+            {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+        @else
+            Talaga, ___________________<br />
+        @endif
+        Kepala SMK Negeri 1 Talaga,
+        <div class="ttd-space"></div>
+        <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+        <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+        <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
+    </div>
+</div>
 
-    </div>{{-- end .page (halaman 1) --}}
+{{-- QR CODE FOOTER --}}
+<div class="doc-qr-footer">
+    <div class="doc-qr-footer-text">
+        <strong>Verifikasi Keaslian Dokumen</strong>
+        Scan QR Code ini untuk memverifikasi keaslian Surat Kelulusan atas nama
+        <strong style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+        Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
+    </div>
+</div>
+</div>
 
     {{-- ══════════════════════════════════════
          HALAMAN 2: TRANSKRIP NILAI
@@ -1081,43 +1103,40 @@
 
 
 
-        {{-- TANDA TANGAN --}}
-        <div class="transkrip-ttd-section">
-            <div class="transkrip-ttd-block">
-                @if ($letter)
-                    Talaga,
-                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
-                @else
-                    Talaga, ___________________<br />
-                @endif
-                Kepala SMK Negeri 1 Talaga,
-                <div class="transkrip-ttd-space"></div>
-                <div class="transkrip-ttd-name">
-                    {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
-                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
-            </div>
-        </div>
-        {{-- QR CODE FOOTER HALAMAN 2 --}}
+         {{-- TANDA TANGAN --}}
+<div class="ttd-section">
+    <div class="qr-block">
         @php
-            $verifyUrl2 = route('graduation.verify', $graduation->uuid);
-            $qrUrl2 =
-                'https://quickchart.io/qr?text=' .
-                urlencode($verifyUrl2) .
-                '&size=200&margin=2&centerImageUrl=' .
-                urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+            $verifyUrl = route('graduation.verify', $graduation->uuid);
+            $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl) . '&size=100&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
         @endphp
-        <div class="doc-qr-footer">
-            <img src="{{ $qrUrl2 }}" alt="QR Verifikasi" />
-            <div class="doc-qr-footer-text">
-                <strong>Verifikasi Keaslian Dokumen</strong>
-                Scan QR Code ini untuk memverifikasi keaslian Transkrip Nilai atas nama
-                <strong
-                    style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
-                Atau kunjungi: <em>{{ $verifyUrl2 }}</em>
-            </div>
-        </div>
-    </div>{{-- end .page-transkrip (halaman 2) --}}
+        <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
+    </div>
+    <div class="ttd-block">
+        @if ($letter)
+            Talaga,
+            {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+        @else
+            Talaga, ___________________<br />
+        @endif
+        Kepala SMK Negeri 1 Talaga,
+        <div class="ttd-space"></div>
+        <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+        <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+        <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
+    </div>
+</div>
+
+{{-- QR CODE FOOTER --}}
+<div class="doc-qr-footer">
+    <div class="doc-qr-footer-text">
+        <strong>Verifikasi Keaslian Dokumen</strong>
+        Scan QR Code ini untuk memverifikasi keaslian Surat Kelulusan atas nama
+        <strong style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+        Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
+    </div>
+</div>
+</div>
 
     {{-- ══════════════════════════════════════
          HALAMAN 3: SURAT PERNYATAAN/FAKTA INTEGRITAS
@@ -1199,6 +1218,7 @@
 
 
         <div class="ttd-pernyataan">
+            
             <div class="ttd-pernyataan-block">
                 @if ($letter)
                     Talaga,
@@ -1214,26 +1234,9 @@
         </div>
 
         {{-- QR CODE FOOTER HALAMAN 3 --}}
-        @php
-            $verifyUrl3 = route('graduation.verify', $graduation->uuid);
-            $qrUrl3 =
-                'https://quickchart.io/qr?text=' .
-                urlencode($verifyUrl3) .
-                '&size=200&margin=2&centerImageUrl=' .
-                urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
-        @endphp
-        <div class="doc-qr-footer">
-            <img src="{{ $qrUrl3 }}" alt="QR Verifikasi" />
-            <div class="doc-qr-footer-text">
-                <strong>Verifikasi Keaslian Dokumen</strong>
-                Scan QR Code ini untuk memverifikasi keaslian Surat Pernyataan atas nama
-                <strong
-                    style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
-                Atau kunjungi: <em>{{ $verifyUrl3 }}</em>
-            </div>
-        </div>
+        
 
-    </div>{{-- end .page-pernyataan (halaman 2) --}}
+    </div>{{-- end .page-pernyataan (halaman 3) --}}
 
 </body>
 
