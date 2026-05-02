@@ -96,13 +96,13 @@ class GraduationSuratController extends Controller
             return $this->transkripNilaiAll();
         }
 
-        $graduation = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
+        $graduation = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'transcriptLetter', 'mapels.mapel'])
             ->where('uuid', $id)
             ->firstOrFail();
 
         $student    = $graduation->user;
         $user       = auth()->user();
-        $letter     = $graduation->letter;
+        $letter     = $graduation->transcriptLetter ?? $graduation->letter;
         $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
 
         $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
@@ -231,7 +231,7 @@ class GraduationSuratController extends Controller
         $classId     = request('class_id');
         $expertiseId = request('expertise_id');
 
-        $graduations = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
+        $graduations = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'transcriptLetter', 'mapels.mapel'])
             ->whereHas('user.academicYears.class', function ($q) use ($classId, $expertiseId) {
                 $q->where('academic_level', 12);
                 if ($classId)     $q->where('id', $classId);
@@ -246,7 +246,7 @@ class GraduationSuratController extends Controller
         foreach ($graduations as $graduation) {
             $student    = $graduation->user;
             $user       = auth()->user();
-            $letter     = $graduation->letter;
+            $letter     = $graduation->transcriptLetter ?? $graduation->letter;
             $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
 
             $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
@@ -260,7 +260,7 @@ class GraduationSuratController extends Controller
             $program1           = $latestAcademicYear?->class?->expertiseProgram;
             $principal          = $this->getPrincipal($letter->headmaster_id ?? null);
 
-            $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'principal', 'letter');
+            $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'principal');
         }
 
         return view('admin.graduation.transkrip-nilai-all', compact('data', 'principal'));

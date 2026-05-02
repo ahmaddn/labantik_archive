@@ -17,6 +17,7 @@
             margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
+            font-size: 10pt;
         }
 
         /* ── ACTION BUTTONS ── */

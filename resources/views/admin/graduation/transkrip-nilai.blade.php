@@ -110,7 +110,7 @@
             text-align: center;
             line-height: 1.2;
             color: #000;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
                 .header-border-top {
@@ -296,7 +296,7 @@
         {{-- JUDUL --}}
         <div class="doc-title">
             <h2>TRANSKRIP NILAI</h2>
-            <div class="nomor">{{ $letter->letter_number ?? '—' }}</div>
+            <div class="nomor">{{ $letter->transcript_letter_number ?? ($letter->letter_number ?? '—') }}</div>
         </div>
 
         {{-- INFO SISWA --}}
@@ -456,14 +456,14 @@
                 @endforeach
 
                 <tr class="rata-rata">
-                    <td colspan="8">Rata-rata</td>
+                        <td colspan="8"  style="text-align: center;">Rata-rata</td>
                     <td class="col-nr">{{ $rataRata }}</td>
                 </tr>
             </tbody>
         </table>
 
         <div style="font-size: 8pt; margin-top: 5px; font-style: italic;">
-            * NR = Nilai Rapor
+            * NR = Rata-rata Nilai Rapor
         </div>
 
         {{-- TANDA TANGAN --}}

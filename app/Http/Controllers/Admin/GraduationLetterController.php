@@ -14,12 +14,13 @@ class GraduationLetterController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'letter_number'   => 'required|string|max:255',
-            'academic_year'   => 'required|string|max:10',
-            'headmaster_id'   => 'required|exists:core_users,id',
-            'graduation_date' => 'required|date',
-            'statement'       => 'required|string',
-            'content'         => 'required|string',
+            'letter_number'            => 'required|string|max:255',
+            'transcript_letter_number' => 'nullable|string|max:255',
+            'academic_year'            => 'required|string|max:10',
+            'headmaster_id'            => 'required|exists:core_users,id',
+            'graduation_date'          => 'required|date',
+            'statement'                => 'required|string',
+            'content'                  => 'required|string',
         ], [
             'letter_number.required'   => 'Nomor surat harus diisi',
             'academic_year.required'   => 'Tahun pelajaran harus diisi',
@@ -62,12 +63,13 @@ class GraduationLetterController extends Controller
         $letter = GoogleGraduationLetter::findOrFail($id);
 
         $validated = $request->validate([
-            'letter_number'   => 'required|string|max:255',
-            'academic_year'   => 'required|string|max:10',
-            'headmaster_id'   => 'required|exists:core_users,id',
-            'graduation_date' => 'required|date',
-            'statement'       => 'required|string',
-            'content'         => 'required|string',
+            'letter_number'            => 'required|string|max:255',
+            'transcript_letter_number' => 'nullable|string|max:255',
+            'academic_year'            => 'required|string|max:10',
+            'headmaster_id'            => 'required|exists:core_users,id',
+            'graduation_date'          => 'required|date',
+            'statement'                => 'required|string',
+            'content'                  => 'required|string',
         ], [
             'letter_number.required'   => 'Nomor surat harus diisi',
             'academic_year.required'   => 'Tahun pelajaran harus diisi',

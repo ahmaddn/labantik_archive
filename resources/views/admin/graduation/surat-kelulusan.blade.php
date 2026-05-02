@@ -13,10 +13,11 @@
 
         body {
             font-family: "Times New Roman", Times, serif;
-            line-height: 1.3;
+            line-height: 1.2;
             margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
+            font-size: 10pt;
         }
 
         /* ── ACTION BUTTONS ── */
