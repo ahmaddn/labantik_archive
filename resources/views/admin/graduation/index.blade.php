@@ -290,7 +290,7 @@
                                     <input type="radio" name="template_type" value="transcript" class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
                                     <span class="ml-3 flex flex-col">
                                         <span class="block text-sm font-bold text-gray-900 uppercase">Transkrip</span>
-                                        <span class="block text-[10px] text-gray-500">S1-S6, NR & NA</span>
+                                        <span class="block text-[10px] text-gray-500">S1-S6, NR (Auto) & NA</span>
                                     </span>
                                 </label>
                             </div>
