@@ -73,9 +73,7 @@
         /* KOP SURAT */
         .header {
             text-align: center;
-            padding-bottom: 5px;
             padding-left: 90px;
-            margin-bottom: 10px;
             position: relative;
             min-height: 100px;
         }
@@ -128,7 +126,7 @@
         /* JUDUL */
         .doc-title {
             text-align: center;
-            margin: 12px 0 4px 0;
+            margin: 0px 0 4px 0;
         }
 
         .doc-title h2 {
@@ -206,6 +204,7 @@
         .nilai-table .col-nilai {
             width: 70px;
             text-align: center;
+            font-weight: normal;
         }
 
         .nilai-table .section-header td {
@@ -630,7 +629,10 @@
         {{-- TEKS PEMBUKA (dari google_graduation_letters) --}}
         <div class="pembuka">
             @if ($letter)
-                <p>{{ $letter->statement }}</p>
+                @php
+                    $displayStatement = str_replace('[TAHUN_PELAJARAN]', $letter->academic_year ?? '', $letter->statement);
+                @endphp
+                <p>{{ $displayStatement }}</p>
                 @php
                     $contentLines = array_filter(array_map('trim', explode("\n", $letter->content)));
                 @endphp
@@ -646,7 +648,7 @@
             @endif
         </div>
 
-        <div style="margin-bottom:6px; font-size:10pt;">Menerangkan Bahwa</div>
+        <div style="margin-bottom:6px; font-size:10pt;">Menerangkan bahwa :</div>
 
         {{-- INFO SISWA --}}
         <table class="info-table">
@@ -678,12 +680,17 @@
             <tr>
                 <td class="label" style="padding:0;">Program Keahlian</td>
                 <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper($program1->program1_name ?? '—') }}</td>
+                <td style="padding:0;">{{ strtoupper($program1->name ?? '—') }}</td>
             </tr>
             <tr>
                 <td class="label" style="padding:0;">Konsentrasi Keahlian</td>
                 <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper($program->program_name ?? '—') }}</td>
+                <td style="padding:0;">{{ strtoupper($program->name ?? '—') }}</td>
+            </tr>
+            <tr>
+                <td class="label" style="padding:0;">Tahun Pelajaran</td>
+                <td class="sep" style="padding:0;">:</td>
+                <td style="padding:0;">{{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
             </tr>
             <tr>
                 <td class="label" style="padding:0;">Dinyatakan</td>
@@ -728,7 +735,11 @@
                 @foreach ($groupedUmum as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
+                        $score = '-';
+                        if ($group[0]->mapel->has_na) {
+                            $foundScore = collect($group)->first(fn($m) => $m->score !== null)?->score;
+                            $score = $foundScore !== null ? $foundScore : '';
+                        }
                     @endphp
                     @foreach ($group as $idx => $mapel)
                         <tr>
@@ -770,7 +781,11 @@
                 @foreach ($groupedJurusan as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
+                        $score = '-';
+                        if ($group[0]->mapel->has_na) {
+                            $foundScore = collect($group)->first(fn($m) => $m->score !== null)?->score;
+                            $score = $foundScore !== null ? $foundScore : '';
+                        }
                     @endphp
                     @foreach ($group as $idx => $mapel)
                         <tr>
@@ -813,9 +828,9 @@
                 @endif
                 Kepala SMK Negeri 1 Talaga,
                 <div class="ttd-space"></div>
-                <div class="nama">Muchamad Eki S.A., S.Kom.</div>
-                <div>Pembina Tingkat I/IVb</div>
-                <div>NIP. 197610012006041011</div>
+                <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
             </div>
         </div>
 
@@ -829,15 +844,15 @@
         <div class="transkrip-header">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Coat_of_arms_of_West_Java.svg/500px-Coat_of_arms_of_West_Java.svg.png"
                 alt="Logo" />
-            <div class="line1">PEMERINTAH PROVINSI JAWA BARAT</div>
+            <div class="line1">PEMERINTAH DAERAH PROVINSI JAWA BARAT</div>
             <div class="line2">CABANG DINAS PENDIDIKAN WILAYAH IX</div>
             <div class="line3">SEKOLAH MENENGAH KEJURUAN NEGERI 1 TALAGA</div>
             <div class="address">
                 Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan Manajemen<br />
-                Kampus 1 : Jalan Sekolah No.20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
-                Kampus 2 : Jalan Talaga - Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
-                Telepon (0233) 319238 &nbsp; Fax (0233) 319238 &nbsp; Kode Pos 45463 &nbsp; NPSN 20.21.38.72<br />
-                Website https://smkn1talaga.sch.id/ &nbsp; E-mail: mailsmkn1talaga@gmail.com
+                Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
+                Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
+                Telpon ☎ (0233) 319238 FAX ☎ (0233) 319238 POS ✉ 45463 NPSN: 20213872<br />
+                Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
             </div>
         </div>
         <div class="transkrip-header-border"></div>
@@ -888,12 +903,17 @@
             <tr>
                 <td class="label">Program Keahlian</td>
                 <td class="sep">:</td>
-                <td>{{ $program1->program1_name ?? '-' }}</td>
+                <td>{{ $program1->name ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="label">Konsentrasi Keahlian</td>
                 <td class="sep">:</td>
-                <td>{{ $program->program_name ?? '-' }}</td>
+                <td>{{ $program->name ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Tahun Pelajaran</td>
+                <td class="sep">:</td>
+                <td>{{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
             </tr>
         </table>
 
@@ -934,7 +954,7 @@
                 @foreach ($groupedUmum as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $g = $group[0];
+                        $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
                     @endphp
                     @foreach ($group as $idx => $m)
                         <tr>
@@ -976,7 +996,7 @@
                 @foreach ($groupedJurusan as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $g = $group[0];
+                        $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
                     @endphp
                     @foreach ($group as $idx => $m)
                         <tr>
@@ -1016,9 +1036,9 @@
                 Talaga, {{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
                 Kepala SMK Negeri 1 Talaga,
                 <div class="transkrip-ttd-space"></div>
-                <div class="transkrip-ttd-name">Muchamad Eki S.A., S.Kom.</div>
-                <div>Penata Tingkat I/III/d</div>
-                <div>NIP. 197610012006041011</div>
+                <div class="transkrip-ttd-name">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
             </div>
         </div>
          {{-- QR CODE FOOTER HALAMAN 2 --}}
@@ -1076,7 +1096,7 @@
             <tr>
                 <td class="label">Program Keahlian</td>
                 <td class="sep">:</td>
-                <td>{{ $program1->program1_name ?? '—' }}</td>
+                <td>{{ $program1->name ?? '—' }}</td>
             </tr>
             <tr>
                 <td class="label">Alamat</td>

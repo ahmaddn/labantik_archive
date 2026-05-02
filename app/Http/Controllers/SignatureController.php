@@ -100,11 +100,26 @@ class SignatureController extends Controller
 
         $refClass = $latestAcademicYear?->class;
         $program  = $refClass
-            ? (object) ['program_name'  => $refClass->expertiseConcentration?->name ?? '-']
+            ? (object) ['name'  => $refClass->expertiseConcentration?->name ?? '-']
             : null;
         $program1 = $refClass
-            ? (object) ['program1_name' => $refClass->expertiseProgram?->name ?? '-']
+            ? (object) ['name' => $refClass->expertiseProgram?->name ?? '-']
             : null;
+
+        // ── Principal ─────────────────────────────────────────────────────────
+        $headmasterId = $letter?->headmaster_id;
+        if ($headmasterId) {
+            $principal = \App\Models\User::find($headmasterId);
+        } else {
+            $principal = \App\Models\User::whereHas('roles', function ($q) {
+                $q->where('code', 'kepala-sekolah');
+            })->first();
+        }
+
+        if ($principal) {
+            $employee = \App\Models\Employee::where('user_id', $principal->id)->first();
+            $principal->setRelation('employee', $employee);
+        }
 
         // ── Mapel umum & jurusan ──────────────────────────────────────────────
         $mapelUmum    = [];
@@ -163,7 +178,8 @@ class SignatureController extends Controller
             'mapelJurusan',
             'rataRata',
             'transkripUmum',
-            'transkripJurusan'
+            'transkripJurusan',
+            'principal'
         ));
     }
 }
