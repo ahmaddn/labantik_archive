@@ -822,7 +822,8 @@
         <div class="ttd-section">
             <div class="ttd-block">
                 @if ($letter)
-                    Talaga, {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+                    Talaga,
+                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
                 @else
                     Talaga, ___________________<br />
                 @endif
@@ -1033,7 +1034,12 @@
         {{-- TANDA TANGAN --}}
         <div class="transkrip-ttd-section">
             <div class="transkrip-ttd-block">
-                Talaga, {{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
+                @if ($letter)
+                    Talaga,
+                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+                @else
+                    Talaga, ___________________<br />
+                @endif
                 Kepala SMK Negeri 1 Talaga,
                 <div class="transkrip-ttd-space"></div>
                 <div class="transkrip-ttd-name">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
@@ -1138,8 +1144,13 @@
 
         <div class="ttd-pernyataan">
             <div class="ttd-pernyataan-block">
-                Majalengka, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
-                Yang menyatakan,<br>
+                @if ($letter)
+                    Talaga,
+                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+                @else
+                    Talaga, ___________________<br />
+                @endif
+                 Yang menyatakan,<br>
                 <img src="{{ $signature->signature_data }}" alt="Tanda Tangan" class="signature-img" />
                 <div class="nama-ttd">{{ $user->name }}</div>
                 <div>NISN. {{ $student->national_student_number ?? '—' }}</div>
