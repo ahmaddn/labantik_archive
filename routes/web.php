@@ -117,6 +117,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
 
     // Apply template ke semua
     Route::post('/graduation/apply-template-all',   [GraduationController::class, 'applyTemplateToAll'])->name('graduation.applyTemplateToAll');
+    Route::post('/graduation/apply-transcript-template-all', [GraduationController::class, 'applyTranscriptTemplateToAll'])->name('graduation.applyTranscriptTemplateToAll');
 
     // ── Mapel ─────────────────────────────────────────────────────────────────
     Route::get('/graduation/mapel/create',       [GraduationMapelController::class, 'create'])->name('graduation.createMapel');

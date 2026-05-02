@@ -18,20 +18,6 @@
                 </svg>
                 Kembali
             </a>
-
-            <form method="POST" action="{{ route('admin.graduation.destroy', $graduation->uuid) }}"
-                onsubmit="return confirm('Hapus data kelulusan siswa {{ $graduation->user->full_name ?? 'Siswa' }}? Tindakan ini tidak dapat dibatalkan.')">
-                @csrf
-                @method('DELETE')
-                <button type="submit"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-xl transition-colors text-sm shadow-sm border border-red-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Hapus
-                </button>
-            </form>
         </div>
     </div>
 
@@ -262,25 +248,32 @@
                                                 {{ $graduationMapel->mapel->class->name ?? '-' }}
                                             </span>
                                         </td>
-                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem1-{{ $graduationMapel->uuid }}">
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600"
+                                            id="sem1-{{ $graduationMapel->uuid }}">
                                             {{ $graduationMapel->sem_1 ?? '-' }}
                                         </td>
-                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem2-{{ $graduationMapel->uuid }}">
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600"
+                                            id="sem2-{{ $graduationMapel->uuid }}">
                                             {{ $graduationMapel->sem_2 ?? '-' }}
                                         </td>
-                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem3-{{ $graduationMapel->uuid }}">
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600"
+                                            id="sem3-{{ $graduationMapel->uuid }}">
                                             {{ $graduationMapel->sem_3 ?? '-' }}
                                         </td>
-                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem4-{{ $graduationMapel->uuid }}">
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600"
+                                            id="sem4-{{ $graduationMapel->uuid }}">
                                             {{ $graduationMapel->sem_4 ?? '-' }}
                                         </td>
-                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem5-{{ $graduationMapel->uuid }}">
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600"
+                                            id="sem5-{{ $graduationMapel->uuid }}">
                                             {{ $graduationMapel->sem_5 ?? '-' }}
                                         </td>
-                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem6-{{ $graduationMapel->uuid }}">
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600"
+                                            id="sem6-{{ $graduationMapel->uuid }}">
                                             {{ $graduationMapel->sem_6 ?? '-' }}
                                         </td>
-                                        <td class="px-2 py-4 text-center hidden lg:table-cell text-xs font-bold text-blue-600" id="nr-{{ $graduationMapel->uuid }}">
+                                        <td class="px-2 py-4 text-center hidden lg:table-cell text-xs font-bold text-blue-600"
+                                            id="nr-{{ $graduationMapel->uuid }}">
                                             {{ $graduationMapel->nr ?? '-' }}
                                         </td>
                                         <td class="px-6 py-4 text-center">
@@ -386,7 +379,8 @@
                 <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                     <div class="flex items-center gap-3">
                         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50">
-                            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
@@ -410,8 +404,10 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
                         @foreach (range(1, 6) as $sem)
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Semester {{ $sem }}</label>
-                                <input type="number" id="sem{{ $sem }}Input" step="0.01" min="0" max="100" placeholder="-"
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Semester
+                                    {{ $sem }}</label>
+                                <input type="number" id="sem{{ $sem }}Input" step="0.01" min="0"
+                                    max="100" placeholder="-"
                                     class="w-full rounded-xl border border-gray-200 px-3 py-2 text-center text-sm font-bold text-gray-800 shadow-sm focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-100">
                             </div>
                         @endforeach
@@ -420,16 +416,19 @@
                     <div class="grid grid-cols-2 gap-4 border-t border-gray-100 pt-5">
                         <div>
                             <label class="block text-xs font-bold text-blue-600 uppercase mb-1">Nilai Rapor (NR)</label>
-                            <input type="number" id="nrInput" step="0.01" min="0" max="100" placeholder="-"
+                            <input type="number" id="nrInput" step="0.01" min="0" max="100"
+                                placeholder="-"
                                 class="w-full rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 text-center text-base font-bold text-blue-700 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-green-600 uppercase mb-1">Nilai Akhir (NA)</label>
-                            <input type="number" id="editScoreInput" step="0.01" min="0" max="100" placeholder="-"
+                            <input type="number" id="editScoreInput" step="0.01" min="0" max="100"
+                                placeholder="-"
                                 class="w-full rounded-xl border border-green-100 bg-green-50 px-4 py-2.5 text-center text-base font-bold text-green-700 shadow-sm focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100">
                         </div>
                     </div>
-                    <p class="mt-4 text-[10px] text-gray-400 text-center italic">Kosongkan jika belum ada nilai. Nilai NA akan muncul di Surat Kelulusan.</p>
+                    <p class="mt-4 text-[10px] text-gray-400 text-center italic">Kosongkan jika belum ada nilai. Nilai NA
+                        akan muncul di Surat Kelulusan.</p>
                 </div>
 
                 {{-- Footer --}}
@@ -532,10 +531,10 @@
         function openEditScoreModal(uuid, mapelName, currentData) {
             _editUuid = uuid;
             document.getElementById('editScoreMapelName').textContent = mapelName;
-            
+
             // NA
             document.getElementById('editScoreInput').value = currentData.score !== null ? currentData.score : '';
-            
+
             // Semesters
             document.getElementById('sem1Input').value = currentData.sem1 !== null ? currentData.sem1 : '';
             document.getElementById('sem2Input').value = currentData.sem2 !== null ? currentData.sem2 : '';
@@ -543,7 +542,7 @@
             document.getElementById('sem4Input').value = currentData.sem4 !== null ? currentData.sem4 : '';
             document.getElementById('sem5Input').value = currentData.sem5 !== null ? currentData.sem5 : '';
             document.getElementById('sem6Input').value = currentData.sem6 !== null ? currentData.sem6 : '';
-            
+
             // NR
             document.getElementById('nrInput').value = currentData.nr !== null ? currentData.nr : '';
 
@@ -603,12 +602,12 @@
                 if (data.success) {
                     // Update NA badge
                     updateScoreBadge(_editUuid, payload.score);
-                    
+
                     // Update semester columns
                     updateSemesterColumns(_editUuid, payload);
-                    
+
                     closeEditScoreModal();
-                    
+
                     // Refresh Average
                     refreshAverage();
                 } else {
@@ -629,7 +628,7 @@
                 const el = document.getElementById(f.replace('sem', 'sem') + '-' + uuid); // sem1-uuid
                 if (el) el.textContent = data[f === 'nr' ? 'nr' : f.replace('sem', 'sem_')] || '-';
             });
-            
+
             // Update the Edit button onclick arguments to reflect new data
             const row = document.getElementById('row-' + uuid);
             if (row) {
@@ -665,7 +664,8 @@
             const display = document.getElementById('avgScoreDisplay');
             if (display) {
                 display.textContent = avg;
-                display.className = 'text-2xl font-extrabold ' + (avg >= 75 ? 'text-green-600' : (avg >= 50 ? 'text-yellow-600' : 'text-red-600'));
+                display.className = 'text-2xl font-extrabold ' + (avg >= 75 ? 'text-green-600' : (avg >= 50 ?
+                    'text-yellow-600' : 'text-red-600'));
             }
         }
 

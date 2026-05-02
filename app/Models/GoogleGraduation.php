@@ -19,6 +19,7 @@ class GoogleGraduation extends Model
         'uuid',
         'user_id',
         'letter_id',
+        'transcript_letter_id',
         'token',
     ];
 
@@ -46,5 +47,10 @@ class GoogleGraduation extends Model
     public function letter(): BelongsTo
     {
         return $this->belongsTo(GoogleGraduationLetter::class, 'letter_id', 'uuid');
+    }
+
+    public function transcriptLetter(): BelongsTo
+    {
+        return $this->belongsTo(GoogleGraduationLetter::class, 'transcript_letter_id', 'uuid');
     }
 }

@@ -138,9 +138,11 @@
                 <p class="text-xs text-gray-500 font-medium">Siswa Lulus</p>
             </div>
         </div>
-        <a href="{{ route('admin.graduation.downloaders') }}" class="text-left w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4 hover:border-orange-300 hover:shadow-md transition-all duration-200 cursor-pointer">
+        <a href="{{ route('admin.graduation.downloaders') }}"
+            class="text-left w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4 hover:border-orange-300 hover:shadow-md transition-all duration-200 cursor-pointer">
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
@@ -151,7 +153,7 @@
             </div>
             <div class="ml-auto">
                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </div>
         </a>
@@ -191,7 +193,7 @@
                     @endif
                 </svg>
                 <div>
-                    <p class="text-sm font-semibold text-gray-800">Terapkan Template ke Semua Kelulusan</p>
+                    <p class="text-sm font-semibold text-gray-800">Terapkan Template Surat Ke Semua</p>
                     <p class="text-xs text-gray-600 mt-0.5">
                         @if ($allHaveLetter)
                             Semua data kelulusan sudah memiliki surat yang ditetapkan.
@@ -215,7 +217,7 @@
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                     <select id="templateSelectDropdown"
                         class="flex-1 px-4 py-2.5 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-blue-300 transition-colors">
-                        <option value="">-- Pilih Template Surat --</option>
+                        <option value="">-- Pilih Template SKL --</option>
                         @foreach ($letters as $letter)
                             <option value="{{ $letter->uuid }}">
                                 {{ $letter->letter_number }}
@@ -235,6 +237,65 @@
                     </button>
                 </div>
             @endif
+
+            <div class="mt-6 pt-6 border-t border-blue-100/50">
+                <div class="flex items-start gap-3 mb-4">
+                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0 {{ $allHaveTranscriptLetter ? 'text-green-600' : 'text-blue-600' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        @if ($allHaveTranscriptLetter)
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        @else
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        @endif
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800">Terapkan Template Transkrip Ke Semua</p>
+                        <p class="text-xs text-gray-600 mt-0.5">
+                            @if ($allHaveTranscriptLetter)
+                                Semua data kelulusan sudah memiliki template transkrip yang ditetapkan.
+                            @else
+                                Pilih template yang akan digunakan khusus untuk pencetakan Transkrip Nilai.
+                            @endif
+                        </p>
+                    </div>
+                </div>
+
+                @if ($allHaveTranscriptLetter)
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-50 border border-green-200 text-green-700 text-xs sm:text-sm font-semibold rounded-lg w-full sm:w-auto justify-center sm:justify-start">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Semua transkrip sudah memiliki template
+                    </div>
+                @else
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                        <select id="transcriptTemplateSelectDropdown"
+                            class="flex-1 px-4 py-2.5 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-blue-300 transition-colors">
+                            <option value="">-- Pilih Template Transkrip --</option>
+                            @foreach ($letters as $letter)
+                                <option value="{{ $letter->uuid }}">
+                                    {{ $letter->transcript_letter_number }}
+                                    ({{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('d M Y') }})
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <button onclick="openApplyTranscriptTemplateModal()" id="applyTranscriptTemplateBtn"
+                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg opacity-50 cursor-not-allowed"
+                            disabled>
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="whitespace-nowrap">Gunakan ke Semua</span>
+                        </button>
+                    </div>
+                @endif
+            </div>
         </div>
         <div class="p-4 sm:p-6">
             @include('admin._partials.graduation_list_table', [
@@ -279,15 +340,19 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Jenis Template</label>
                             <div class="grid grid-cols-2 gap-3">
-                                <label class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
-                                    <input type="radio" name="template_type" value="graduation" checked class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                <label
+                                    class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="template_type" value="graduation" checked
+                                        class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
                                     <span class="ml-3 flex flex-col">
                                         <span class="block text-sm font-bold text-gray-900 uppercase">Kelulusan</span>
                                         <span class="block text-[10px] text-gray-500">Hanya Nilai Akhir (NA)</span>
                                     </span>
                                 </label>
-                                <label class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
-                                    <input type="radio" name="template_type" value="transcript" class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                <label
+                                    class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="template_type" value="transcript"
+                                        class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
                                     <span class="ml-3 flex flex-col">
                                         <span class="block text-sm font-bold text-gray-900 uppercase">Transkrip</span>
                                         <span class="block text-[10px] text-gray-500">S1-S6, NR (Auto) & NA</span>
@@ -311,15 +376,19 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Format Template</label>
                             <div class="grid grid-cols-2 gap-3">
-                                <label class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
-                                    <input type="radio" name="format" value="csv" checked class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                <label
+                                    class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="format" value="csv" checked
+                                        class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
                                     <span class="ml-3 flex flex-col">
                                         <span class="block text-sm font-bold text-gray-900 uppercase">CSV</span>
                                         <span class="block text-[10px] text-gray-500">Satu Sheet (Cepat)</span>
                                     </span>
                                 </label>
-                                <label class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
-                                    <input type="radio" name="format" value="xlsx" class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                <label
+                                    class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="format" value="xlsx"
+                                        class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
                                     <span class="ml-3 flex flex-col">
                                         <span class="block text-sm font-bold text-gray-900 uppercase">XLSX</span>
                                         <span class="block text-[10px] text-gray-500">Multi Sheet (Per Siswa)</span>
@@ -329,7 +398,9 @@
                         </div>
 
                         <div class="text-sm text-gray-500 bg-blue-50 p-3 rounded-xl">
-                            <p class="text-[10px] leading-relaxed">💡 Template **CSV** berisi semua siswa dalam satu tabel. Template **XLSX** akan memisahkan setiap siswa ke dalam sheet yang berbeda (satu sheet per siswa).</p>
+                            <p class="text-[10px] leading-relaxed">💡 Template **CSV** berisi semua siswa dalam satu tabel.
+                                Template **XLSX** akan memisahkan setiap siswa ke dalam sheet yang berbeda (satu sheet per
+                                siswa).</p>
                         </div>
                     </div>
                 </div>
@@ -368,13 +439,13 @@
             const classId = document.getElementById('classFilter').value;
             const format = document.querySelector('input[name="format"]:checked').value;
             const templateType = document.querySelector('input[name="template_type"]:checked').value;
-            
+
             let url = '{{ route('admin.graduation.downloadTemplate') }}';
             const params = new URLSearchParams();
             if (classId) params.append('class_id', classId);
             if (format) params.append('format', format);
             if (templateType) params.append('template_type', templateType);
-            
+
             if (params.toString()) url += '?' + params.toString();
             window.location.href = url;
             closeDownloadModal();
@@ -392,6 +463,91 @@
                 applyTemplateBtn.classList.toggle('cursor-not-allowed', !has);
                 applyTemplateBtn.classList.toggle('hover:scale-[1.02]', has);
             });
+        }
+
+        // Transcript Template dropdown enable/disable button
+        const transcriptTemplateSelectDropdown = document.getElementById('transcriptTemplateSelectDropdown');
+        const applyTranscriptTemplateBtn = document.getElementById('applyTranscriptTemplateBtn');
+
+        if (transcriptTemplateSelectDropdown && applyTranscriptTemplateBtn) {
+            transcriptTemplateSelectDropdown.addEventListener('change', function() {
+                const has = this.value !== '';
+                applyTranscriptTemplateBtn.disabled = !has;
+                applyTranscriptTemplateBtn.classList.toggle('opacity-50', !has);
+                applyTranscriptTemplateBtn.classList.toggle('cursor-not-allowed', !has);
+                applyTranscriptTemplateBtn.classList.toggle('hover:scale-[1.02]', has);
+            });
+        }
+
+        function openApplyTemplateModal() {
+            if (!confirm('Apakah Anda yakin ingin menerapkan template surat ini ke SEMUA data kelulusan kelas 12?')) return;
+            applyTemplate();
+        }
+
+        function applyTemplate() {
+            const letterId = document.getElementById('templateSelectDropdown').value;
+            if (!letterId) return;
+
+            fetch('{{ route('admin.graduation.applyTemplateToAll') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        letter_id: letterId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Berhasil!', data.message, 'success').then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Gagal!', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
+                });
+        }
+
+        function openApplyTranscriptTemplateModal() {
+            if (!confirm('Apakah Anda yakin ingin menerapkan template TRANSKRIP ini ke SEMUA data kelulusan kelas 12?'))
+                return;
+            applyTranscriptTemplate();
+        }
+
+        function applyTranscriptTemplate() {
+            const letterId = document.getElementById('transcriptTemplateSelectDropdown').value;
+            if (!letterId) return;
+
+            fetch('{{ route('admin.graduation.applyTranscriptTemplateToAll') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        letter_id: letterId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Berhasil!', data.message, 'success').then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Gagal!', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error!', 'Terjadi kesalahan sistem.', 'error');
+                });
         }
 
         document.addEventListener('keydown', function(e) {

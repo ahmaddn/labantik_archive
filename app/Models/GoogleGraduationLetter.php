@@ -16,6 +16,7 @@ class GoogleGraduationLetter extends Model
 
     protected $fillable = [
         'letter_number',
+        'transcript_letter_number',
         'academic_year',
         'headmaster_id',
         'graduation_date',

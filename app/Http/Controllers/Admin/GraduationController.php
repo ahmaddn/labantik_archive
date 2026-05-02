@@ -49,6 +49,10 @@ class GraduationController extends Controller
             $q->where('academic_level', 12);
         })->whereNull('letter_id')->doesntExist();
 
+        $allHaveTranscriptLetter = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {
+            $q->where('academic_level', 12);
+        })->whereNull('transcript_letter_id')->doesntExist();
+
         // 5. Statistik download dokumen kelulusan
         $totalDownloaders = GoogleStatement::where('print_count', '>', 0)->count();
 
@@ -67,6 +71,7 @@ class GraduationController extends Controller
             'letters',
             'totalDownloaders',
             'allHaveLetter',
+            'allHaveTranscriptLetter',
             'headmasters'
         ));
     }
@@ -375,6 +380,49 @@ class GraduationController extends Controller
         }
     }
 
+    /**
+     * Apply template transkrip ke semua data kelulusan kelas 12
+     * POST /admin/graduation/apply-transcript-template
+     */
+    public function applyTranscriptTemplateToAll(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'letter_id' => 'required|string|exists:google_graduation_letters,uuid',
+            ]);
+
+            $letter = GoogleGraduationLetter::where('uuid', $validated['letter_id'])->first();
+
+            if (!$letter) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Template transkrip tidak ditemukan',
+                ], 404);
+            }
+
+            $updatedCount = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {
+                $q->where('academic_level', 12);
+            })->update(['transcript_letter_id' => $validated['letter_id']]);
+
+            return response()->json([
+                'success'       => true,
+                'message'       => "Template Transkrip '{$letter->letter_number}' berhasil diterapkan ke {$updatedCount} data kelulusan!",
+                'updated_count' => $updatedCount,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => collect($e->errors())->flatten()->first(),
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Apply Transcript Template To All - Error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menerapkan template transkrip: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function updateScore(Request $request)
     {
         try {
@@ -502,8 +550,13 @@ class GraduationController extends Controller
             $updatedCount = 0;
             \DB::beginTransaction();
             foreach ($graduations as $graduation) {
-                // Generate a random 6 character uppercase alphanumeric token
-                $token = strtoupper(\Illuminate\Support\Str::random(6));
+                // Generate a random 4 character uppercase alphabetic token (letters only)
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $token = '';
+                for ($i = 0; $i < 4; $i++) {
+                    $token .= $chars[rand(0, strlen($chars) - 1)];
+                }
+                
                 $graduation->update(['token' => $token]);
                 $updatedCount++;
             }

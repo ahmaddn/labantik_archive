@@ -113,7 +113,7 @@
             text-align: center;
             line-height: 1.2;
             color: #000;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .header-border-top {
@@ -135,8 +135,10 @@
         .doc-title h2 {
             font-size: 14pt;
             font-weight: bold;
+            text-decoration: underline;
             margin: 0;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .doc-title .nomor {
@@ -318,15 +320,15 @@
                 Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
                 Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
                 Telpon ☎ (0233) 319238 FAX ☎ (0233) 319238 POS ✉ 45463 NPSN: 20213872<br />
-                Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
+                Website www.smkn1talaga.sch.id - Email ✉ mail@smkn1talaga.sch.id
             </div>
         </div>
-            <div class="header-border-top"></div>
-            <div class="header-border-thin"></div>
+        <div class="header-border-top"></div>
+        <div class="header-border-thin"></div>
         {{-- JUDUL --}}
         <div class="doc-title">
             <h2>TRANSKRIP NILAI</h2>
-            <div class="nomor">{{ $letter->letter_number ?? '—' }}</div>
+            <div class="nomor">{{ $letter->transcript_letter_number ?? ($letter->letter_number ?? '—') }}</div>
         </div>
 
         {{-- INFO SISWA --}}
@@ -390,7 +392,8 @@
                 <tr>
                     <th rowspan="2" class="col-no">No</th>
                     <th rowspan="2">Mata Pelajaran</th>
-                    <th colspan="7">Nilai Rapor</th>
+                    <th colspan="6">Nilai Rapor</th>
+                    <th rowspan="2" class="col-nr">NR</th>
                 </tr>
                 <tr>
                     <th class="col-semester">1</th>
@@ -399,7 +402,6 @@
                     <th class="col-semester">4</th>
                     <th class="col-semester">5</th>
                     <th class="col-semester">6</th>
-                    <th class="col-nr">NR</th>
                 </tr>
             </thead>
             <tbody>
@@ -420,24 +422,42 @@
                 @foreach ($groupedUmum as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
+                        $g =
+                            collect($group)->first(
+                                fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
+                            ) ?? $group[0];
                     @endphp
                     @foreach ($group as $idx => $m)
                         <tr>
                             @if ($idx === 0)
-                                <td class="col-no" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                <td class="col-no"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
                                     {{ $noUmum }}
                                 </td>
                             @endif
                             <td class="col-mapel">{{ $m->mapel->name }}</td>
                             @if ($idx === 0)
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_1 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_2 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_3 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_4 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
-                                <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_1 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_2 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_3 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_4 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_5 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_6 }}</td>
+                                <td class="col-nr"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->nr }}</td>
                             @endif
                         </tr>
                     @endforeach
@@ -461,24 +481,42 @@
                 @foreach ($groupedJurusan as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
+                        $g =
+                            collect($group)->first(
+                                fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
+                            ) ?? $group[0];
                     @endphp
                     @foreach ($group as $idx => $m)
                         <tr>
                             @if ($idx === 0)
-                                <td class="col-no" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                <td class="col-no"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
                                     {{ $noJurusan }}
                                 </td>
                             @endif
                             <td class="col-mapel">{{ $m->mapel->name }}</td>
                             @if ($idx === 0)
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_1 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_2 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_3 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_4 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
-                                <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_1 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_2 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_3 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_4 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_5 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_6 }}</td>
+                                <td class="col-nr"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->nr }}</td>
                             @endif
                         </tr>
                     @endforeach
@@ -486,14 +524,14 @@
                 @endforeach
 
                 <tr class="rata-rata">
-                    <td colspan="8">Rata-rata</td>
+                    <td colspan="8" style="text-align: center;">Rata-rata</td>
                     <td class="col-nr">{{ $rataRata }}</td>
                 </tr>
             </tbody>
         </table>
 
         <div style="font-size: 8pt; margin-top: 5px; font-style: italic;">
-            * NR = Nilai Rapor
+            * NR = Rata-rata Nilai Rapor
         </div>
 
         {{-- TANDA TANGAN --}}

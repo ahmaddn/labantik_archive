@@ -277,18 +277,21 @@
                         </svg>
                         <span>Transkrip Nilai</span>
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
 
                     <div id="dropdownTranskrip"
                         class="hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-3 space-y-1">
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export sebagai
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export
+                            sebagai
                         </p>
 
                         <button onclick="doExport('transkrip', 'all')"
                             class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors">
-                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                             </svg>
@@ -402,8 +405,23 @@
                 <table class="w-full text-sm min-w-[480px]">
                     <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
                         <tr>
-                            <th class="px-4 sm:px-6 py-3 text-left font-semibold w-10">#</th>
                             {{-- Sortable headers --}}
+                            <th class="px-4 sm:px-6 py-3 text-center font-semibold">Aksi</th>
+                            <th class="hidden xl:table-cell px-4 sm:px-6 py-3 text-left font-semibold">
+                                <button type="button"
+                                    class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
+                                    data-col="token">
+                                    Token
+                                    <span class="grad-sort-icon text-gray-300 group-hover:text-[#1b84ff]"
+                                        data-col="token">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </th>
                             <th class="px-4 sm:px-6 py-3 text-left font-semibold">
                                 <button type="button"
                                     class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
@@ -479,22 +497,7 @@
                                     </span>
                                 </button>
                             </th>
-                            <th class="hidden xl:table-cell px-4 sm:px-6 py-3 text-left font-semibold">
-                                <button type="button"
-                                    class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
-                                    data-col="token">
-                                    Token
-                                    <span class="grad-sort-icon text-gray-300 group-hover:text-[#1b84ff]"
-                                        data-col="token">
-                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
-                                        </svg>
-                                    </span>
-                                </button>
-                            </th>
-                            <th class="px-4 sm:px-6 py-3 text-center font-semibold">Aksi</th>
+
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100" id="graduationTableBody"></tbody>
@@ -772,7 +775,54 @@
                 const detailUrl = routeShow.replace(':id', g.uuid);
 
                 row.innerHTML = `
-                <td class="px-4 sm:px-6 py-4 text-gray-400 font-medium text-xs">${start + idx + 1}</td>
+                                <td class="px-4 sm:px-6 py-4 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <a href="${detailUrl}"
+                           class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            Detail
+                        </a>
+                        <div class="relative group">
+                            <button class="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                </svg>
+                            </button>
+                            <div class="absolute left-0 mt-0 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-40">
+                                <a href="${routeSuratKelulusan.replace(':id', g.uuid)}" target="_blank"
+                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors first:rounded-t-lg">
+                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Surat Kelulusan
+                                </a>
+                                <a href="${routeSuratPernyataan.replace(':id', g.uuid)}" target="_blank"
+                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors last:rounded-b-lg border-t border-gray-100">
+                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    Surat Pernyataan
+                                </a>
+                                <a href="${routeTranskripNilai.replace(':id', g.uuid)}" target="_blank"
+                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors last:rounded-b-lg border-t border-gray-100">
+                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Transkrip Nilai
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="hidden xl:table-cell px-4 sm:px-6 py-4">
+                    ${g.token
+                        ? `<code class="inline-block rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${g.token}</code>`
+                        : `<span class="text-xs text-gray-400 italic">Belum ada</span>`
+                    }
+                </td>
                 <td class="px-4 sm:px-6 py-4">
                     <div class="flex items-center gap-2.5">
                         <div class="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-purple-600 text-xs font-bold text-white">
@@ -799,54 +849,8 @@
                         ${g.mapel_count ?? 0} Mapel
                     </span>
                 </td>
-                <td class="hidden xl:table-cell px-4 sm:px-6 py-4">
-                    ${g.token
-                        ? `<code class="inline-block rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${g.token}</code>`
-                        : `<span class="text-xs text-gray-400 italic">Belum ada</span>`
-                    }
-                </td>
-                <td class="px-4 sm:px-6 py-4 text-center">
-                    <div class="flex items-center justify-center gap-2">
-                        <a href="${detailUrl}"
-                           class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            Detail
-                        </a>
-                        <div class="relative group">
-                            <button class="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors">
-                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                </svg>
-                            </button>
-                            <div class="absolute right-0 mt-0 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-40">
-                                <a href="${routeSuratKelulusan.replace(':id', g.uuid)}" target="_blank"
-                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors first:rounded-t-lg">
-                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Surat Kelulusan
-                                </a>
-                                <a href="${routeSuratPernyataan.replace(':id', g.uuid)}" target="_blank"
-                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors last:rounded-b-lg border-t border-gray-100">
-                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                    </svg>
-                                    Surat Pernyataan
-                                </a>
-                                <a href="${routeTranskripNilai.replace(':id', g.uuid)}" target="_blank"
-                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors last:rounded-b-lg border-t border-gray-100">
-                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Transkrip Nilai
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </td>
+
+
             `;
                 tableBody.appendChild(row);
             });
@@ -1131,35 +1135,38 @@
         const btn = document.getElementById('btnGenerateToken');
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> Generating...`;
+            btn.innerHTML =
+                `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> Generating...`;
         }
 
         fetch('{{ route('admin.graduation.generateTokens') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '{{ csrf_token() }}',
-                'Accept': 'application/json',
-            },
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                window.location.reload();
-            } else {
-                alert('Gagal: ' + data.message);
-            }
-        })
-        .catch(err => {
-            alert('Terjadi kesalahan koneksi.');
-            console.error(err);
-        })
-        .finally(() => {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg> Generate Token`;
-            }
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ||
+                        '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('Terjadi kesalahan koneksi.');
+                console.error(err);
+            })
+            .finally(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML =
+                        `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg> Generate Token`;
+                }
+            });
     }
 </script>

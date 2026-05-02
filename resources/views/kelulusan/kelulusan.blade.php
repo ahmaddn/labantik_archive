@@ -602,7 +602,7 @@
             <i class="fa-solid fa-arrow-left"></i> Kembali
         </button>
         <button id="btnPrint" onclick="trackPrint()" class="btn btn-print">
-            <i class="fa-solid fa-print"></i> 
+            <i class="fa-solid fa-print"></i>
             <span id="printBtnText">Print</span>
         </button>
     </div>
@@ -640,7 +640,11 @@
         <div class="pembuka">
             @if ($letter)
                 @php
-                    $displayStatement = str_replace('[TAHUN_PELAJARAN]', $letter->academic_year ?? '', $letter->statement);
+                    $displayStatement = str_replace(
+                        '[TAHUN_PELAJARAN]',
+                        $letter->academic_year ?? '',
+                        $letter->statement,
+                    );
                 @endphp
                 <p>{{ $displayStatement }}</p>
                 @php
@@ -700,7 +704,8 @@
             <tr>
                 <td class="label" style="padding:0;">Tahun Pelajaran</td>
                 <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
+                <td style="padding:0;">
+                    {{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
             </tr>
             <tr>
                 <td class="label" style="padding:0;">Dinyatakan</td>
@@ -826,7 +831,7 @@
             </tbody>
         </table>
 
-        
+
 
         {{-- TANDA TANGAN --}}
 <div class="ttd-section">
@@ -879,7 +884,7 @@
                 Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
                 Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
                 Telpon ☎ (0233) 319238 FAX ☎ (0233) 319238 POS ✉ 45463 NPSN: 20213872<br />
-                Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
+                Website www.smkn1talaga.sch.id - Email ✉ mail@smkn1talaga.sch.id
             </div>
         </div>
         <div class="transkrip-header-border"></div>
@@ -925,7 +930,8 @@
             <tr>
                 <td class="label">Tanggal Kelulusan</td>
                 <td class="sep">:</td>
-                <td>{{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}</td>
+                <td>{{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}
+                </td>
             </tr>
             <tr>
                 <td class="label">Program Keahlian</td>
@@ -981,25 +987,45 @@
                 @foreach ($groupedUmum as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
+                        $g =
+                            collect($group)->first(
+                                fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
+                            ) ?? $group[0];
                     @endphp
                     @foreach ($group as $idx => $m)
                         <tr>
                             @if ($idx === 0)
-                                <td class="col-no" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                <td class="col-no"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
                                     {{ $noUmumTr }}
                                 </td>
                             @endif
                             <td class="col-mapel">{{ $m->mapel->name }}</td>
                             @if ($idx === 0)
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_1 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_2 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_3 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_4 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
-                                <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
-                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_1 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_2 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_3 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_4 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_5 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_6 }}</td>
+                                <td class="col-nr"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->nr }}</td>
+                                <td class="col-na"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $m->mapel->has_na ? $g->score : '-' }}</td>
                             @endif
                         </tr>
                     @endforeach
@@ -1023,25 +1049,45 @@
                 @foreach ($groupedJurusan as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
+                        $g =
+                            collect($group)->first(
+                                fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
+                            ) ?? $group[0];
                     @endphp
                     @foreach ($group as $idx => $m)
                         <tr>
                             @if ($idx === 0)
-                                <td class="col-no" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                <td class="col-no"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
                                     {{ $noJurusanTr }}
                                 </td>
                             @endif
                             <td class="col-mapel">{{ $m->mapel->name }}</td>
                             @if ($idx === 0)
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_1 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_2 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_3 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_4 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
-                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
-                                <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
-                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_1 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_2 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_3 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_4 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_5 }}</td>
+                                <td class="col-semester"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->sem_6 }}</td>
+                                <td class="col-nr"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->nr }}</td>
+                                <td class="col-na"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $m->mapel->has_na ? $g->score : '-' }}</td>
                             @endif
                         </tr>
                     @endforeach
@@ -1055,7 +1101,7 @@
             </tbody>
         </table>
 
-       
+
 
          {{-- TANDA TANGAN --}}
 <div class="ttd-section">
@@ -1169,7 +1215,7 @@
 
         <p class="pernyataan-text">Demikian pernyataan saya dibuat dengan sadar tanpa paksaan dari pihak mana pun.</p>
 
-      
+
 
         <div class="ttd-pernyataan">
             
@@ -1180,7 +1226,7 @@
                 @else
                     Talaga, ___________________<br />
                 @endif
-                 Yang menyatakan,<br>
+                Yang menyatakan,<br>
                 <img src="{{ $signature->signature_data }}" alt="Tanda Tangan" class="signature-img" />
                 <div class="nama-ttd">{{ $user->name }}</div>
                 <div>NISN. {{ $student->national_student_number ?? '—' }}</div>
@@ -1199,7 +1245,7 @@
     async function trackPrint() {
         const btnPrint = document.getElementById('btnPrint');
         const printBtnText = document.getElementById('printBtnText');
-        
+
         if (btnPrint.disabled) return;
 
         // Disable sementara biar nggak double click saat request ke server
@@ -1220,7 +1266,7 @@
             // Kembalikan tombol ke keadaan semula
             btnPrint.disabled = false;
             printBtnText.innerText = 'Print';
-            
+
             // Panggil dialog print browser
             window.print();
         }
