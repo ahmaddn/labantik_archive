@@ -142,6 +142,15 @@ class SignatureController extends Controller
             if (!empty($scores)) {
                 $rataRata = number_format(array_sum($scores) / count($scores), 2);
             }
+        } // end if graduation && mapels
+
+        $transkripUmum = collect();
+        $transkripJurusan = collect();
+        if ($graduation) {
+            $transkripUmum = $graduation->mapels->filter(fn($m) => $m->mapel && $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+            $transkripJurusan = $graduation->mapels->filter(fn($m) => $m->mapel && $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+        }
+
         return view('kelulusan.kelulusan', compact(
             'user',
             'student',
@@ -152,8 +161,9 @@ class SignatureController extends Controller
             'program1',
             'mapelUmum',
             'mapelJurusan',
-            'rataRata'
+            'rataRata',
+            'transkripUmum',
+            'transkripJurusan'
         ));
     }
-}
 }

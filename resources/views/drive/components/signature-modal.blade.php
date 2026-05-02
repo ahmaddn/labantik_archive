@@ -6,6 +6,8 @@
 
 @php
     $sudahTandaTangan = \App\Models\GoogleStatement::where('user_id', auth()->id())->exists();
+    $studentData = \Illuminate\Support\Facades\DB::table('ref_students')->where('user_id', auth()->id())->first();
+    $graduationToken = $studentData ? \Illuminate\Support\Facades\DB::table('google_graduation')->where('user_id', $studentData->id)->value('token') : null;
 @endphp
 
 <div class="flex items-center gap-3">
@@ -21,8 +23,8 @@
             Surat Kelulusan
         </a>
     @else
-        {{-- Belum TTD → tombol Surat Pernyataan membuka modal untuk tanda tangan --}}
-        <button type="button" onclick="document.getElementById('modalSuratPernyataan').classList.remove('hidden')"
+        {{-- Belum TTD → tombol Surat Pernyataan membuka modal token --}}
+        <button type="button" onclick="document.getElementById('modalToken').classList.remove('hidden')"
             class="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -181,11 +183,54 @@
     </div>
 </div>
 
+{{-- ── MODAL TOKEN ────────────────────────────── --}}
+<div id="modalToken" class="fixed inset-0 z-[60] flex hidden items-center justify-center bg-black/60 p-4"
+    role="dialog" aria-modal="true">
+    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+        <h3 class="mb-4 text-lg font-bold text-gray-800">Masukkan Token</h3>
+        <p class="mb-4 text-sm text-gray-600">Silakan masukkan token yang diberikan oleh wali kelas/admin untuk melanjutkan ke penandatanganan Surat Pernyataan.</p>
+        
+        <input type="text" id="tokenInput" class="mb-4 w-full rounded-lg border border-gray-300 p-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Token" autocomplete="off">
+        
+        <p id="tokenError" class="mb-4 hidden text-sm text-red-500">Token salah! Silakan coba lagi.</p>
+
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="document.getElementById('modalToken').classList.add('hidden')"
+                class="rounded-xl border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Batal
+            </button>
+            <button type="button" onclick="verifyToken()"
+                class="rounded-xl bg-[#1b84ff] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1570e0]">
+                Lanjut
+            </button>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <script>
         (function() {
             let signaturePad = null;
+
+            window.verifyToken = function() {
+                const tokenInput = document.getElementById('tokenInput').value;
+                const correctToken = "{{ $graduationToken }}";
+                
+                if (!correctToken) {
+                    alert('Token belum di-generate oleh admin.');
+                    return;
+                }
+
+                if (tokenInput === correctToken) {
+                    document.getElementById('modalToken').classList.add('hidden');
+                    document.getElementById('modalSuratPernyataan').classList.remove('hidden');
+                    document.getElementById('tokenError').classList.add('hidden');
+                    document.getElementById('tokenInput').value = '';
+                } else {
+                    document.getElementById('tokenError').classList.remove('hidden');
+                }
+            };
 
             function initPad() {
                 const canvas = document.getElementById('signatureCanvas');
