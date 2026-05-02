@@ -16,6 +16,13 @@ class GoogleGraduationMapel extends Model
     protected $fillable = [
         'graduation_id',
         'mapel_id',
+        'sem_1',
+        'sem_2',
+        'sem_3',
+        'sem_4',
+        'sem_5',
+        'sem_6',
+        'nr',
         'score',
         'order',
         'join',

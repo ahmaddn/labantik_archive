@@ -74,6 +74,17 @@
                     <span>Import Nilai</span>
                 </a>
 
+                <a href="{{ route('admin.graduation.createTranscript') }}"
+                    class="col-span-2 sm:col-auto inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
+               bg-pink-600 hover:bg-pink-700 text-white
+               font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm shadow-pink-200 w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Tambah Transkrip</span>
+                </a>
+
                 <a href="{{ route('admin.graduation.create') }}"
                     class="col-span-2 sm:col-auto inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
                bg-violet-600 hover:bg-violet-700 text-white
@@ -250,6 +261,26 @@
 
                     <div class="space-y-4">
                         <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Jenis Template</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="template_type" value="graduation" checked class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-3 flex flex-col">
+                                        <span class="block text-sm font-bold text-gray-900 uppercase">Kelulusan</span>
+                                        <span class="block text-[10px] text-gray-500">Hanya Nilai Akhir (NA)</span>
+                                    </span>
+                                </label>
+                                <label class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="template_type" value="transcript" class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-3 flex flex-col">
+                                        <span class="block text-sm font-bold text-gray-900 uppercase">Transkrip</span>
+                                        <span class="block text-[10px] text-gray-500">S1-S6, NR & NA</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Kelas (Opsional)</label>
                             <select id="classFilter"
                                 class="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -261,9 +292,28 @@
                             </select>
                         </div>
 
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Format Template</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="format" value="csv" checked class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-3 flex flex-col">
+                                        <span class="block text-sm font-bold text-gray-900 uppercase">CSV</span>
+                                        <span class="block text-[10px] text-gray-500">Satu Sheet (Cepat)</span>
+                                    </span>
+                                </label>
+                                <label class="relative flex cursor-pointer rounded-xl border border-gray-200 p-3 focus:outline-none hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="format" value="xlsx" class="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-3 flex flex-col">
+                                        <span class="block text-sm font-bold text-gray-900 uppercase">XLSX</span>
+                                        <span class="block text-[10px] text-gray-500">Multi Sheet (Per Siswa)</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="text-sm text-gray-500 bg-blue-50 p-3 rounded-xl">
-                            <p class="text-xs">💡 Template akan berisi semua siswa yang sesuai dengan filter kelas dan
-                                jurusan yang dipilih.</p>
+                            <p class="text-[10px] leading-relaxed">💡 Template **CSV** berisi semua siswa dalam satu tabel. Template **XLSX** akan memisahkan setiap siswa ke dalam sheet yang berbeda (satu sheet per siswa).</p>
                         </div>
                     </div>
                 </div>
@@ -300,9 +350,15 @@
 
         function downloadTemplate() {
             const classId = document.getElementById('classFilter').value;
+            const format = document.querySelector('input[name="format"]:checked').value;
+            const templateType = document.querySelector('input[name="template_type"]:checked').value;
+            
             let url = '{{ route('admin.graduation.downloadTemplate') }}';
             const params = new URLSearchParams();
             if (classId) params.append('class_id', classId);
+            if (format) params.append('format', format);
+            if (templateType) params.append('template_type', templateType);
+            
             if (params.toString()) url += '?' + params.toString();
             window.location.href = url;
             closeDownloadModal();

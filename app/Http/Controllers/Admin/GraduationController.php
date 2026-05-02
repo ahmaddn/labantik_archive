@@ -76,6 +76,20 @@ class GraduationController extends Controller
     }
 
     /**
+     * Show form tambah transkrip nilai (full semester)
+     */
+    public function createTranscript()
+    {
+        $classes = RefClass::with('expertiseConcentration')
+            ->where('academic_level', 12)
+            ->orderBy('academic_level')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.graduation.create-transcript', compact('classes'));
+    }
+
+    /**
      * Store kelulusan baru
      */
     public function store(Request $request)
@@ -115,6 +129,53 @@ class GraduationController extends Controller
 
             \DB::commit();
             return redirect()->route('admin.graduation.index')->with('success', 'Data kelulusan berhasil disimpan!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan validasi: ' . implode(' ', $e->errors()));
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+            public function storeTranscript(Request $request)
+    {
+        $validated = $request->validate([
+            'student_id' => 'required|exists:ref_students,id',
+            'mapel_ids'  => 'required|array|min:1',
+            's1'         => 'nullable|array',
+            's2'         => 'nullable|array',
+            's3'         => 'nullable|array',
+            's4'         => 'nullable|array',
+            's5'         => 'nullable|array',
+            's6'         => 'nullable|array',
+            'nr'         => 'nullable|array',
+            'na'         => 'nullable|array',
+        ]);
+
+        try {
+            $student = RefStudent::with(['academicYears.class'])->findOrFail($validated['student_id']);
+            \DB::beginTransaction();
+
+            $graduation = GoogleGraduation::firstOrCreate(['user_id' => $student->id]);
+
+            foreach ($validated['mapel_ids'] as $mapelUuid) {
+                GoogleGraduationMapel::updateOrCreate(
+                    ['graduation_id' => $graduation->uuid, 'mapel_id' => $mapelUuid],
+                    [
+                        'sem_1' => $validated['s1'][$mapelUuid] ?? null,
+                        'sem_2' => $validated['s2'][$mapelUuid] ?? null,
+                        'sem_3' => $validated['s3'][$mapelUuid] ?? null,
+                        'sem_4' => $validated['s4'][$mapelUuid] ?? null,
+                        'sem_5' => $validated['s5'][$mapelUuid] ?? null,
+                        'sem_6' => $validated['s6'][$mapelUuid] ?? null,
+                        'nr'    => $validated['nr'][$mapelUuid] ?? null,
+                        'score' => $validated['na'][$mapelUuid] ?? null,
+                    ]
+                );
+            }
+
+            \DB::commit();
+            return redirect()->route('admin.graduation.index')->with('success', 'Data transkrip nilai berhasil disimpan!');
         } catch (\Exception $e) {
             \DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -279,6 +340,13 @@ class GraduationController extends Controller
         try {
             $validated = $request->validate([
                 'uuid'  => 'required|string',
+                'sem_1' => 'nullable|numeric|min:0|max:100',
+                'sem_2' => 'nullable|numeric|min:0|max:100',
+                'sem_3' => 'nullable|numeric|min:0|max:100',
+                'sem_4' => 'nullable|numeric|min:0|max:100',
+                'sem_5' => 'nullable|numeric|min:0|max:100',
+                'sem_6' => 'nullable|numeric|min:0|max:100',
+                'nr'    => 'nullable|numeric|min:0|max:100',
                 'score' => 'nullable|numeric|min:0|max:100',
             ], [
                 'score.numeric' => 'Nilai harus berupa angka.',
@@ -289,16 +357,20 @@ class GraduationController extends Controller
             $graduationMapel = GoogleGraduationMapel::where('uuid', $validated['uuid'])->firstOrFail();
 
             $graduationMapel->update([
-                'score' => $validated['score'] ?? null,
+                'sem_1' => $request->sem_1 ?? null,
+                'sem_2' => $request->sem_2 ?? null,
+                'sem_3' => $request->sem_3 ?? null,
+                'sem_4' => $request->sem_4 ?? null,
+                'sem_5' => $request->sem_5 ?? null,
+                'sem_6' => $request->sem_6 ?? null,
+                'nr'    => $request->nr ?? null,
+                'score' => $request->score ?? null,
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Nilai berhasil diperbarui.',
-                'data'    => [
-                    'uuid'  => $graduationMapel->uuid,
-                    'score' => $graduationMapel->score,
-                ],
+                'data'    => $graduationMapel,
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -366,5 +438,48 @@ class GraduationController extends Controller
                 'message' => 'Gagal memperbarui nilai: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Generate tokens for all students in class 12 who have a graduation record.
+     */
+    public function generateTokens()
+    {
+        try {
+            $graduations = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {
+                $q->where('academic_level', 12);
+            })->get();
+
+            $updatedCount = 0;
+            \DB::beginTransaction();
+            foreach ($graduations as $graduation) {
+                // Generate a random 6 character uppercase alphanumeric token
+                $token = strtoupper(\Illuminate\Support\Str::random(6));
+                $graduation->update(['token' => $token]);
+                $updatedCount++;
+            }
+            \DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Token berhasil di-generate untuk {$updatedCount} siswa.",
+                'updated_count' => $updatedCount,
+            ]);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('generateTokens error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal meng-generate token: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export tokens to Excel
+     */
+    public function exportTokens()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\GraduationTokensExport, 'data_token_kelulusan.xlsx');
     }
 }

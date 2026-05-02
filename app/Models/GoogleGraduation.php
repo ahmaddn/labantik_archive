@@ -19,6 +19,7 @@ class GoogleGraduation extends Model
         'uuid',
         'user_id',
         'letter_id',
+        'token',
     ];
 
     public function mapels()

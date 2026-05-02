@@ -137,7 +137,9 @@
                                 <li><strong>Kolom yang diperlukan:</strong></li>
                                 <li>• NIS</li>
                                 <li>• Id Mapel</li>
-                                <li>• Nilai</li>
+                                <li>• NA (Nilai Akhir)</li>
+                                <li>• S1 - S6 (Opsional untuk Transkrip)</li>
+                                <li>• NR (Opsional untuk Transkrip)</li>
                             </ul>
                             <p class="text-xs text-blue-700 mt-3"><strong>Catatan:</strong> File harus memiliki minimal 3
                                 kolom dengan header NIS, Id Mapel, dan Nilai. Anda dapat menggunakan template yang
@@ -159,40 +161,40 @@
                             <div class="bg-white rounded text-xs p-2 font-mono text-gray-700 overflow-x-auto">
                                 <table class="min-w-max border-collapse">
                                     <thead>
-                                        <tr class="text-gray-500 border-b border-gray-100">
-                                            <th class="pr-3 py-1 text-left font-medium">No</th>
-                                            <th class="pr-3 py-1 text-left font-medium">NIS</th>
-                                            <th class="pr-3 py-1 text-left font-medium">NISN</th>
-                                            <th class="pr-3 py-1 text-left font-medium">Nama Siswa</th>
-                                            <th class="pr-3 py-1 text-left font-medium">Kelas</th>
-                                            <th class="pr-3 py-1 text-left font-medium">Tapel</th>
-                                            <th class="pr-3 py-1 text-left font-medium">Id Mapel</th>
-                                            <th class="pr-3 py-1 text-left font-medium">Nama Mapel</th>
-                                            <th class="py-1 text-left font-medium">Nilai</th>
+                                        <tr class="text-gray-500 border-b border-gray-100 uppercase tracking-tighter">
+                                            <th class="pr-3 py-1 text-left font-bold text-[10px]">Nama Siswa</th>
+                                            <th class="pr-3 py-1 text-left font-bold text-[10px]">Kelas</th>
+                                            <th class="pr-3 py-1 text-left font-bold text-[10px]">Id Mapel</th>
+                                            <th class="pr-3 py-1 text-left font-bold text-[10px] text-blue-600">S1</th>
+                                            <th class="pr-3 py-1 text-left font-bold text-[10px] text-blue-600">...</th>
+                                            <th class="pr-3 py-1 text-left font-bold text-[10px] text-blue-600">S6</th>
+                                            <th class="pr-3 py-1 text-left font-bold text-[10px] text-blue-600">NR</th>
+                                            <th class="pr-3 py-1 text-left font-bold text-[10px] text-indigo-600">NA</th>
+                                            <th class="py-1 text-left font-bold text-[10px]">NIS</th>
                                         </tr>
                                     </thead>
                                     <tbody class="text-gray-600">
                                         <tr class="border-b border-gray-50">
-                                            <td class="pr-3 py-1">1</td>
-                                            <td class="pr-3 py-1">25262189</td>
-                                            <td class="pr-3 py-1">25262189</td>
                                             <td class="pr-3 py-1">AA PAHRUROJI</td>
-                                            <td class="pr-3 py-1">10 TSM 2</td>
-                                            <td class="pr-3 py-1">2025/2026</td>
-                                            <td class="pr-3 py-1 text-blue-600">019dd78b-d742-71d7...</td>
-                                            <td class="pr-3 py-1">Matematika</td>
-                                            <td class="py-1">85</td>
+                                            <td class="pr-3 py-1">12 TSM 2</td>
+                                            <td class="pr-3 py-1 text-blue-500">019dd78b...</td>
+                                            <td class="pr-3 py-1">85</td>
+                                            <td class="pr-3 py-1">...</td>
+                                            <td class="pr-3 py-1">88</td>
+                                            <td class="pr-3 py-1">86</td>
+                                            <td class="pr-3 py-1 font-bold text-indigo-600">87.5</td>
+                                            <td class="py-1">25262189</td>
                                         </tr>
                                         <tr>
-                                            <td class="pr-3 py-1">2</td>
-                                            <td class="pr-3 py-1">25262189</td>
-                                            <td class="pr-3 py-1">25262189</td>
                                             <td class="pr-3 py-1">AA PAHRUROJI</td>
-                                            <td class="pr-3 py-1">10 TSM 2</td>
-                                            <td class="pr-3 py-1">2025/2026</td>
-                                            <td class="pr-3 py-1 text-blue-600">019dd78b-d749-70bd...</td>
-                                            <td class="pr-3 py-1">Bahasa Indonesia</td>
-                                            <td class="py-1">90</td>
+                                            <td class="pr-3 py-1">12 TSM 2</td>
+                                            <td class="pr-3 py-1 text-blue-500">019dd78b...</td>
+                                            <td class="pr-3 py-1">80</td>
+                                            <td class="pr-3 py-1">...</td>
+                                            <td class="pr-3 py-1">82</td>
+                                            <td class="pr-3 py-1">81</td>
+                                            <td class="pr-3 py-1 font-bold text-indigo-600">81.0</td>
+                                            <td class="py-1">25262189</td>
                                         </tr>
                                     </tbody>
                                 </table>

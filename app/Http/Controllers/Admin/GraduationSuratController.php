@@ -17,7 +17,7 @@ class GraduationSuratController extends Controller
             return $this->suratKelulusanAll();
         }
 
-        $graduation = GoogleGraduation::with(['user', 'letter', 'mapels.mapel'])
+        $graduation = GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
             ->where('uuid', $id)
             ->firstOrFail();
 
@@ -61,7 +61,7 @@ class GraduationSuratController extends Controller
             return $this->suratPernyataanAll();
         }
 
-        $graduation = GoogleGraduation::with(['user', 'letter'])
+        $graduation = GoogleGraduation::with(['user.academicYears.class.expertiseConcentration', 'letter'])
             ->where('uuid', $id)
             ->firstOrFail();
 
@@ -82,6 +82,47 @@ class GraduationSuratController extends Controller
         ));
     }
 
+    /**
+     * Tampilkan transkrip nilai — 1 siswa atau semua (export)
+     */
+    public function showTranskripNilai($id)
+    {
+        if ($id === 'all') {
+            return $this->transkripNilaiAll();
+        }
+
+        $graduation = GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
+            ->where('uuid', $id)
+            ->firstOrFail();
+
+        $student    = $graduation->user;
+        $user       = auth()->user();
+        $letter     = $graduation->letter;
+        $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
+
+        $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+        $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+
+        $scores   = $mapelsData->whereNotNull('score')->pluck('score');
+        $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
+
+        $latestAcademicYear = $student->academicYears->first();
+        $program            = $latestAcademicYear?->class?->expertiseConcentration;
+        $program1           = $latestAcademicYear?->class?->expertiseProgram;
+
+        return view('admin.graduation.transkrip-nilai', compact(
+            'graduation',
+            'student',
+            'user',
+            'letter',
+            'mapelUmum',
+            'mapelJurusan',
+            'rataRata',
+            'program',
+            'program1'
+        ));
+    }
+
     // =========================================================================
     // PRIVATE — export semua
     // =========================================================================
@@ -91,13 +132,16 @@ class GraduationSuratController extends Controller
         $classId     = request('class_id');
         $expertiseId = request('expertise_id');
 
-        $graduations = GoogleGraduation::with(['user', 'letter', 'mapels.mapel'])
+        $graduations = GoogleGraduation::with(['user.academicYears.class', 'letter', 'mapels.mapel'])
             ->whereHas('user.academicYears.class', function ($q) use ($classId, $expertiseId) {
                 $q->where('academic_level', 12);
                 if ($classId)     $q->where('id', $classId);
                 if ($expertiseId) $q->where('expertise_concentration_id', $expertiseId);
             })
-            ->get();
+            ->get()
+            ->sortBy(function($g) {
+                return ($g->user->academicYears->first()?->class?->name ?? '') . ' ' . ($g->user->full_name ?? '');
+            });
 
         $data = [];
         foreach ($graduations as $graduation) {
@@ -128,13 +172,16 @@ class GraduationSuratController extends Controller
         $classId     = request('class_id');
         $expertiseId = request('expertise_id');
 
-        $graduations = GoogleGraduation::with(['user', 'letter'])
+        $graduations = GoogleGraduation::with(['user.academicYears.class', 'letter'])
             ->whereHas('user.academicYears.class', function ($q) use ($classId, $expertiseId) {
                 $q->where('academic_level', 12);
                 if ($classId)     $q->where('id', $classId);
                 if ($expertiseId) $q->where('expertise_concentration_id', $expertiseId);
             })
-            ->get();
+            ->get()
+            ->sortBy(function($g) {
+                return ($g->user->academicYears->first()?->class?->name ?? '') . ' ' . ($g->user->full_name ?? '');
+            });
 
         $data = [];
         foreach ($graduations as $graduation) {
@@ -150,5 +197,44 @@ class GraduationSuratController extends Controller
         }
 
         return view('admin.graduation.surat-pernyataan-all', compact('data'));
+    }
+    
+    private function transkripNilaiAll()
+    {
+        $classId     = request('class_id');
+        $expertiseId = request('expertise_id');
+
+        $graduations = GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
+            ->whereHas('user.academicYears.class', function ($q) use ($classId, $expertiseId) {
+                $q->where('academic_level', 12);
+                if ($classId)     $q->where('id', $classId);
+                if ($expertiseId) $q->where('expertise_concentration_id', $expertiseId);
+            })
+            ->get()
+            ->sortBy(function($g) {
+                return ($g->user->academicYears->first()?->class?->name ?? '') . ' ' . ($g->user->full_name ?? '');
+            });
+
+        $data = [];
+        foreach ($graduations as $graduation) {
+            $student    = $graduation->user;
+            $user       = auth()->user();
+            $letter     = $graduation->letter;
+            $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
+
+            $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+            $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+
+            $scores   = $mapelsData->whereNotNull('score')->pluck('score');
+            $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
+
+            $latestAcademicYear = $student->academicYears->first();
+            $program            = $latestAcademicYear?->class?->expertiseConcentration;
+            $program1           = $latestAcademicYear?->class?->expertiseProgram;
+
+            $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1');
+        }
+
+        return view('admin.graduation.transkrip-nilai-all', compact('data'));
     }
 }

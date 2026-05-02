@@ -131,6 +131,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     // ── Surat (static, harus sebelum {id}) ───────────────────────────────────
     Route::get('/graduation/{id}/surat-kelulusan',  [GraduationSuratController::class, 'showSuratKelulusan'])->name('graduation.showSuratKelulusan');
     Route::get('/graduation/{id}/surat-pernyataan', [GraduationSuratController::class, 'showSuratPernyataan'])->name('graduation.showSuratPernyataan');
+    Route::get('/graduation/{id}/transkrip-nilai',  [GraduationSuratController::class, 'showTranskripNilai'])->name('graduation.showTranskripNilai');
 
     // ── Graduation Letter (Template Surat) ────────────────────────────────────
     Route::post('/graduation/letter',            [GraduationLetterController::class, 'store'])->name('graduation.letter.store');
@@ -140,9 +141,13 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
 
     // ── Graduation CRUD — dynamic {id} HARUS paling bawah ────────────────────
     Route::get('/graduation/create',             [GraduationController::class, 'create'])->name('graduation.create');
+    Route::get('/graduation/create-transcript',  [GraduationController::class, 'createTranscript'])->name('graduation.createTranscript');
     Route::post('/graduation/store',             [GraduationController::class, 'store'])->name('graduation.store');
-    Route::get('/graduation/{id}',               [GraduationController::class, 'show'])->name('graduation.show');
-    Route::delete('/graduation/{id}',            [GraduationController::class, 'destroy'])->name('graduation.destroy');
+    Route::post('/graduation/store-transcript',    [GraduationController::class, 'storeTranscript'])->name('graduation.storeTranscript');
     Route::post('graduation/score/update',      [GraduationController::class, 'updateScore'])->name('graduation.updateScore');
     Route::post('graduation/score/update-bulk', [GraduationController::class, 'updateScoreBulk'])->name('graduation.updateScoreBulk');
+    Route::post('graduation/generate-tokens',   [GraduationController::class, 'generateTokens'])->name('graduation.generateTokens');
+    Route::get('graduation/export-tokens',      [GraduationController::class, 'exportTokens'])->name('graduation.exportTokens');
+    Route::get('/graduation/{id}',               [GraduationController::class, 'show'])->name('graduation.show');
+    Route::delete('/graduation/{id}',            [GraduationController::class, 'destroy'])->name('graduation.destroy');
 });

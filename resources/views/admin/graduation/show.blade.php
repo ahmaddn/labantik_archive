@@ -172,14 +172,34 @@
                         Daftar Mapel & Nilai
                     </h2>
                     @if ($graduation->mapels->isNotEmpty())
-                        <button type="button" onclick="openBulkScoreModal()"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-semibold rounded-lg transition-colors border border-purple-100">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit Semua Nilai
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('admin.graduation.downloadTemplate', ['user_id' => $graduation->user_id]) }}"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg transition-colors border border-blue-100">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Template
+                            </a>
+
+                            <a href="{{ route('admin.graduation.showImportNilai') }}"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-semibold rounded-lg transition-colors border border-green-100">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                Import
+                            </a>
+
+                            <button type="button" onclick="openBulkScoreModal()"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-semibold rounded-lg transition-colors border border-purple-100">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit Semua Nilai
+                            </button>
+                        </div>
                     @endif
                 </div>
 
@@ -199,10 +219,15 @@
                                 <tr>
                                     <th class="text-left px-6 py-3 font-semibold">#</th>
                                     <th class="text-left px-6 py-3 font-semibold">Nama Mapel</th>
-                                    <th class="text-left px-6 py-3 font-semibold hidden sm:table-cell">Kelas</th>
-                                    <th class="text-left px-6 py-3 font-semibold hidden md:table-cell">Jurusan</th>
-                                    <th class="text-center px-6 py-3 font-semibold hidden lg:table-cell">Tipe</th>
-                                    <th class="text-center px-6 py-3 font-semibold">Nilai</th>
+                                    <th class="text-left px-6 py-3 font-semibold hidden 2xl:table-cell">Kelas</th>
+                                    <th class="text-center px-2 py-3 font-semibold hidden xl:table-cell">S1</th>
+                                    <th class="text-center px-2 py-3 font-semibold hidden xl:table-cell">S2</th>
+                                    <th class="text-center px-2 py-3 font-semibold hidden xl:table-cell">S3</th>
+                                    <th class="text-center px-2 py-3 font-semibold hidden xl:table-cell">S4</th>
+                                    <th class="text-center px-2 py-3 font-semibold hidden xl:table-cell">S5</th>
+                                    <th class="text-center px-2 py-3 font-semibold hidden xl:table-cell">S6</th>
+                                    <th class="text-center px-2 py-3 font-semibold hidden lg:table-cell">NR</th>
+                                    <th class="text-center px-6 py-3 font-semibold">Nilai (NA)</th>
                                     <th class="text-center px-6 py-3 font-semibold">Aksi</th>
                                 </tr>
                             </thead>
@@ -221,33 +246,42 @@
                                                             d="M12 6.253v13m0-13C6.228 6.253 2.092 10.814 2.092 16.427c0 5.613 4.136 10.174 9.908 10.174s9.908-4.561 9.908-10.174c0-5.613-4.136-10.174-9.908-10.174z" />
                                                     </svg>
                                                 </div>
-                                                <span
-                                                    class="font-semibold text-gray-800">{{ $graduationMapel->mapel->name ?? '-' }}</span>
+                                                <div>
+                                                    <p class="font-semibold text-gray-800 text-xs sm:text-sm">
+                                                        {{ $graduationMapel->mapel->name ?? '-' }}
+                                                    </p>
+                                                    <p class="text-[10px] text-gray-400 font-medium hidden sm:block">
+                                                        {{ $graduationMapel->mapel->expertise->name ?? 'Umum' }}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 hidden sm:table-cell">
+                                        <td class="px-6 py-4 hidden 2xl:table-cell">
                                             <span
                                                 class="inline-block text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg font-medium">
                                                 {{ $graduationMapel->mapel->class->name ?? '-' }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 text-gray-700 hidden md:table-cell text-xs font-medium">
-                                            {{ $graduationMapel->mapel->expertise->name ?? '-' }}
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem1-{{ $graduationMapel->uuid }}">
+                                            {{ $graduationMapel->sem_1 ?? '-' }}
                                         </td>
-                                        <td class="px-6 py-4 text-center hidden lg:table-cell">
-                                            @php $type = $graduationMapel->mapel->type ?? '' @endphp
-                                            @if ($type === 'umum')
-                                                <span
-                                                    class="inline-block px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg">Umum</span>
-                                            @elseif ($type === 'jurusan')
-                                                <span
-                                                    class="inline-block px-2.5 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-lg">Jurusan</span>
-                                            @elseif ($type)
-                                                <span
-                                                    class="inline-block px-2.5 py-1 bg-gray-50 text-gray-700 text-xs font-medium rounded-lg">{{ $type }}</span>
-                                            @else
-                                                <span class="text-gray-400">-</span>
-                                            @endif
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem2-{{ $graduationMapel->uuid }}">
+                                            {{ $graduationMapel->sem_2 ?? '-' }}
+                                        </td>
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem3-{{ $graduationMapel->uuid }}">
+                                            {{ $graduationMapel->sem_3 ?? '-' }}
+                                        </td>
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem4-{{ $graduationMapel->uuid }}">
+                                            {{ $graduationMapel->sem_4 ?? '-' }}
+                                        </td>
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem5-{{ $graduationMapel->uuid }}">
+                                            {{ $graduationMapel->sem_5 ?? '-' }}
+                                        </td>
+                                        <td class="px-2 py-4 text-center hidden xl:table-cell text-xs font-medium text-gray-600" id="sem6-{{ $graduationMapel->uuid }}">
+                                            {{ $graduationMapel->sem_6 ?? '-' }}
+                                        </td>
+                                        <td class="px-2 py-4 text-center hidden lg:table-cell text-xs font-bold text-blue-600" id="nr-{{ $graduationMapel->uuid }}">
+                                            {{ $graduationMapel->nr ?? '-' }}
                                         </td>
                                         <td class="px-6 py-4 text-center">
                                             @php $score = $graduationMapel->score @endphp
@@ -259,7 +293,16 @@
                                         </td>
                                         <td class="px-6 py-4 text-center">
                                             <button type="button"
-                                                onclick="openEditScoreModal('{{ $graduationMapel->uuid }}', '{{ addslashes($graduationMapel->mapel->name ?? '-') }}', {{ $graduationMapel->score ?? 'null' }})"
+                                                onclick="openEditScoreModal('{{ $graduationMapel->uuid }}', '{{ addslashes($graduationMapel->mapel->name ?? '-') }}', {
+                                                    score: {{ $graduationMapel->score ?? 'null' }},
+                                                    sem1: {{ $graduationMapel->sem_1 ?? 'null' }},
+                                                    sem2: {{ $graduationMapel->sem_2 ?? 'null' }},
+                                                    sem3: {{ $graduationMapel->sem_3 ?? 'null' }},
+                                                    sem4: {{ $graduationMapel->sem_4 ?? 'null' }},
+                                                    sem5: {{ $graduationMapel->sem_5 ?? 'null' }},
+                                                    sem6: {{ $graduationMapel->sem_6 ?? 'null' }},
+                                                    nr: {{ $graduationMapel->nr ?? 'null' }}
+                                                })"
                                                 class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-medium rounded-lg transition-colors border border-amber-100">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
@@ -337,20 +380,19 @@
     <div id="editScoreModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
         <div class="flex min-h-screen items-center justify-center px-4 py-8">
             <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeEditScoreModal()"></div>
-            <div class="relative w-full max-w-sm rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200">
+            <div class="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200">
 
                 {{-- Header --}}
                 <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                     <div class="flex items-center gap-3">
                         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50">
-                            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-sm font-bold text-gray-900">Edit Nilai</h3>
+                            <h3 class="text-sm font-bold text-gray-900">Edit Nilai Mapel</h3>
                             <p class="text-xs text-gray-500" id="editScoreMapelName">—</p>
                         </div>
                     </div>
@@ -365,28 +407,29 @@
 
                 {{-- Body --}}
                 <div class="px-6 py-5">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Nilai <span class="text-red-500">*</span>
-                        <span class="ml-1 text-xs text-gray-400 font-normal">(0 – 100)</span>
-                    </label>
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="adjustScore(-1)"
-                            class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition-colors">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                            </svg>
-                        </button>
-                        <input type="number" id="editScoreInput" min="0" max="100" placeholder="0"
-                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-center text-lg font-bold text-gray-800 shadow-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-100">
-                        <button type="button" onclick="adjustScore(1)"
-                            class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition-colors">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                        </button>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+                        @foreach (range(1, 6) as $sem)
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Semester {{ $sem }}</label>
+                                <input type="number" id="sem{{ $sem }}Input" step="0.01" min="0" max="100" placeholder="-"
+                                    class="w-full rounded-xl border border-gray-200 px-3 py-2 text-center text-sm font-bold text-gray-800 shadow-sm focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-100">
+                            </div>
+                        @endforeach
                     </div>
-                    <p class="mt-2 text-xs text-gray-400">Kosongkan jika belum ada nilai.</p>
+
+                    <div class="grid grid-cols-2 gap-4 border-t border-gray-100 pt-5">
+                        <div>
+                            <label class="block text-xs font-bold text-blue-600 uppercase mb-1">Nilai Rapor (NR)</label>
+                            <input type="number" id="nrInput" step="0.01" min="0" max="100" placeholder="-"
+                                class="w-full rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 text-center text-base font-bold text-blue-700 shadow-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-green-600 uppercase mb-1">Nilai Akhir (NA)</label>
+                            <input type="number" id="editScoreInput" step="0.01" min="0" max="100" placeholder="-"
+                                class="w-full rounded-xl border border-green-100 bg-green-50 px-4 py-2.5 text-center text-base font-bold text-green-700 shadow-sm focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100">
+                        </div>
+                    </div>
+                    <p class="mt-4 text-[10px] text-gray-400 text-center italic">Kosongkan jika belum ada nilai. Nilai NA akan muncul di Surat Kelulusan.</p>
                 </div>
 
                 {{-- Footer --}}
@@ -400,7 +443,7 @@
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        Simpan
+                        Simpan Perubahan
                     </button>
                 </div>
             </div>
@@ -486,14 +529,28 @@
         // ══════════════════════════════════════════════════════════
         // MODAL: Edit Single Score
         // ══════════════════════════════════════════════════════════
-        function openEditScoreModal(uuid, mapelName, currentScore) {
+        function openEditScoreModal(uuid, mapelName, currentData) {
             _editUuid = uuid;
             document.getElementById('editScoreMapelName').textContent = mapelName;
-            document.getElementById('editScoreInput').value = currentScore !== null ? currentScore : '';
+            
+            // NA
+            document.getElementById('editScoreInput').value = currentData.score !== null ? currentData.score : '';
+            
+            // Semesters
+            document.getElementById('sem1Input').value = currentData.sem1 !== null ? currentData.sem1 : '';
+            document.getElementById('sem2Input').value = currentData.sem2 !== null ? currentData.sem2 : '';
+            document.getElementById('sem3Input').value = currentData.sem3 !== null ? currentData.sem3 : '';
+            document.getElementById('sem4Input').value = currentData.sem4 !== null ? currentData.sem4 : '';
+            document.getElementById('sem5Input').value = currentData.sem5 !== null ? currentData.sem5 : '';
+            document.getElementById('sem6Input').value = currentData.sem6 !== null ? currentData.sem6 : '';
+            
+            // NR
+            document.getElementById('nrInput').value = currentData.nr !== null ? currentData.nr : '';
+
             document.getElementById('editScoreModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             setTimeout(function() {
-                document.getElementById('editScoreInput').focus();
+                document.getElementById('nrInput').focus();
             }, 100);
         }
 
@@ -513,13 +570,17 @@
         async function saveScore() {
             if (!_editUuid) return;
 
-            var scoreVal = document.getElementById('editScoreInput').value;
-            var score = scoreVal === '' ? null : parseFloat(scoreVal);
-
-            if (score !== null && (score < 0 || score > 100)) {
-                alert('Nilai harus antara 0 dan 100.');
-                return;
-            }
+            const payload = {
+                uuid: _editUuid,
+                sem_1: document.getElementById('sem1Input').value || null,
+                sem_2: document.getElementById('sem2Input').value || null,
+                sem_3: document.getElementById('sem3Input').value || null,
+                sem_4: document.getElementById('sem4Input').value || null,
+                sem_5: document.getElementById('sem5Input').value || null,
+                sem_6: document.getElementById('sem6Input').value || null,
+                nr: document.getElementById('nrInput').value || null,
+                score: document.getElementById('editScoreInput').value || null,
+            };
 
             var btn = document.getElementById('saveScoreBtn');
             btn.disabled = true;
@@ -535,16 +596,21 @@
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify({
-                        uuid: _editUuid,
-                        score: score
-                    }),
+                    body: JSON.stringify(payload),
                 });
 
                 var data = await res.json();
                 if (data.success) {
-                    updateScoreBadge(_editUuid, score);
+                    // Update NA badge
+                    updateScoreBadge(_editUuid, payload.score);
+                    
+                    // Update semester columns
+                    updateSemesterColumns(_editUuid, payload);
+                    
                     closeEditScoreModal();
+                    
+                    // Refresh Average
+                    refreshAverage();
                 } else {
                     alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));
                 }
@@ -553,7 +619,53 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML =
-                    '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Simpan';
+                    '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Simpan Perubahan';
+            }
+        }
+
+        function updateSemesterColumns(uuid, data) {
+            const fields = ['sem1', 'sem2', 'sem3', 'sem4', 'sem5', 'sem6', 'nr'];
+            fields.forEach(f => {
+                const el = document.getElementById(f.replace('sem', 'sem') + '-' + uuid); // sem1-uuid
+                if (el) el.textContent = data[f === 'nr' ? 'nr' : f.replace('sem', 'sem_')] || '-';
+            });
+            
+            // Update the Edit button onclick arguments to reflect new data
+            const row = document.getElementById('row-' + uuid);
+            if (row) {
+                const editBtn = row.querySelector('button[onclick^="openEditScoreModal"]');
+                if (editBtn) {
+                    const mapelName = document.getElementById('editScoreMapelName').textContent;
+                    editBtn.setAttribute('onclick', `openEditScoreModal('${uuid}', '${mapelName.replace(/'/g, "\\'")}', ${JSON.stringify({
+                        score: data.score,
+                        sem1: data.sem_1,
+                        sem2: data.sem_2,
+                        sem3: data.sem_3,
+                        sem4: data.sem_4,
+                        sem5: data.sem_5,
+                        sem6: data.sem_6,
+                        nr: data.nr
+                    })})`);
+                }
+            }
+        }
+
+        function refreshAverage() {
+            const badges = document.querySelectorAll('[id^="score-badge-"]');
+            let sum = 0;
+            let count = 0;
+            badges.forEach(b => {
+                const val = parseFloat(b.textContent);
+                if (!isNaN(val)) {
+                    sum += val;
+                    count++;
+                }
+            });
+            const avg = count > 0 ? (sum / count).toFixed(1) : '-';
+            const display = document.getElementById('avgScoreDisplay');
+            if (display) {
+                display.textContent = avg;
+                display.className = 'text-2xl font-extrabold ' + (avg >= 75 ? 'text-green-600' : (avg >= 50 ? 'text-yellow-600' : 'text-red-600'));
             }
         }
 
