@@ -679,35 +679,37 @@
 
                 @php
                     $noUmum = 1;
-                    $skipUmum = 0; // sisa baris yang dilewati karena rowspan
+                    $groupedUmum = [];
+                    foreach ($transkripUmum as $m) {
+                        $joinVal = $m->mapel->join ?? 0;
+                        $key = $joinVal == 0 ? 'solo_' . $m->id : 'grp_' . $joinVal;
+                        $groupedUmum[$key][] = $m;
+                    }
                 @endphp
 
-                @foreach ($mapelUmum as $mapel)
+                @foreach ($groupedUmum as $key => $group)
                     @php
-                        $rowspan = intval($mapel->join ?? 1);
-                        $score = $mapel->score !== null ? $mapel->score : '';
+                        $rowspan = count($group);
+                        $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
                     @endphp
-
-                    @if ($skipUmum > 0)
-                        {{-- Baris lanjutan rowspan: tidak tampilkan No & Nilai --}}
+                    @foreach ($group as $idx => $mapel)
                         <tr>
-                            <td style="padding:2px;">{{ $mapel->name }}</td>
+                            @if ($idx === 0)
+                                <td class="col-no" style="padding:0px; vertical-align:middle;"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $noUmum }}
+                                </td>
+                            @endif
+                            <td style="padding:2px;">{{ $mapel->mapel->name }}</td>
+                            @if ($idx === 0)
+                                <td class="col-nilai" style="padding:0px; vertical-align:middle;"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $score }}
+                                </td>
+                            @endif
                         </tr>
-                        @php $skipUmum--; @endphp
-                    @else
-                        <tr>
-                            <td class="col-no" style="padding:0px; vertical-align:middle;"
-                                @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                {{ $noUmum++ }}
-                            </td>
-                            <td style="padding:2px;">{{ $mapel->name }}</td>
-                            <td class="col-nilai" style="padding:0px; vertical-align:middle;"
-                                @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                {{ $score }}
-                            </td>
-                        </tr>
-                        @php $skipUmum = $rowspan - 1; @endphp
-                    @endif
+                    @endforeach
+                    @php $noUmum++; @endphp
                 @endforeach
 
                 {{-- ── B. KEJURUAN ─────────────────────────── --}}
@@ -719,34 +721,37 @@
 
                 @php
                     $noJurusan = 1;
-                    $skipJurusan = 0;
+                    $groupedJurusan = [];
+                    foreach ($transkripJurusan as $m) {
+                        $joinVal = $m->mapel->join ?? 0;
+                        $key = $joinVal == 0 ? 'solo_' . $m->id : 'grp_' . $joinVal;
+                        $groupedJurusan[$key][] = $m;
+                    }
                 @endphp
 
-                @foreach ($mapelJurusan as $mapel)
+                @foreach ($groupedJurusan as $key => $group)
                     @php
-                        $rowspan = intval($mapel->join ?? 1);
-                        $score = $mapel->score !== null ? $mapel->score : '';
+                        $rowspan = count($group);
+                        $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
                     @endphp
-
-                    @if ($skipJurusan > 0)
+                    @foreach ($group as $idx => $mapel)
                         <tr>
-                            <td style="padding:2px;">{{ $mapel->name }}</td>
+                            @if ($idx === 0)
+                                <td class="col-no" style="padding:0px; vertical-align:middle;"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $noJurusan }}
+                                </td>
+                            @endif
+                            <td style="padding:2px;">{{ $mapel->mapel->name }}</td>
+                            @if ($idx === 0)
+                                <td class="col-nilai" style="padding:0px; vertical-align:middle;"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $score }}
+                                </td>
+                            @endif
                         </tr>
-                        @php $skipJurusan--; @endphp
-                    @else
-                        <tr>
-                            <td class="col-no" style="padding:0px; vertical-align:middle;"
-                                @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                {{ $noJurusan++ }}
-                            </td>
-                            <td style="padding:2px;">{{ $mapel->name }}</td>
-                            <td class="col-nilai" style="padding:0px; vertical-align:middle;"
-                                @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                {{ $score }}
-                            </td>
-                        </tr>
-                        @php $skipJurusan = $rowspan - 1; @endphp
-                    @endif
+                    @endforeach
+                    @php $noJurusan++; @endphp
                 @endforeach
 
                 {{-- ── RATA-RATA ─────────────────────────────── --}}
