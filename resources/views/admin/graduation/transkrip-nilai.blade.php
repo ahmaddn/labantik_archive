@@ -278,7 +278,7 @@
             position: absolute;
             left: 0px;
             top: 20px;
-            width: 80px;
+            width: 70px;
             z-index: 5;
             pointer-events: none;
         }
@@ -582,22 +582,22 @@
                     @endif
                 </div>
                 <div class="ttd-name">
-                    {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                    {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}
+                </div>
                 <div>{{ $principal->employee->functional_position ?? 'Penata Tingkat I/IIId' }}</div>
                 <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
             </div>
+        </div>
 
-            {{-- QR CODE FOOTER --}}
-            <div class="doc-qr-footer">
-                <div class="doc-qr-footer-text">
-                    <strong>Verifikasi Keaslian Dokumen</strong>
-                    Scan QR Code ini untuk memverifikasi keaslian Transkrip Nilai atas nama
-                    <strong
-                        style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
-                    Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
-                </div>
+        {{-- QR CODE FOOTER --}}
+        <div class="doc-qr-footer">
+            <div class="doc-qr-footer-text">
+                <strong>Verifikasi Keaslian Dokumen</strong>
+                Scan QR Code ini untuk memverifikasi keaslian Transkrip Nilai atas nama
+                <strong
+                    style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+                Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
             </div>
-
         </div>
 </body>
 

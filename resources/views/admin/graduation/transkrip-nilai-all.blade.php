@@ -242,14 +242,16 @@
             font-size: 7.5pt;
             font-family: Arial, sans-serif;
             position: absolute;
-            
+
             left: 15mm;
             right: 15mm;
         }
+
         .doc-qr-footer-text {
             line-height: 1.5;
             color: #222;
         }
+
         .doc-qr-footer-text strong {
             display: block;
             font-size: 8pt;
@@ -276,7 +278,7 @@
             position: absolute;
             left: 0px;
             top: 25px;
-            width: 80px;
+            width: 70px;
             z-index: 5;
             pointer-events: none;
         }
@@ -565,7 +567,11 @@
                 <div class="qr-block">
                     @php
                         $verifyUrl = route('graduation.verify', $item->graduation->uuid);
-                        $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl) . '&size=100&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+                        $qrUrl =
+                            'https://quickchart.io/qr?text=' .
+                            urlencode($verifyUrl) .
+                            '&size=100&margin=1&centerImageUrl=' .
+                            urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
                     @endphp
                     <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
                 </div>
@@ -574,11 +580,11 @@
                     {{ $item->letter ? \Carbon\Carbon::parse($item->letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
                     Kepala SMK Negeri 1 Talaga,
                     <div class="ttd-space">
-                        @if (in_array($sigMode ?? 'both', ['sig', 'both']) && $letter && $letter->signature_image)
-                            <img src="{{ url('storage/', $letter->signature_image) }}" class="signature-image">
+                        @if (in_array($sigMode ?? 'both', ['sig', 'both']) && $item->letter && $item->letter->signature_image)
+                            <img src="{{ url('storage/', $item->letter->signature_image) }}" class="signature-image">
                         @endif
-                        @if (($sigMode ?? 'both') === 'both' && $letter && $letter->stamp_image)
-                            <img src="{{ url('storage/', $letter->stamp_image) }}" class="stamp-image">
+                        @if (($sigMode ?? 'both') === 'both' && $item->letter && $item->letter->stamp_image)
+                            <img src="{{ url('storage/', $item->letter->stamp_image) }}" class="stamp-image">
                         @endif
                     </div>
                     <div class="ttd-name">
@@ -588,17 +594,18 @@
                     <div>NIP. {{ $item->principal->employee->nip ?? '197610012006041011' }}</div>
                 </div>
             </div>
-            
+
             {{-- QR CODE FOOTER --}}
             <div class="doc-qr-footer">
                 <div class="doc-qr-footer-text">
                     <strong>Verifikasi Keaslian Dokumen</strong>
                     Scan QR Code ini untuk memverifikasi keaslian Transkrip Nilai atas nama
-                    <strong style="display:inline; font-size:inherit;">{{ strtoupper($item->student->full_name ?? '—') }}</strong>.
+                    <strong
+                        style="display:inline; font-size:inherit;">{{ strtoupper($item->student->full_name ?? '—') }}</strong>.
                     Atau kunjungi: <em>{{ route('graduation.verify', $item->graduation->uuid) }}</em>
                 </div>
             </div>
-            
+
         </div>
     @endforeach
 </body>
