@@ -13,7 +13,7 @@
 
         body {
             font-family: "Times New Roman", Times, serif;
-            line-height: 1.3;
+            line-height: 1.2;
             margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
@@ -71,9 +71,7 @@
         ═══════════════════════════════════════════ */
         .header {
             text-align: center;
-            padding-bottom: 5px;
             padding-left: 90px;
-            margin-bottom: 10px;
             position: relative;
             min-height: 100px;
         }
@@ -125,7 +123,7 @@
 
         .doc-title {
             text-align: center;
-            margin: 12px 0 4px 0;
+            margin: 0px 0 4px 0;
         }
 
         .doc-title h2 {
@@ -195,11 +193,13 @@
         .nilai-table .col-no {
             width: 35px;
             text-align: center;
+
         }
 
         .nilai-table .col-nilai {
             width: 70px;
             text-align: center;
+            font-weight: normal;
         }
 
         .nilai-table .section-header td {
@@ -310,7 +310,10 @@
             {{-- TEKS PEMBUKA --}}
             <div class="pembuka">
                 @if ($item->letter)
-                    <p>{{ $item->letter->statement }}</p>
+                    @php
+                        $displayStatement = str_replace('[TAHUN_PELAJARAN]', $item->letter->academic_year ?? '', $item->letter->statement);
+                    @endphp
+                    <p>{{ $displayStatement }}</p>
                     @php
                         $contentLines = array_filter(array_map('trim', explode("\n", $item->letter->content)));
                     @endphp
@@ -326,7 +329,7 @@
                 @endif
             </div>
 
-            <div style="margin-bottom:6px; font-size:10pt;">Menerangkan Bahwa</div>
+            <div style="margin-bottom:6px; font-size:10pt;">Menerangkan bahwa :</div>
 
             {{-- INFO SISWA --}}
             <table class="info-table">
@@ -366,6 +369,11 @@
                     <td style="padding:0;">{{ strtoupper($item->program->name ?? '—') }}</td>
                 </tr>
                 <tr>
+                    <td class="label" style="padding:0;">Tahun Pelajaran</td>
+                    <td class="sep" style="padding:0;">:</td>
+                    <td style="padding:0;">{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}</td>
+                </tr>
+                <tr>
                     <td class="label" style="padding:0;">Dinyatakan</td>
                     <td class="sep" style="padding:0;">:</td>
                     <td class="dinyatakan-lulus" style="padding:0;">LULUS</td>
@@ -379,7 +387,7 @@
                 <thead>
                     <tr>
                         <th class="col-no">No</th>
-                        <th>Mata Pelajaran (Kurikulum Merdeka)</th>
+                        <th>Mata Pelajaran</th>
                         <th class="col-nilai">Nilai</th>
                     </tr>
                 </thead>
@@ -403,11 +411,15 @@
                     @endphp
 
 
-                        @foreach ($groupedUmum as $key => $group)
-                            @php
-                                $rowspan = count($group);
-                                $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
-                            @endphp
+                    @foreach ($groupedUmum as $key => $group)
+                        @php
+                            $rowspan = count($group);
+                            $score = '-';
+                            if ($group[0]->mapel->has_na) {
+                                $foundScore = collect($group)->first(fn($m) => $m->score !== null)?->score;
+                                $score = $foundScore !== null ? $foundScore : '';
+                            }
+                        @endphp
                         @foreach ($group as $idx => $mapel)
                             <tr>
                                 @if ($idx === 0)
@@ -416,7 +428,7 @@
                                         {{ $noUmum }}
                                     </td>
                                 @endif
-                                <td style="padding:2px;">{{ $mapel->mapel->name }}</td>
+                                <td style="padding:2px; font-weight: normal;">{{ $mapel->mapel->name }}</td>
                                 @if ($idx === 0)
                                     <td class="col-nilai" style="padding:0px; vertical-align:middle;"
                                         @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
@@ -447,7 +459,11 @@
                     @foreach ($groupedJurusan as $key => $group)
                         @php
                             $rowspan = count($group);
-                            $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
+                            $score = '-';
+                            if ($group[0]->mapel->has_na) {
+                                $foundScore = collect($group)->first(fn($m) => $m->score !== null)?->score;
+                                $score = $foundScore !== null ? $foundScore : '';
+                            }
                         @endphp
 
                         @foreach ($group as $idx => $mapel)
@@ -490,9 +506,9 @@
                     @endif
                     Kepala SMK Negeri 1 Talaga,
                     <div class="ttd-space"></div>
-                    <div class="nama">Muchamad Eki S.A., S.Kom.</div>
-                    <div>Penata Tingkat I/III/d</div>
-                    <div>NIP. 197610012006041011</div>
+                    <div class="nama">{{ $item->principal->employee->full_name ?? ($item->principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                    <div>{{ $item->principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                    <div>NIP. {{ $item->principal->employee->nip ?? '197610012006041011' }}</div>
                 </div>
             </div>
 

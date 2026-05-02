@@ -220,6 +220,11 @@
                 <td>{{ $program1->name ?? '—' }}</td>
             </tr>
             <tr>
+                <td class="label">Tahun Pelajaran</td>
+                <td class="sep">:</td>
+                <td>{{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
+            </tr>
+            <tr>
                 <td class="label">Alamat</td>
                 <td class="sep">:</td>
                 <td>{{ $student->address ?? '—' }}</td>
@@ -256,16 +261,16 @@
         <p class="pernyataan-text">Demikian pernyataan saya dibuat dengan sadar tanpa paksaan dari pihak mana pun.</p>
 
         <div class="ttd-pernyataan">
+
             <div class="ttd-pernyataan-block">
                 Majalengka, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
                 Yang menyatakan,<br>
-                {{-- SESUDAH (benar) --}}
-                @if ($item->signature?->signature_data)
-                    <img src="{{ $item->signature->signature_data }}" alt="Tanda Tangan" style="height: 60px;">
+                @if ($signature?->signature_data)
+                    <img src="{{ $signature->signature_data }}" alt="Tanda Tangan" style="height: 60px;">
                 @else
                     <div style="height: 60px;"></div>
                 @endif
-                <div class="nama-ttd">{{ $item->student->full_name }}</div>
+                <div class="nama-ttd">{{ $student->full_name }}</div>
                 <div>NISN. {{ $student->national_student_number ?? '—' }}</div>
             </div>
         </div>

@@ -17,7 +17,7 @@
             margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
-            font-size: 9pt;
+            font-size: 10pt;
         }
 
         /* ── ACTION BUTTONS ── */
@@ -87,25 +87,25 @@
         }
 
         .header .line1 {
-            font-size: 14pt;
+            font-size: 15pt;
             font-weight: bold;
             margin: 0;
         }
 
         .header .line2 {
-            font-size: 14pt;
+            font-size: 15pt;
             font-weight: bold;
             margin: 0;
         }
 
         .header .line3 {
-            font-size: 12pt;
+            font-size: 13pt;
             font-weight: bold;
             margin: 0;
         }
 
         .header .address {
-            font-size: 7.5pt;
+            font-size: 8.5pt;
             font-weight: normal;
             text-align: center;
             line-height: 1.2;
@@ -113,13 +113,16 @@
             margin-top: 2px;
         }
 
-        .header-border {
-            border-bottom: 2px solid #000;
-            border-top: 1px solid #000;
-            height: 2px;
-            margin-top: 2px;
-            margin-bottom: 10px;
+                .header-border-top {
+            border-top: 3px solid #000;
+            margin-top: 5px;
         }
+
+        .header-border-thin {
+            border-top: 1px solid #000;
+            margin-top: 2px;
+        }
+
 
         /* JUDUL */
         .doc-title {
@@ -128,14 +131,14 @@
         }
 
         .doc-title h2 {
-            font-size: 11pt;
+            font-size: 14pt;
             font-weight: bold;
             margin: 0;
             text-transform: uppercase;
         }
 
         .doc-title .nomor {
-            font-size: 9pt;
+            font-size: 10pt;
             margin: 0;
         }
 
@@ -163,7 +166,7 @@
         .nilai-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8.5pt;
+            font-size: 10pt;
         }
 
         .nilai-table th,
@@ -288,12 +291,12 @@
                 Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
             </div>
         </div>
-        <div class="header-border"></div>
-
+            <div class="header-border-top"></div>
+            <div class="header-border-thin"></div>
         {{-- JUDUL --}}
         <div class="doc-title">
             <h2>TRANSKRIP NILAI</h2>
-            <div class="nomor">{{ $letter->letter_number ?? '261/TU.01.02/SMK-Tlg.CADISDIKWIL.IX/V/2025' }}</div>
+            <div class="nomor">{{ $letter->letter_number ?? '—' }}</div>
         </div>
 
         {{-- INFO SISWA --}}
@@ -344,6 +347,11 @@
                 <td class="sep">:</td>
                 <td>{{ $program->name ?? '-' }}</td>
             </tr>
+            <tr>
+                <td class="label">Tahun Pelajaran</td>
+                <td class="sep">:</td>
+                <td>{{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
+            </tr>
         </table>
 
         {{-- NILAI TABLE --}}
@@ -383,7 +391,7 @@
                 @foreach ($groupedUmum as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $g = $group[0];
+                        $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
                     @endphp
                     @foreach ($group as $idx => $m)
                         <tr>
@@ -425,7 +433,7 @@
                 @foreach ($groupedJurusan as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $g = $group[0];
+                        $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
                     @endphp
                     @foreach ($group as $idx => $m)
                         <tr>
@@ -463,9 +471,9 @@
                 Talaga, {{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
                 Kepala SMK Negeri 1 Talaga,
                 <div class="ttd-space"></div>
-                <div class="ttd-name">Muchamad Eki S.A., S.Kom.</div>
-                <div>Penata Tingkat I/III/d</div>
-                <div>NIP. 197610012006041011</div>
+                <div class="ttd-name">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
             </div>
         </div>
     </div>

@@ -52,6 +52,10 @@ class GraduationController extends Controller
         // 5. Statistik download dokumen kelulusan
         $totalDownloaders = GoogleStatement::where('print_count', '>', 0)->count();
 
+        $headmasters = \App\Models\User::whereHas('roles', function ($q) {
+            $q->where('code', 'kepala-sekolah');
+        })->with('employee')->get();
+
         return view('admin.graduation.index', compact(
             'mapels',
             'graduations',
@@ -62,7 +66,8 @@ class GraduationController extends Controller
             'expertise',
             'letters',
             'totalDownloaders',
-            'allHaveLetter'
+            'allHaveLetter',
+            'headmasters'
         ));
     }
 

@@ -17,7 +17,7 @@ class GraduationSuratController extends Controller
             return $this->suratKelulusanAll();
         }
 
-        $graduation = GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
+        $graduation = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
             ->where('uuid', $id)
             ->firstOrFail();
 
@@ -37,6 +37,7 @@ class GraduationSuratController extends Controller
         $program1           = $latestAcademicYear?->class?->expertiseProgram;
 
         $signature = (object) ['signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='];
+        $principal = $this->getPrincipal($letter->headmaster_id ?? null);
 
         return view('admin.graduation.surat-kelulusan', compact(
             'graduation',
@@ -48,7 +49,8 @@ class GraduationSuratController extends Controller
             'rataRata',
             'program',
             'program1',
-            'signature'
+            'signature',
+            'principal'
         ));
     }
 
@@ -61,7 +63,7 @@ class GraduationSuratController extends Controller
             return $this->suratPernyataanAll();
         }
 
-        $graduation = GoogleGraduation::with(['user.academicYears.class.expertiseConcentration', 'letter'])
+        $graduation = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseConcentration', 'letter'])
             ->where('uuid', $id)
             ->firstOrFail();
 
@@ -72,13 +74,16 @@ class GraduationSuratController extends Controller
 
         $statement = \App\Models\GoogleStatement::where('user_id', $student->id)->first();
         $signature = $statement?->signature ?? null;
+        $principal = $this->getPrincipal($letter->headmaster_id ?? null);
 
         return view('admin.graduation.surat-pernyataan', compact(
             'graduation',
             'student',
             'user',
             'program1',
-            'signature'
+            'signature',
+            'principal',
+            'letter'
         ));
     }
 
@@ -91,7 +96,7 @@ class GraduationSuratController extends Controller
             return $this->transkripNilaiAll();
         }
 
-        $graduation = GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
+        $graduation = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
             ->where('uuid', $id)
             ->firstOrFail();
 
@@ -109,6 +114,7 @@ class GraduationSuratController extends Controller
         $latestAcademicYear = $student->academicYears->first();
         $program            = $latestAcademicYear?->class?->expertiseConcentration;
         $program1           = $latestAcademicYear?->class?->expertiseProgram;
+        $principal          = $this->getPrincipal($letter->headmaster_id ?? null);
 
         return view('admin.graduation.transkrip-nilai', compact(
             'graduation',
@@ -119,7 +125,8 @@ class GraduationSuratController extends Controller
             'mapelJurusan',
             'rataRata',
             'program',
-            'program1'
+            'program1',
+            'principal'
         ));
     }
 
@@ -127,12 +134,30 @@ class GraduationSuratController extends Controller
     // PRIVATE — export semua
     // =========================================================================
 
+    private function getPrincipal($headmasterId = null)
+    {
+        if ($headmasterId) {
+            $user = \App\Models\User::find($headmasterId);
+        } else {
+            $user = \App\Models\User::whereHas('roles', function ($q) {
+                $q->where('code', 'kepala-sekolah');
+            })->first();
+        }
+
+        if ($user) {
+            $employee = \App\Models\Employee::where('user_id', $user->id)->first();
+            $user->setRelation('employee', $employee);
+        }
+
+        return $user;
+    }
+
     private function suratKelulusanAll()
     {
         $classId     = request('class_id');
         $expertiseId = request('expertise_id');
 
-        $graduations = GoogleGraduation::with(['user.academicYears.class', 'letter', 'mapels.mapel'])
+        $graduations = \App\Models\GoogleGraduation::with(['user.academicYears.class', 'letter', 'mapels.mapel'])
             ->whereHas('user.academicYears.class', function ($q) use ($classId, $expertiseId) {
                 $q->where('academic_level', 12);
                 if ($classId)     $q->where('id', $classId);
@@ -160,8 +185,9 @@ class GraduationSuratController extends Controller
             $program            = $latestAcademicYear?->class?->expertiseConcentration;
             $program1           = $latestAcademicYear?->class?->expertiseProgram;
             $signature          = (object) ['signature_data' => null];
+            $principal          = $this->getPrincipal($letter->headmaster_id ?? null);
 
-            $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'signature');
+            $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'signature', 'principal');
         }
 
         return view('admin.graduation.surat-kelulusan-all', compact('data'));
@@ -172,7 +198,7 @@ class GraduationSuratController extends Controller
         $classId     = request('class_id');
         $expertiseId = request('expertise_id');
 
-        $graduations = GoogleGraduation::with(['user.academicYears.class', 'letter'])
+        $graduations = \App\Models\GoogleGraduation::with(['user.academicYears.class', 'letter'])
             ->whereHas('user.academicYears.class', function ($q) use ($classId, $expertiseId) {
                 $q->where('academic_level', 12);
                 if ($classId)     $q->where('id', $classId);
@@ -192,8 +218,9 @@ class GraduationSuratController extends Controller
 
             $statement = \App\Models\GoogleStatement::where('user_id', $student->id)->first();
             $signature = $statement?->signature ?? null;
+            $principal = $this->getPrincipal($graduation->letter->headmaster_id ?? null);
 
-            $data[] = (object) compact('graduation', 'student', 'user', 'program1', 'signature');
+            $data[] = (object) compact('graduation', 'student', 'user', 'program1', 'signature', 'principal');
         }
 
         return view('admin.graduation.surat-pernyataan-all', compact('data'));
@@ -204,7 +231,7 @@ class GraduationSuratController extends Controller
         $classId     = request('class_id');
         $expertiseId = request('expertise_id');
 
-        $graduations = GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
+        $graduations = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'mapels.mapel'])
             ->whereHas('user.academicYears.class', function ($q) use ($classId, $expertiseId) {
                 $q->where('academic_level', 12);
                 if ($classId)     $q->where('id', $classId);
@@ -231,10 +258,11 @@ class GraduationSuratController extends Controller
             $latestAcademicYear = $student->academicYears->first();
             $program            = $latestAcademicYear?->class?->expertiseConcentration;
             $program1           = $latestAcademicYear?->class?->expertiseProgram;
+            $principal          = $this->getPrincipal($letter->headmaster_id ?? null);
 
-            $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1');
+            $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'principal', 'letter');
         }
 
-        return view('admin.graduation.transkrip-nilai-all', compact('data'));
+        return view('admin.graduation.transkrip-nilai-all', compact('data', 'principal'));
     }
 }

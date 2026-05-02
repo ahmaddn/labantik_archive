@@ -223,6 +223,11 @@
                     <td>{{ $item->program1->name ?? '—' }}</td>
                 </tr>
                 <tr>
+                    <td class="label">Tahun Pelajaran</td>
+                    <td class="sep">:</td>
+                    <td>{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}</td>
+                </tr>
+                <tr>
                     <td class="label">Alamat</td>
                     <td class="sep">:</td>
                     <td>{{ $item->student->address ?? '—' }}</td>
@@ -263,10 +268,10 @@
             </p>
 
             <div class="ttd-pernyataan">
+
                 <div class="ttd-pernyataan-block">
                     Majalengka, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
                     Yang menyatakan,<br>
-                    {{-- SESUDAH (benar) --}}
                     @if ($item->signature?->signature_data)
                         <img src="{{ $item->signature->signature_data }}" alt="Tanda Tangan" style="height: 60px;">
                     @else

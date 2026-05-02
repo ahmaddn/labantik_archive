@@ -46,6 +46,12 @@
                                 Nomor Surat</th>
                             <th
                                 class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-3 pr-4">
+                                Tahun Pelajaran</th>
+                            <th
+                                class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-3 pr-4">
+                                Kepala Sekolah</th>
+                            <th
+                                class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-3 pr-4">
                                 Tanggal Kelulusan</th>
                             <th
                                 class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-3 pr-4">
@@ -63,6 +69,15 @@
                                 <td class="py-3.5 pr-4 text-gray-500 font-medium">{{ $index + 1 }}</td>
                                 <td class="py-3.5 pr-4">
                                     <span class="font-semibold text-gray-800">{{ $letter->letter_number }}</span>
+                                </td>
+                                <td class="py-3.5 pr-4 text-gray-600">
+                                    {{ $letter->academic_year ?? '-' }}
+                                </td>
+                                <td class="py-3.5 pr-4 text-gray-600">
+                                    @php
+                                        $hm = $headmasters->firstWhere('id', $letter->headmaster_id);
+                                    @endphp
+                                    {{ $hm->employee->full_name ?? ($hm->name ?? '-') }}
                                 </td>
                                 <td class="py-3.5 pr-4 text-gray-600">
                                     {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('d F Y') }}
@@ -94,7 +109,7 @@
                                         class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         {{-- Tombol Preview --}}
                                         <button
-                                            onclick="previewLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }})"
+                                            onclick="previewLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }})"
                                             class="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                                             title="Preview">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -108,7 +123,7 @@
 
                                         {{-- Tombol Edit --}}
                                         <button
-                                            onclick="editLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }})"
+                                            onclick="editLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }})"
                                             class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                             title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -175,25 +190,56 @@
 
                 <div class="px-6 py-5 space-y-4">
 
-                    {{-- Nomor Surat --}}
-                    <div>
-                        <label for="letter_number" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Nomor Surat <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" id="letter_number" name="letter_number"
-                            placeholder="Contoh: 260/TU.01.02/SMK-Tig.CADISDIKWIL.IX/V/2025"
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
-                            required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Nomor Surat --}}
+                        <div>
+                            <label for="letter_number" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Nomor Surat <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="letter_number" name="letter_number"
+                                placeholder="Contoh: 260/TU.01.02/SMK-Tig.CADISDIKWIL.IX/V/2025"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
+                                required>
+                        </div>
+
+                        {{-- Tahun Pelajaran --}}
+                        <div>
+                            <label for="academic_year" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Tahun Pelajaran <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="academic_year" name="academic_year"
+                                placeholder="Contoh: 2025/2026"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
+                                required>
+                        </div>
                     </div>
 
-                    {{-- Tanggal Kelulusan --}}
-                    <div>
-                        <label for="graduation_date" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Tanggal Kelulusan <span class="text-red-500">*</span>
-                        </label>
-                        <input type="date" id="graduation_date" name="graduation_date"
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                            required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Tanggal Kelulusan --}}
+                        <div>
+                            <label for="graduation_date" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Tanggal Kelulusan <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" id="graduation_date" name="graduation_date"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                required>
+                        </div>
+
+                        {{-- Kepala Sekolah --}}
+                        <div>
+                            <label for="headmaster_id" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Kepala Sekolah <span class="text-red-500">*</span>
+                            </label>
+                            <select id="headmaster_id" name="headmaster_id"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                required>
+                                <option value="">Pilih Kepala Sekolah</option>
+                                @foreach ($headmasters as $hm)
+                                    <option value="{{ $hm->id }}">
+                                        {{ $hm->employee->full_name ?? ($hm->name ?? 'Tanpa Nama') }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     {{-- Statement (Kepala Sekolah sampai Berdasarkan) --}}
@@ -205,10 +251,10 @@
                             Isi bagian pembuka: dari "Kepala SMK..." hingga "...berdasarkan:". Contoh:
                             <em class="text-gray-500">Kepala SMK Negeri 1 Talaga Selaku Ketua Penyelenggara Ujian
                                 Sekolah
-                                Tahun Pelajaran 2025/2026 berdasarkan:</em>
+                                Tahun Pelajaran [TAHUN_PELAJARAN] berdasarkan:</em>
                         </p>
                         <textarea id="statement" name="statement" rows="4"
-                            placeholder="Kepala SMK Negeri 1 Talaga Selaku Ketua Penyelenggara Ujian Sekolah Tahun Pelajaran 2025/2026 berdasarkan:"
+                            placeholder="Kepala SMK Negeri 1 Talaga Selaku Ketua Penyelenggara Ujian Sekolah Tahun Pelajaran [TAHUN_PELAJARAN] berdasarkan:"
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400 resize-none"
                             required></textarea>
                     </div>
@@ -384,6 +430,8 @@
         document.getElementById('letterForm').action = '{{ route('admin.graduation.letter.store') }}';
         document.getElementById('letterUuid').value = '';
         document.getElementById('letter_number').value = '';
+        document.getElementById('academic_year').value = '';
+        document.getElementById('headmaster_id').value = '';
         document.getElementById('graduation_date').value = '';
         document.getElementById('statement').value = '';
         // Reset editor
@@ -397,13 +445,15 @@
         document.getElementById('letterModal').classList.add('hidden');
     }
 
-    function editLetter(uuid, letterNumber, graduationDate, statement, content) {
+    function editLetter(uuid, letterNumber, graduationDate, statement, content, academicYear, headmasterId) {
         document.getElementById('letterModalTitle').textContent = 'Edit Template Surat';
         document.getElementById('letterSubmitText').textContent = 'Perbarui Template';
         document.getElementById('letterFormMethod').value = 'PUT';
         document.getElementById('letterForm').action = `/admin/graduation/letter/${uuid}`;
         document.getElementById('letterUuid').value = uuid;
         document.getElementById('letter_number').value = letterNumber;
+        document.getElementById('academic_year').value = academicYear || '';
+        document.getElementById('headmaster_id').value = headmasterId || '';
         document.getElementById('graduation_date').value = graduationDate;
         document.getElementById('statement').value = statement;
         // Load ke editor

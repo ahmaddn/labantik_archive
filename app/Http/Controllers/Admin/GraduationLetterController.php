@@ -15,11 +15,16 @@ class GraduationLetterController extends Controller
     {
         $validated = $request->validate([
             'letter_number'   => 'required|string|max:255',
+            'academic_year'   => 'required|string|max:10',
+            'headmaster_id'   => 'required|exists:core_users,id',
             'graduation_date' => 'required|date',
             'statement'       => 'required|string',
             'content'         => 'required|string',
         ], [
             'letter_number.required'   => 'Nomor surat harus diisi',
+            'academic_year.required'   => 'Tahun pelajaran harus diisi',
+            'headmaster_id.required'   => 'Kepala sekolah harus dipilih',
+            'headmaster_id.exists'     => 'Kepala sekolah tidak valid',
             'graduation_date.required' => 'Tanggal kelulusan harus diisi',
             'graduation_date.date'     => 'Format tanggal tidak valid',
             'statement.required'       => 'Pernyataan kepala sekolah harus diisi',
@@ -58,11 +63,16 @@ class GraduationLetterController extends Controller
 
         $validated = $request->validate([
             'letter_number'   => 'required|string|max:255',
+            'academic_year'   => 'required|string|max:10',
+            'headmaster_id'   => 'required|exists:core_users,id',
             'graduation_date' => 'required|date',
             'statement'       => 'required|string',
             'content'         => 'required|string',
         ], [
             'letter_number.required'   => 'Nomor surat harus diisi',
+            'academic_year.required'   => 'Tahun pelajaran harus diisi',
+            'headmaster_id.required'   => 'Kepala sekolah harus dipilih',
+            'headmaster_id.exists'     => 'Kepala sekolah tidak valid',
             'graduation_date.required' => 'Tanggal kelulusan harus diisi',
             'graduation_date.date'     => 'Format tanggal tidak valid',
             'statement.required'       => 'Pernyataan kepala sekolah harus diisi',

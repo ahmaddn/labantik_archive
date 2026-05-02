@@ -309,7 +309,10 @@
         {{-- TEKS PEMBUKA (dari google_graduation_letters) --}}
         <div class="pembuka">
             @if ($letter)
-                <p>{{ $letter->statement }}</p>
+                @php
+                    $displayStatement = str_replace('[TAHUN_PELAJARAN]', $letter->academic_year ?? '', $letter->statement);
+                @endphp
+                <p>{{ $displayStatement }}</p>
                 @php
                     $contentLines = array_filter(array_map('trim', explode("\n", $letter->content)));
                 @endphp
@@ -365,6 +368,11 @@
                 <td style="padding:0;">{{ strtoupper($program->name ?? '—') }}</td>
             </tr>
             <tr>
+                <td class="label" style="padding:0;">Tahun Pelajaran</td>
+                <td class="sep" style="padding:0;">:</td>
+                <td style="padding:0;">{{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
+            </tr>
+            <tr>
                 <td class="label" style="padding:0;">Dinyatakan</td>
                 <td class="sep" style="padding:0;">:</td>
                 <td class="dinyatakan-lulus" style="padding:0;">LULUS</td>
@@ -407,7 +415,11 @@
                 @foreach ($groupedUmum as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
+                        $score = '-';
+                        if ($group[0]->mapel->has_na) {
+                            $foundScore = collect($group)->first(fn($m) => $m->score !== null)?->score;
+                            $score = $foundScore !== null ? $foundScore : '';
+                        }
                     @endphp
                     @foreach ($group as $idx => $mapel)
                         <tr>
@@ -449,7 +461,11 @@
                 @foreach ($groupedJurusan as $key => $group)
                     @php
                         $rowspan = count($group);
-                        $score = $group[0]->mapel->has_na ? ($group[0]->score !== null ? $group[0]->score : '') : '-';
+                        $score = '-';
+                        if ($group[0]->mapel->has_na) {
+                            $foundScore = collect($group)->first(fn($m) => $m->score !== null)?->score;
+                            $score = $foundScore !== null ? $foundScore : '';
+                        }
                     @endphp
                     @foreach ($group as $idx => $mapel)
                         <tr>
@@ -490,9 +506,9 @@
                 @endif
                 Kepala SMK Negeri 1 Talaga,
                 <div class="ttd-space"></div>
-                <div class="nama">Muchamad Eki S.A., S.Kom.</div>
-                <div>Penata Tingkat I/III/d</div>
-                <div>NIP. 197610012006041011</div>
+                <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
             </div>
         </div>
 

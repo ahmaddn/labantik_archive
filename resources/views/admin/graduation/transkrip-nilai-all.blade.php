@@ -17,7 +17,7 @@
             margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
-            font-size: 9pt;
+            font-size: 10pt;
         }
 
         /* ── ACTION BUTTONS ── */
@@ -76,9 +76,7 @@
         /* KOP SURAT */
         .header {
             text-align: center;
-            padding-bottom: 5px;
             padding-left: 80px;
-            margin-bottom: 5px;
             position: relative;
             min-height: 90px;
         }
@@ -92,25 +90,25 @@
         }
 
         .header .line1 {
-            font-size: 14pt;
+            font-size: 15pt;
             font-weight: bold;
             margin: 0;
         }
 
         .header .line2 {
-            font-size: 14pt;
+            font-size: 15pt;
             font-weight: bold;
             margin: 0;
         }
 
         .header .line3 {
-            font-size: 12pt;
+            font-size: 13pt;
             font-weight: bold;
             margin: 0;
         }
 
         .header .address {
-            font-size: 7.5pt;
+            font-size: 8.5pt;
             font-weight: normal;
             text-align: center;
             line-height: 1.2;
@@ -118,12 +116,14 @@
             margin-top: 2px;
         }
 
-        .header-border {
-            border-bottom: 2px solid #000;
+        .header-border-top {
+            border-top: 3px solid #000;
+            margin-top: 5px;
+        }
+
+        .header-border-thin {
             border-top: 1px solid #000;
-            height: 2px;
             margin-top: 2px;
-            margin-bottom: 10px;
         }
 
         /* JUDUL */
@@ -133,14 +133,14 @@
         }
 
         .doc-title h2 {
-            font-size: 11pt;
+            font-size: 14pt;
             font-weight: bold;
             margin: 0;
             text-transform: uppercase;
         }
 
         .doc-title .nomor {
-            font-size: 9pt;
+            font-size: 10pt;
             margin: 0;
         }
 
@@ -168,7 +168,7 @@
         .nilai-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8.5pt;
+            font-size: 10pt;
         }
 
         .nilai-table th,
@@ -287,21 +287,23 @@
                 <div class="line2">CABANG DINAS PENDIDIKAN WILAYAH IX</div>
                 <div class="line3">SEKOLAH MENENGAH KEJURUAN NEGERI 1 TALAGA</div>
                 <div class="address">
-                    Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan Manajemen<br />
+                    Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan
+                    Manajemen<br />
                     Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
                     Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
                     Telpon ☎ (0233) 319238 FAX ☎ (0233) 319238 POS ✉ 45463 NPSN: 20213872<br />
                     Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
                 </div>
             </div>
-            <div class="header-border"></div>
-
+                        <div class="header-border-top"></div>
+            <div class="header-border-thin"></div>
             {{-- JUDUL --}}
             <div class="doc-title">
                 <h2>TRANSKRIP NILAI</h2>
-                <div class="nomor">{{ $item->letter->letter_number ?? '261/TU.01.02/SMK-Tlg.CADISDIKWIL.IX/V/2025' }}
+                <div class="nomor">{{ $item->letter->letter_number ?? '—' }}
                 </div>
             </div>
+
 
             {{-- INFO SISWA --}}
             <table class="info-table">
@@ -351,6 +353,11 @@
                     <td class="sep">:</td>
                     <td>{{ $item->program->name ?? '-' }}</td>
                 </tr>
+                <tr>
+                    <td class="label">Tahun Pelajaran</td>
+                    <td class="sep">:</td>
+                    <td>{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}</td>
+                </tr>
             </table>
 
             {{-- NILAI TABLE --}}
@@ -390,25 +397,42 @@
                     @foreach ($groupedUmum as $key => $group)
                         @php
                             $rowspan = count($group);
-                            $g = $group[0];
+                            $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
                         @endphp
                         @foreach ($group as $idx => $m)
                             <tr>
                                 @if ($idx === 0)
-                                    <td class="col-no" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    <td class="col-no"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
                                         {{ $noUmum }}
                                     </td>
                                 @endif
                                 <td class="col-mapel">{{ $m->mapel->name }}</td>
                                 @if ($idx === 0)
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_1 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_2 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_3 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_4 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
-                                    <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
-                                    <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_1 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_2 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_3 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_4 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_5 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_6 }}</td>
+                                    <td class="col-nr"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->nr }}</td>
+                                    <td class="col-na"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $m->mapel->has_na ? $g->score : '-' }}</td>
                                 @endif
                             </tr>
                         @endforeach
@@ -432,25 +456,42 @@
                     @foreach ($groupedJurusan as $key => $group)
                         @php
                             $rowspan = count($group);
-                            $g = $group[0];
+                            $g = collect($group)->first(fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null) ?? $group[0];
                         @endphp
                         @foreach ($group as $idx => $m)
                             <tr>
                                 @if ($idx === 0)
-                                    <td class="col-no" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    <td class="col-no"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
                                         {{ $noJurusan }}
                                     </td>
                                 @endif
                                 <td class="col-mapel">{{ $m->mapel->name }}</td>
                                 @if ($idx === 0)
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_1 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_2 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_3 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_4 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
-                                    <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
-                                    <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
-                                    <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_1 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_2 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_3 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_4 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_5 }}</td>
+                                    <td class="col-semester"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->sem_6 }}</td>
+                                    <td class="col-nr"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $g->nr }}</td>
+                                    <td class="col-na"
+                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                        {{ $m->mapel->has_na ? $g->score : '-' }}</td>
                                 @endif
                             </tr>
                         @endforeach
@@ -471,9 +512,9 @@
                     {{ $item->letter ? \Carbon\Carbon::parse($item->letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
                     Kepala SMK Negeri 1 Talaga,
                     <div class="ttd-space"></div>
-                    <div class="ttd-name">Muchamad Eki S.A., S.Kom.</div>
-                    <div>Penata Tingkat I/III/d</div>
-                    <div>NIP. 197610012006041011</div>
+                    <div class="ttd-name">{{ $item->principal->employee->full_name ?? ($item->principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                    <div>{{ $item->principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                    <div>NIP. {{ $item->principal->employee->nip ?? '197610012006041011' }}</div>
                 </div>
             </div>
         </div>
