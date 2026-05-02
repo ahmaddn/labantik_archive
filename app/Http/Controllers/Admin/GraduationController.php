@@ -7,6 +7,7 @@ use App\Models\GoogleGraduation;
 use App\Models\GoogleGraduationLetter;
 use App\Models\GoogleGraduationMapel;
 use App\Models\GoogleMapel;
+use App\Models\GoogleStatement;
 use App\Models\RefClass;
 use App\Models\RefStudent;
 use App\Models\ExpertiseConcentration;

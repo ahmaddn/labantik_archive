@@ -146,6 +146,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/graduation/letter/{id}',     [GraduationLetterController::class, 'destroy'])->name('graduation.letter.destroy');
 
     // ── Graduation CRUD — dynamic {id} HARUS paling bawah ────────────────────
+    Route::get('/graduation/downloaders',       [GraduationController::class, 'downloaders'])->name('graduation.downloaders');
     Route::get('/graduation/create',             [GraduationController::class, 'create'])->name('graduation.create');
     Route::get('/graduation/create-transcript',  [GraduationController::class, 'createTranscript'])->name('graduation.createTranscript');
     Route::post('/graduation/store',             [GraduationController::class, 'store'])->name('graduation.store');
