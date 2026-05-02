@@ -72,15 +72,20 @@
                 <tr>
                     <td class="w-56 align-top py-0.5">Nama Lengkap</td>
                     <td class="w-4 align-top py-0.5">:</td>
-                    @php
-                            $student = \Illuminate\Support\Facades\DB::table('ref_students')
-                                ->where('user_id', auth()->id())
+                        @php
+                            $student = \App\Models\RefStudent::where('user_id', auth()->id())->first();
+
+                            $latestAcademicYear = \App\Models\RefStudentAcademicYear::with([
+                                'class.expertiseConcentration',
+                                'class.expertiseProgram',
+                            ])
+                                ->where('student_id', $student?->id)
+                                ->latest()
                                 ->first();
-                            $program = \Illuminate\Support\Facades\DB::table('ref_classes')
-                                ->join('core_expertise_concentrations', 'ref_classes.expertise_concentration_id', '=', 'core_expertise_concentrations.id')
-                                ->where('ref_classes.id', auth()->user()->class_id)
-                                ->select('core_expertise_concentrations.name as program_name')
-                                ->first();
+
+                            $refClass = $latestAcademicYear?->class;
+                            $programName = $refClass?->expertiseConcentration?->name ?? '—';
+                            $programKeahlian = $refClass?->expertiseProgram?->name ?? '—';
                         @endphp
                     <td class="py-0.5"><strong>{{ $student->full_name ?? '—' }}</strong></td>
                 </tr>
@@ -110,7 +115,12 @@
                 <tr>
                     <td class="align-top py-0.5">Program Keahlian</td>
                     <td class="py-0.5">:</td>
-                    <td class="py-0.5">{{ $program->program_name ?? '—' }}</td>
+                    <td class="py-0.5">{{ $programKeahlian }}</td>
+                </tr>
+                <tr>
+                    <td class="align-top py-0.5">Konsentrasi Keahlian</td>
+                    <td class="py-0.5">:</td>
+                    <td class="py-0.5">{{ $programName }}</td>
                 </tr>
                 <tr>
                     <td class="align-top py-0.5">Alamat</td>
