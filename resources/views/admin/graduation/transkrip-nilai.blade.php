@@ -361,7 +361,6 @@
                     <th rowspan="2" class="col-no">No</th>
                     <th rowspan="2">Mata Pelajaran</th>
                     <th colspan="7">Nilai Rapor</th>
-                    <th rowspan="2" class="col-na">NA</th>
                 </tr>
                 <tr>
                     <th class="col-semester">1</th>
@@ -376,7 +375,7 @@
             <tbody>
                 {{-- A. Kelompok Mata Pelajaran Umum --}}
                 <tr class="group-header">
-                    <td colspan="10">A. Kelompok Mata Pelajaran Umum</td>
+                    <td colspan="9">A. Kelompok Mata Pelajaran Umum</td>
                 </tr>
                 @php
                     $noUmum = 1;
@@ -409,7 +408,6 @@
                                 <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
                                 <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
                                 <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
-                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
                             @endif
                         </tr>
                     @endforeach
@@ -418,7 +416,7 @@
 
                 {{-- B. Kelompok Mata Pelajaran Kejuruan --}}
                 <tr class="group-header">
-                    <td colspan="10">B. Kelompok Mata Pelajaran Kejuruan</td>
+                    <td colspan="9">B. Kelompok Mata Pelajaran Kejuruan</td>
                 </tr>
                 @php
                     $noJurusan = 1;
@@ -451,7 +449,6 @@
                                 <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
                                 <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
                                 <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
-                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
                             @endif
                         </tr>
                     @endforeach
@@ -459,11 +456,15 @@
                 @endforeach
 
                 <tr class="rata-rata">
-                    <td colspan="9">Rata-rata</td>
-                    <td class="col-na">{{ $rataRata }}</td>
+                    <td colspan="8">Rata-rata</td>
+                    <td class="col-nr">{{ $rataRata }}</td>
                 </tr>
             </tbody>
         </table>
+
+        <div style="font-size: 8pt; margin-top: 5px; font-style: italic;">
+            * NR = Nilai Rapor
+        </div>
 
         {{-- TANDA TANGAN --}}
         <div class="ttd-section">
