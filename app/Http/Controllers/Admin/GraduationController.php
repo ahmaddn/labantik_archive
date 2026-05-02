@@ -48,6 +48,9 @@ class GraduationController extends Controller
             $q->where('academic_level', 12);
         })->whereNull('letter_id')->doesntExist();
 
+        // 5. Statistik download dokumen kelulusan
+        $totalDownloaders = GoogleStatement::where('print_count', '>', 0)->count();
+
         return view('admin.graduation.index', compact(
             'mapels',
             'graduations',
@@ -57,13 +60,34 @@ class GraduationController extends Controller
             'classes',
             'expertise',
             'letters',
+            'totalDownloaders',
             'allHaveLetter'
         ));
     }
 
     /**
-     * Show form tambah kelulusan siswa
+     * Display a paginated listing of students who downloaded the graduation document.
      */
+    public function downloaders(Request $request)
+    {
+        $search = $request->input('search');
+
+        $downloadersQuery = GoogleStatement::with('user')
+            ->where('print_count', '>', 0)
+            ->orderByDesc('print_count');
+
+        if (!empty($search)) {
+            $downloadersQuery->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $downloaders = $downloadersQuery->paginate(15)->withQueryString();
+
+        return view('admin.graduation.downloaders', compact('downloaders', 'search'));
+    }
+
+
     public function create()
     {
         $classes = RefClass::with('expertiseConcentration')

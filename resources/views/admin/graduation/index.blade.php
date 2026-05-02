@@ -101,7 +101,7 @@
     </div>
 
     {{-- Stats --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
             <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#1b84ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,6 +138,23 @@
                 <p class="text-xs text-gray-500 font-medium">Siswa Lulus</p>
             </div>
         </div>
+        <a href="{{ route('admin.graduation.downloaders') }}" class="text-left w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 flex items-center gap-3 sm:gap-4 hover:border-orange-300 hover:shadow-md transition-all duration-200 cursor-pointer">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-xl sm:text-2xl font-extrabold text-gray-900">{{ $totalDownloaders }}</p>
+                <p class="text-xs text-gray-500 font-medium">Siswa Yang Mendownload Dokumen</p>
+            </div>
+            <div class="ml-auto">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </a>
     </div>
 
     {{-- Daftar Mapel --}}
@@ -229,7 +246,6 @@
     </div>
 
     @include('admin._partials.graduation_letter_section', ['letters' => $letters])
-
 
     {{-- ===================================================== --}}
     {{-- MODAL: Download Template                              --}}
@@ -379,7 +395,9 @@
         }
 
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeDownloadModal();
+            if (e.key === 'Escape') {
+                closeDownloadModal();
+            }
         });
     </script>
 @endsection
