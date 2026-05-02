@@ -324,6 +324,183 @@
             text-decoration: underline;
         }
 
+        /* ═══════════════════════════════════════════
+           HALAMAN 2 — TRANSKRIP NILAI
+        ═══════════════════════════════════════════ */
+        .page-transkrip {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto 20px auto;
+            padding: 10mm 15mm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            position: relative;
+        }
+
+        .transkrip-header {
+            text-align: center;
+            padding-bottom: 5px;
+            padding-left: 80px;
+            margin-bottom: 5px;
+            position: relative;
+            min-height: 90px;
+        }
+
+        .transkrip-header img {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: auto;
+            height: 110px;
+        }
+
+        .transkrip-header .line1 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .transkrip-header .line2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .transkrip-header .line3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .transkrip-header .address {
+            font-size: 7.5pt;
+            font-weight: normal;
+            text-align: center;
+            line-height: 1.2;
+            color: #000;
+            margin-top: 2px;
+        }
+
+        .transkrip-header-border {
+            border-bottom: 2px solid #000;
+            border-top: 1px solid #000;
+            height: 2px;
+            margin-top: 2px;
+            margin-bottom: 10px;
+        }
+
+        .transkrip-doc-title {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .transkrip-doc-title h2 {
+            font-size: 11pt;
+            font-weight: bold;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .transkrip-doc-title .nomor {
+            font-size: 9pt;
+            margin: 0;
+        }
+
+        .transkrip-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 9pt;
+        }
+
+        .transkrip-info-table td {
+            padding: 1px 2px;
+            vertical-align: top;
+        }
+
+        .transkrip-info-table .label {
+            width: 180px;
+        }
+
+        .transkrip-info-table .sep {
+            width: 10px;
+        }
+
+        .transkrip-nilai-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+        }
+
+        .transkrip-nilai-table th,
+        .transkrip-nilai-table td {
+            border: 1px solid #000;
+            padding: 2px 4px;
+        }
+
+        .transkrip-nilai-table th {
+            background-color: #fff;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .transkrip-nilai-table .col-no {
+            width: 30px;
+            text-align: center;
+        }
+
+        .transkrip-nilai-table .col-mapel {
+            text-align: left;
+        }
+
+        .transkrip-nilai-table .col-semester {
+            width: 25px;
+            text-align: center;
+        }
+
+        .transkrip-nilai-table .col-nr {
+            width: 30px;
+            text-align: center;
+        }
+
+        .transkrip-nilai-table .col-na {
+            width: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .transkrip-nilai-table .group-header {
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .transkrip-nilai-table .rata-rata {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .transkrip-ttd-section {
+            margin-top: 15px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            font-size: 9pt;
+        }
+
+        .transkrip-ttd-block {
+            width: 250px;
+            text-align: left;
+        }
+
+        .transkrip-ttd-space {
+            height: 50px;
+        }
+
+        .transkrip-ttd-name {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
         /* ── PRINT ── */
         @media print {
             .action-buttons {
@@ -341,6 +518,16 @@
                 box-shadow: none;
                 width: 100%;
                 padding: 8mm 15mm 10mm 15mm;
+            }
+
+            .page-transkrip {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                padding: 10mm 15mm;
+                /* Selalu mulai di halaman baru */
+                page-break-before: always;
+                break-before: page;
             }
 
             .page-pernyataan {
@@ -590,7 +777,207 @@
     </div>{{-- end .page (halaman 1) --}}
 
     {{-- ══════════════════════════════════════
-         HALAMAN 2: SURAT PERNYATAAN/FAKTA INTEGRITAS
+         HALAMAN 2: TRANSKRIP NILAI
+    ══════════════════════════════════════ --}}
+    <div class="page-transkrip" style="font-size: 9pt;">
+        {{-- KOP SURAT --}}
+        <div class="transkrip-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Coat_of_arms_of_West_Java.svg/500px-Coat_of_arms_of_West_Java.svg.png"
+                alt="Logo" />
+            <div class="line1">PEMERINTAH DAERAH PROVINSI JAWA BARAT</div>
+            <div class="line2">CABANG DINAS PENDIDIKAN WILAYAH IX</div>
+            <div class="line3">SEKOLAH MENENGAH KEJURUAN NEGERI 1 TALAGA</div>
+            <div class="address">
+                Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan Manajemen<br />
+                Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
+                Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
+                Telpon ☎ (0233) 319238 FAX ☎ (0233) 319238 POS ✉ 45463 NPSN: 20213872<br />
+                Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
+            </div>
+        </div>
+        <div class="transkrip-header-border"></div>
+
+        {{-- JUDUL --}}
+        <div class="transkrip-doc-title">
+            <h2>TRANSKRIP NILAI</h2>
+            <div class="nomor">{{ $letter->letter_number ?? '261/TU.01.02/SMK-Tlg.CADISDIKWIL.IX/V/2025' }}</div>
+        </div>
+
+        {{-- INFO SISWA --}}
+        <table class="transkrip-info-table">
+            <tr>
+                <td class="label">Satuan Pendidikan</td>
+                <td class="sep">:</td>
+                <td>SMKN 1 Talaga</td>
+            </tr>
+            <tr>
+                <td class="label">Nomor Pokok Sekolah Nasional</td>
+                <td class="sep">:</td>
+                <td>20213872</td>
+            </tr>
+            <tr>
+                <td class="label">Nama Lengkap</td>
+                <td class="sep">:</td>
+                <td style="font-weight:bold;">{{ strtoupper($student->full_name) }}</td>
+            </tr>
+            <tr>
+                <td class="label">Tempat, Tanggal Lahir</td>
+                <td class="sep">:</td>
+                <td>{{ $student->birth_place_date ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Nomor Induk Siswa Nasional</td>
+                <td class="sep">:</td>
+                <td>{{ $student->national_student_number ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Nomor Ijazah</td>
+                <td class="sep">:</td>
+                <td>{{ $student->diploma_number ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Tanggal Kelulusan</td>
+                <td class="sep">:</td>
+                <td>{{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Program Keahlian</td>
+                <td class="sep">:</td>
+                <td>{{ $program1->program1_name ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Konsentrasi Keahlian</td>
+                <td class="sep">:</td>
+                <td>{{ $program->program_name ?? '-' }}</td>
+            </tr>
+        </table>
+
+        {{-- NILAI TABLE --}}
+        <table class="transkrip-nilai-table">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="col-no">No</th>
+                    <th rowspan="2">Mata Pelajaran</th>
+                    <th colspan="7">Nilai Rapor</th>
+                    <th rowspan="2" class="col-na">NA</th>
+                </tr>
+                <tr>
+                    <th class="col-semester">1</th>
+                    <th class="col-semester">2</th>
+                    <th class="col-semester">3</th>
+                    <th class="col-semester">4</th>
+                    <th class="col-semester">5</th>
+                    <th class="col-semester">6</th>
+                    <th class="col-nr">NR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{-- A. Kelompok Mata Pelajaran Umum --}}
+                <tr class="group-header">
+                    <td colspan="10">A. Kelompok Mata Pelajaran Umum</td>
+                </tr>
+                @php
+                    $noUmumTr = 1;
+                    $groupedUmum = [];
+                    foreach ($transkripUmum as $m) {
+                        $joinVal = $m->mapel->join ?? 0;
+                        $key = $joinVal == 0 ? 'solo_' . $m->id : 'grp_' . $joinVal;
+                        $groupedUmum[$key][] = $m;
+                    }
+                @endphp
+
+                @foreach ($groupedUmum as $key => $group)
+                    @php
+                        $rowspan = count($group);
+                        $g = $group[0];
+                    @endphp
+                    @foreach ($group as $idx => $m)
+                        <tr>
+                            @if ($idx === 0)
+                                <td class="col-no" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $noUmumTr }}
+                                </td>
+                            @endif
+                            <td class="col-mapel">{{ $m->mapel->name }}</td>
+                            @if ($idx === 0)
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_1 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_2 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_3 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_4 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
+                                <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
+                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
+                            @endif
+                        </tr>
+                    @endforeach
+                    @php $noUmumTr++; @endphp
+                @endforeach
+
+                {{-- B. Kelompok Mata Pelajaran Kejuruan --}}
+                <tr class="group-header">
+                    <td colspan="10">B. Kelompok Mata Pelajaran Kejuruan</td>
+                </tr>
+                @php
+                    $noJurusanTr = 1;
+                    $groupedJurusan = [];
+                    foreach ($transkripJurusan as $m) {
+                        $joinVal = $m->mapel->join ?? 0;
+                        $key = $joinVal == 0 ? 'solo_' . $m->id : 'grp_' . $joinVal;
+                        $groupedJurusan[$key][] = $m;
+                    }
+                @endphp
+
+                @foreach ($groupedJurusan as $key => $group)
+                    @php
+                        $rowspan = count($group);
+                        $g = $group[0];
+                    @endphp
+                    @foreach ($group as $idx => $m)
+                        <tr>
+                            @if ($idx === 0)
+                                <td class="col-no" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $noJurusanTr }}
+                                </td>
+                            @endif
+                            <td class="col-mapel">{{ $m->mapel->name }}</td>
+                            @if ($idx === 0)
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_1 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_2 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_3 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_4 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_5 }}</td>
+                                <td class="col-semester" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->sem_6 }}</td>
+                                <td class="col-nr" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $g->nr }}</td>
+                                <td class="col-na" @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>{{ $m->mapel->has_na ? $g->score : '-' }}</td>
+                            @endif
+                        </tr>
+                    @endforeach
+                    @php $noJurusanTr++; @endphp
+                @endforeach
+
+                <tr class="rata-rata">
+                    <td colspan="9">Rata-rata</td>
+                    <td class="col-na">{{ $rataRata }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {{-- TANDA TANGAN --}}
+        <div class="transkrip-ttd-section">
+            <div class="transkrip-ttd-block">
+                Talaga, {{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
+                Kepala SMK Negeri 1 Talaga,
+                <div class="transkrip-ttd-space"></div>
+                <div class="transkrip-ttd-name">Muchamad Eki S.A., S.Kom.</div>
+                <div>Penata Tingkat I/III/d</div>
+                <div>NIP. 197610012006041011</div>
+            </div>
+        </div>
+    </div>{{-- end .page-transkrip (halaman 2) --}}
+
+    {{-- ══════════════════════════════════════
+         HALAMAN 3: SURAT PERNYATAAN/FAKTA INTEGRITAS
          page-break-before: always (di CSS print)
     ══════════════════════════════════════ --}}
     <div class="page-pernyataan">
