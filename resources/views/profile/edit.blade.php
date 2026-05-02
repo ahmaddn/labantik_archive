@@ -52,7 +52,7 @@
                     <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
                         Nama Lengkap <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="name" name="name"
+                    <input type="text" id="name" name="name" readonly
                            value="{{ old('name', auth()->user()->name) }}"
                            class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm
                                   focus:ring-2 focus:ring-[#1b84ff]/30 focus:border-[#1b84ff] transition-colors

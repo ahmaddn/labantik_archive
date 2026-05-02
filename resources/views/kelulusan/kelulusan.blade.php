@@ -64,6 +64,7 @@
             margin: 0 auto 20px auto;
             padding: 8mm 15mm 10mm 15mm;
             box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            position: relative;
         }
 
         /* ═══════════════════════════════════════════
@@ -84,7 +85,7 @@
             left: 0;
             top: 0;
             width: auto;
-            height: 100px;
+            height: 135px;
         }
 
         .header .line1 {
@@ -250,6 +251,7 @@
             margin: 0 auto;
             padding: 20mm 20mm 20mm 25mm;
             box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            position: relative;
         }
 
         h2.judul-pernyataan {
@@ -545,6 +547,42 @@
             size: A4 portrait;
             margin: 0;
         }
+
+        /* ── QR FOOTER ── */
+        .doc-qr-footer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-top: 1.5px solid #000;
+            font-size: 7.5pt;
+            font-family: Arial, sans-serif;
+            position: absolute;
+            bottom: 10mm;
+            left: 15mm;
+            right: 15mm;
+        }
+        .doc-qr-footer img {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+        }
+        .doc-qr-footer-text {
+            line-height: 1.5;
+            color: #222;
+        }
+        .doc-qr-footer-text strong {
+            display: block;
+            font-size: 8pt;
+            margin-bottom: 2px;
+        }
+
+        .page-pernyataan .doc-qr-footer {
+            bottom: 20mm;
+            left: 25mm;
+            right: 20mm;
+        }
     </style>
 </head>
 
@@ -763,6 +801,8 @@
             </tbody>
         </table>
 
+        
+
         {{-- TANDA TANGAN KEPALA SEKOLAH --}}
         <div class="ttd-section">
             <div class="ttd-block">
@@ -789,15 +829,15 @@
         <div class="transkrip-header">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Coat_of_arms_of_West_Java.svg/500px-Coat_of_arms_of_West_Java.svg.png"
                 alt="Logo" />
-            <div class="line1">PEMERINTAH DAERAH PROVINSI JAWA BARAT</div>
+            <div class="line1">PEMERINTAH PROVINSI JAWA BARAT</div>
             <div class="line2">CABANG DINAS PENDIDIKAN WILAYAH IX</div>
             <div class="line3">SEKOLAH MENENGAH KEJURUAN NEGERI 1 TALAGA</div>
             <div class="address">
                 Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan Manajemen<br />
-                Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
-                Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
-                Telpon ☎ (0233) 319238 FAX ☎ (0233) 319238 POS ✉ 45463 NPSN: 20213872<br />
-                Website www.smkn1talaga.sch.id - Email ✉ admin@smkn1talaga.sch.id
+                Kampus 1 : Jalan Sekolah No.20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
+                Kampus 2 : Jalan Talaga - Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
+                Telepon (0233) 319238 &nbsp; Fax (0233) 319238 &nbsp; Kode Pos 45463 &nbsp; NPSN 20.21.38.72<br />
+                Website https://smkn1talaga.sch.id/ &nbsp; E-mail: mailsmkn1talaga@gmail.com
             </div>
         </div>
         <div class="transkrip-header-border"></div>
@@ -968,6 +1008,8 @@
             </tbody>
         </table>
 
+       
+
         {{-- TANDA TANGAN --}}
         <div class="transkrip-ttd-section">
             <div class="transkrip-ttd-block">
@@ -977,6 +1019,20 @@
                 <div class="transkrip-ttd-name">Muchamad Eki S.A., S.Kom.</div>
                 <div>Penata Tingkat I/III/d</div>
                 <div>NIP. 197610012006041011</div>
+            </div>
+        </div>
+         {{-- QR CODE FOOTER HALAMAN 2 --}}
+        @php
+            $verifyUrl2 = route('graduation.verify', $graduation->uuid);
+            $qrUrl2 = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl2) . '&size=200&margin=2&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+        @endphp
+        <div class="doc-qr-footer">
+            <img src="{{ $qrUrl2 }}" alt="QR Verifikasi" />
+            <div class="doc-qr-footer-text">
+                <strong>Verifikasi Keaslian Dokumen</strong>
+                Scan QR Code ini untuk memverifikasi keaslian Transkrip Nilai atas nama
+                <strong style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+                Atau kunjungi: <em>{{ $verifyUrl2 }}</em>
             </div>
         </div>
     </div>{{-- end .page-transkrip (halaman 2) --}}
@@ -1058,6 +1114,8 @@
 
         <p class="pernyataan-text">Demikian pernyataan saya dibuat dengan sadar tanpa paksaan dari pihak mana pun.</p>
 
+      
+
         <div class="ttd-pernyataan">
             <div class="ttd-pernyataan-block">
                 Majalengka, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
@@ -1065,6 +1123,21 @@
                 <img src="{{ $signature->signature_data }}" alt="Tanda Tangan" class="signature-img" />
                 <div class="nama-ttd">{{ $user->name }}</div>
                 <div>NISN. {{ $student->national_student_number ?? '—' }}</div>
+            </div>
+        </div>
+
+        {{-- QR CODE FOOTER HALAMAN 3 --}}
+        @php
+            $verifyUrl3 = route('graduation.verify', $graduation->uuid);
+            $qrUrl3 = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl3) . '&size=200&margin=2&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+        @endphp
+        <div class="doc-qr-footer">
+            <img src="{{ $qrUrl3 }}" alt="QR Verifikasi" />
+            <div class="doc-qr-footer-text">
+                <strong>Verifikasi Keaslian Dokumen</strong>
+                Scan QR Code ini untuk memverifikasi keaslian Surat Pernyataan atas nama
+                <strong style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+                Atau kunjungi: <em>{{ $verifyUrl3 }}</em>
             </div>
         </div>
 

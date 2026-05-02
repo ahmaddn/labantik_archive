@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminGoogleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DriveFileController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\GraduationVerifyController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\GraduationController;
@@ -14,6 +15,10 @@ use App\Http\Controllers\SignatureController;
 use App\Http\Controllers\Admin\GraduationMapelController;
 use App\Http\Controllers\Admin\GraduationImportController;
 use App\Http\Controllers\Admin\GraduationSuratController;
+
+// ── Verifikasi Dokumen Kelulusan (PUBLIK — tanpa login) ───────
+Route::get('/verify/{uuid}', [GraduationVerifyController::class, 'show'])->name('graduation.verify');
+
 
 // ── Root redirect ─────────────────────────────────
 Route::get('/', function () {
