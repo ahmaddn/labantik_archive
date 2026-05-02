@@ -129,6 +129,14 @@ class RefStudent extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * Get the graduation statement for the student.
+     */
+    public function graduationStatement(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(GoogleStatement::class, 'user_id', 'user_id');
+    }
+
 
 
 

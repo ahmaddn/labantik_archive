@@ -115,7 +115,7 @@
                                         class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         {{-- Tombol Preview --}}
                                         <button
-                                            onclick="previewLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->transcript_letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }})"
+                                            onclick="previewLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->transcript_letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }}, '{{ $letter->stamp_image }}', '{{ $letter->signature_image }}')"
                                             class="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                                             title="Preview">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -129,7 +129,7 @@
 
                                         {{-- Tombol Edit --}}
                                         <button
-                                            onclick="editLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->transcript_letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }})"
+                                            onclick="editLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->transcript_letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }}, '{{ $letter->stamp_image }}', '{{ $letter->signature_image }}')"
                                             class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                             title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -189,7 +189,7 @@
             </div>
 
             {{-- Modal Body --}}
-            <form id="letterForm" method="POST" action="{{ route('admin.graduation.letter.store') }}">
+            <form id="letterForm" method="POST" action="{{ route('admin.graduation.letter.store') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="_method" id="letterFormMethod" value="POST">
                 <input type="hidden" name="letter_uuid" id="letterUuid" value="">
@@ -217,7 +217,9 @@
                                 placeholder="Contoh: 261/TU.01.02/SMK-Tig.CADISDIKWIL.IX/V/2025"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400">
                         </div>
+                    </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {{-- Tahun Pelajaran --}}
                         <div>
                             <label for="academic_year" class="block text-sm font-medium text-gray-700 mb-1.5">
@@ -228,9 +230,7 @@
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
                                 required>
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {{-- Tanggal Kelulusan --}}
                         <div>
                             <label for="graduation_date" class="block text-sm font-medium text-gray-700 mb-1.5">
@@ -240,21 +240,49 @@
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 required>
                         </div>
+                    </div>
 
-                        {{-- Kepala Sekolah --}}
+                    {{-- Kepala Sekolah (Full Width) --}}
+                    <div>
+                        <label for="headmaster_id" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Kepala Sekolah <span class="text-red-500">*</span>
+                        </label>
+                        <select id="headmaster_id" name="headmaster_id"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            required>
+                            <option value="">Pilih Kepala Sekolah</option>
+                            @foreach ($headmasters as $hm)
+                                <option value="{{ $hm->id }}">
+                                    {{ $hm->employee->full_name ?? ($hm->name ?? 'Tanpa Nama') }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Stempel Image --}}
                         <div>
-                            <label for="headmaster_id" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                Kepala Sekolah <span class="text-red-500">*</span>
+                            <label for="stamp_image" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Stempel (Format Gambar)
                             </label>
-                            <select id="headmaster_id" name="headmaster_id"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                required>
-                                <option value="">Pilih Kepala Sekolah</option>
-                                @foreach ($headmasters as $hm)
-                                    <option value="{{ $hm->id }}">
-                                        {{ $hm->employee->full_name ?? ($hm->name ?? 'Tanpa Nama') }}</option>
-                                @endforeach
-                            </select>
+                            <input type="file" id="stamp_image" name="stamp_image" accept="image/*"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            <div id="stamp_preview" class="mt-2 hidden">
+                                <p class="text-[10px] text-gray-400 mb-1">Stempel saat ini:</p>
+                                <img id="stamp_preview_img" src="" class="h-16 w-auto border border-gray-200 rounded p-1 bg-white">
+                            </div>
+                        </div>
+
+                        {{-- Signature Image --}}
+                        <div>
+                            <label for="signature_image" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Tanda Tangan (Format Gambar)
+                            </label>
+                            <input type="file" id="signature_image" name="signature_image" accept="image/*"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            <div id="signature_preview" class="mt-2 hidden">
+                                <p class="text-[10px] text-gray-400 mb-1">TTD saat ini:</p>
+                                <img id="signature_preview_img" src="" class="h-16 w-auto border border-gray-200 rounded p-1 bg-white">
+                            </div>
                         </div>
                     </div>
 
@@ -381,6 +409,7 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
 
             <div class="bg-gray-50 px-6 py-4 flex justify-end border-t border-gray-100">
@@ -451,6 +480,11 @@
         document.getElementById('headmaster_id').value = '';
         document.getElementById('graduation_date').value = '';
         document.getElementById('statement').value = '';
+        // Reset file inputs & previews
+        document.getElementById('stamp_image').value = '';
+        document.getElementById('signature_image').value = '';
+        document.getElementById('stamp_preview').classList.add('hidden');
+        document.getElementById('signature_preview').classList.add('hidden');
         // Reset editor
         document.getElementById('contentEditor').innerHTML = '<div><br></div>';
         document.getElementById('content').value = '';
@@ -462,7 +496,7 @@
         document.getElementById('letterModal').classList.add('hidden');
     }
 
-    function editLetter(uuid, letterNumber, transcriptLetterNumber, graduationDate, statement, content, academicYear, headmasterId) {
+    function editLetter(uuid, letterNumber, transcriptLetterNumber, graduationDate, statement, content, academicYear, headmasterId, stampImage, signatureImage) {
         document.getElementById('letterModalTitle').textContent = 'Edit Template Surat';
         document.getElementById('letterSubmitText').textContent = 'Perbarui Template';
         document.getElementById('letterFormMethod').value = 'PUT';
@@ -474,6 +508,21 @@
         document.getElementById('headmaster_id').value = headmasterId || '';
         document.getElementById('graduation_date').value = graduationDate;
         document.getElementById('statement').value = statement;
+        // Previews
+        const stampPrev = document.getElementById('stamp_preview');
+        const signaturePrev = document.getElementById('signature_preview');
+        if (stampImage) {
+            stampPrev.classList.remove('hidden');
+            document.getElementById('stamp_preview_img').src = `/storage/${stampImage}`;
+        } else {
+            stampPrev.classList.add('hidden');
+        }
+        if (signatureImage) {
+            signaturePrev.classList.remove('hidden');
+            document.getElementById('signature_preview_img').src = `/storage/${signatureImage}`;
+        } else {
+            signaturePrev.classList.add('hidden');
+        }
         // Load ke editor
         textToEditor(content);
         document.getElementById('content').value = content;
@@ -586,7 +635,7 @@
     // --------------------------------------------------------
     // Modal: Preview Surat
     // --------------------------------------------------------
-    function previewLetter(uuid, letterNumber, transcriptLetterNumber, graduationDate, statement, content) {
+    function previewLetter(uuid, letterNumber, transcriptLetterNumber, graduationDate, statement, content, academicYear, headmasterId, stampImage, signatureImage) {
         document.getElementById('previewLetterNumber').textContent = 'Nomor SKL: ' + letterNumber + ' | Transkrip: ' + (transcriptLetterNumber || '-');
         document.getElementById('previewStatement').textContent = statement;
 

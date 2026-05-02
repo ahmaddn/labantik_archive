@@ -21,6 +21,8 @@ class GraduationLetterController extends Controller
             'graduation_date'          => 'required|date',
             'statement'                => 'required|string',
             'content'                  => 'required|string',
+            'stamp_image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'signature_image'          => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'letter_number.required'   => 'Nomor surat harus diisi',
             'academic_year.required'   => 'Tahun pelajaran harus diisi',
@@ -30,9 +32,18 @@ class GraduationLetterController extends Controller
             'graduation_date.date'     => 'Format tanggal tidak valid',
             'statement.required'       => 'Pernyataan kepala sekolah harus diisi',
             'content.required'         => 'Isi/konten surat harus diisi',
+            'stamp_image.image'        => 'Stempel harus berupa gambar',
+            'signature_image.image'    => 'Tanda tangan harus berupa gambar',
         ]);
 
         try {
+            if ($request->hasFile('stamp_image')) {
+                $validated['stamp_image'] = $request->file('stamp_image')->store('graduation', 'public');
+            }
+            if ($request->hasFile('signature_image')) {
+                $validated['signature_image'] = $request->file('signature_image')->store('graduation', 'public');
+            }
+
             GoogleGraduationLetter::create($validated);
 
             return redirect()
@@ -70,6 +81,8 @@ class GraduationLetterController extends Controller
             'graduation_date'          => 'required|date',
             'statement'                => 'required|string',
             'content'                  => 'required|string',
+            'stamp_image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'signature_image'          => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'letter_number.required'   => 'Nomor surat harus diisi',
             'academic_year.required'   => 'Tahun pelajaran harus diisi',
@@ -79,9 +92,26 @@ class GraduationLetterController extends Controller
             'graduation_date.date'     => 'Format tanggal tidak valid',
             'statement.required'       => 'Pernyataan kepala sekolah harus diisi',
             'content.required'         => 'Isi/konten surat harus diisi',
+            'stamp_image.image'        => 'Stempel harus berupa gambar',
+            'signature_image.image'    => 'Tanda tangan harus berupa gambar',
         ]);
 
         try {
+            if ($request->hasFile('stamp_image')) {
+                // Delete old image
+                if ($letter->stamp_image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($letter->stamp_image);
+                }
+                $validated['stamp_image'] = $request->file('stamp_image')->store('graduation', 'public');
+            }
+            if ($request->hasFile('signature_image')) {
+                // Delete old image
+                if ($letter->signature_image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($letter->signature_image);
+                }
+                $validated['signature_image'] = $request->file('signature_image')->store('graduation', 'public');
+            }
+
             $letter->update($validated);
 
             return redirect()
@@ -102,6 +132,15 @@ class GraduationLetterController extends Controller
     {
         try {
             $letter = GoogleGraduationLetter::findOrFail($id);
+            
+            // Delete images
+            if ($letter->stamp_image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($letter->stamp_image);
+            }
+            if ($letter->signature_image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($letter->signature_image);
+            }
+
             $letter->delete();
 
             return redirect()

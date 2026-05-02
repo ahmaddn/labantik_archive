@@ -22,6 +22,8 @@ class GoogleGraduationLetter extends Model
         'graduation_date',
         'statement',
         'content',
+        'stamp_image',
+        'signature_image',
     ];
 
     protected static function boot()

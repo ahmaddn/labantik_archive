@@ -39,6 +39,9 @@ class GraduationSuratController extends Controller
         $signature = (object) ['signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='];
         $principal = $this->getPrincipal($letter->headmaster_id ?? null);
 
+        $principal = $this->getPrincipal($letter->headmaster_id ?? null);
+        $sigMode = request('sig_mode', 'both'); // none, sig, both
+
         return view('admin.graduation.surat-kelulusan', compact(
             'graduation',
             'student',
@@ -50,7 +53,8 @@ class GraduationSuratController extends Controller
             'program',
             'program1',
             'signature',
-            'principal'
+            'principal',
+            'sigMode'
         ));
     }
 
@@ -116,6 +120,9 @@ class GraduationSuratController extends Controller
         $program1           = $latestAcademicYear?->class?->expertiseProgram;
         $principal          = $this->getPrincipal($letter->headmaster_id ?? null);
 
+        $principal          = $this->getPrincipal($letter->headmaster_id ?? null);
+        $sigMode            = request('sig_mode', 'both');
+
         return view('admin.graduation.transkrip-nilai', compact(
             'graduation',
             'student',
@@ -126,7 +133,8 @@ class GraduationSuratController extends Controller
             'rataRata',
             'program',
             'program1',
-            'principal'
+            'principal',
+            'sigMode'
         ));
     }
 
@@ -190,7 +198,9 @@ class GraduationSuratController extends Controller
             $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'signature', 'principal');
         }
 
-        return view('admin.graduation.surat-kelulusan-all', compact('data'));
+        $sigMode = request('sig_mode', 'both');
+
+        return view('admin.graduation.surat-kelulusan-all', compact('data', 'sigMode'));
     }
 
     private function suratPernyataanAll()
@@ -263,6 +273,8 @@ class GraduationSuratController extends Controller
             $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'principal');
         }
 
-        return view('admin.graduation.transkrip-nilai-all', compact('data', 'principal'));
+        $sigMode = request('sig_mode', 'both');
+
+        return view('admin.graduation.transkrip-nilai-all', compact('data', 'principal', 'sigMode'));
     }
 }

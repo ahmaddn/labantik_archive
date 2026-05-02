@@ -229,6 +229,26 @@
         .ttd-block {
             width: 250px;
             text-align: left;
+            position: relative;
+        }
+
+        .stamp-image {
+            position: absolute;
+            left: -60px;
+            top: -30px;
+            width: 120px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .signature-image {
+            position: absolute;
+            left: 0px;
+            top: 20px;
+            width: 70px;
+            z-index: 5;
+            pointer-events: none;
         }
 
         .ttd-space {
@@ -297,7 +317,7 @@
         <div class="header-border-thin"></div>
         {{-- JUDUL --}}
         <div class="doc-title">
-            <h2>TRANSKRIP NILAI</h2>
+            <h2>TRANSKRIP NILAI RAPOR</h2>
             <div class="nomor">{{ $letter->transcript_letter_number ?? ($letter->letter_number ?? '—') }}</div>
         </div>
 
@@ -510,7 +530,14 @@
                 Talaga,
                 {{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
                 Kepala SMK Negeri 1 Talaga,
-                <div class="ttd-space"></div>
+                <div class="ttd-space">
+                    @if (in_array($sigMode ?? 'both', ['sig', 'both']) && $letter && $letter->signature_image)
+                        <img src="{{ url('storage/', $letter->signature_image) }}" class="signature-image">
+                    @endif
+                    @if (($sigMode ?? 'both') === 'both' && $letter && $letter->stamp_image)
+                        <img src="{{ url('storage/', $letter->stamp_image) }}" class="stamp-image">
+                    @endif
+                </div>
                 <div class="ttd-name">
                     {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
                 <div>{{ $principal->employee->functional_position ?? 'Penata Tingkat I/IIId' }}</div>

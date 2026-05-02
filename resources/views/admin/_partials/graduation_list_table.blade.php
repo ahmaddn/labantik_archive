@@ -8,7 +8,7 @@
 --}}
 
 @php
-    $allGraduationsData = \App\Models\GoogleGraduation::with(['user', 'mapels', 'user.academicYears.class'])
+    $allGraduationsData = \App\Models\GoogleGraduation::with(['user.graduationStatement', 'mapels', 'user.academicYears.class'])
         ->get()
         ->map(function ($graduation) {
             $arr = $graduation->toArray();
@@ -16,6 +16,7 @@
             $arr['letter_number'] = $graduation->letter->letter_number ?? '-';
             $arr['graduation_date'] = $graduation->letter->graduation_date ?? null;
             $arr['mapel_count'] = $graduation->mapels->count();
+            $arr['has_signature'] = $graduation->user->graduationStatement?->signature_id ? true : false;
 
             // Ambil kelas dari academic year terbaru
             $latestYear = $graduation->user->academicYears->first();
@@ -54,11 +55,24 @@
 
         {{-- Count row + Export Surat --}}
         <div class="flex items-center justify-between flex-wrap gap-2">
-            <p class="text-xs text-gray-500">
-                <span class="font-semibold text-gray-700"
-                    id="graduationTotalCount">{{ count($allGraduationsData) }}</span>
-                data ditemukan
-            </p>
+            <div class="flex items-center gap-3">
+                <p class="text-xs text-gray-500">
+                    <span class="font-semibold text-gray-700"
+                        id="graduationTotalCount">{{ count($allGraduationsData) }}</span>
+                    data ditemukan
+                </p>
+
+                {{-- Global Signature Mode Selector --}}
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-xl shadow-sm">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Mode TTD:</span>
+                    <select id="globalSigMode" onchange="updateAllExportLinks()"
+                        class="text-xs border-none focus:ring-0 cursor-pointer text-gray-700 font-semibold bg-transparent p-0 pr-6">
+                        <option value="none">Polos (Tanpa TTD)</option>
+                        <option value="sig">Hanya Tanda Tangan</option>
+                        <option value="both" selected>Lengkap (TTD + Stempel)</option>
+                    </select>
+                </div>
+            </div>
 
             {{-- Token Actions + Export Surat --}}
             <div class="flex items-center gap-2 flex-wrap" id="suratExportGroup">
@@ -99,6 +113,15 @@
 
                     <div id="dropdownKelulusan"
                         class="hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-3 space-y-1">
+                        <div class="px-1 pb-2 border-b border-gray-100 mb-1">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Mode Tanda Tangan</p>
+                            <select id="sigModeKelulusan" 
+                                class="w-full text-xs rounded-lg border-gray-200 focus:ring-indigo-500 focus:border-indigo-500 py-1.5">
+                                <option value="none">Polos (Tanpa TTD)</option>
+                                <option value="sig">Hanya Tanda Tangan</option>
+                                <option value="both" selected>Lengkap (TTD + Stempel)</option>
+                            </select>
+                        </div>
                         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export sebagai
                         </p>
 
@@ -284,6 +307,15 @@
 
                     <div id="dropdownTranskrip"
                         class="hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-3 space-y-1">
+                        <div class="px-1 pb-2 border-b border-gray-100 mb-1">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Mode Tanda Tangan</p>
+                            <select id="sigModeTranskrip" 
+                                class="w-full text-xs rounded-lg border-gray-200 focus:ring-blue-500 focus:border-blue-500 py-1.5">
+                                <option value="none">Polos (Tanpa TTD)</option>
+                                <option value="sig">Hanya Tanda Tangan</option>
+                                <option value="both" selected>Lengkap (TTD + Stempel)</option>
+                            </select>
+                        </div>
                         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export
                             sebagai
                         </p>
@@ -589,6 +621,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const container = document.querySelector('.graduation-table-container');
         const allData = JSON.parse(container.dataset.allGraduations);
+        window.allGraduationsData = allData;
         const routeShow = container.dataset.routeShow;
         const routeSuratKelulusan = container.dataset.routeSuratKelulusan;
         const routeSuratPernyataan = container.dataset.routeSuratPernyataan;
@@ -597,6 +630,25 @@
         const searchInput = document.getElementById('graduationSearchInput');
         const clearBtn = document.getElementById('graduationClearSearch');
         const perPageSelect = document.getElementById('graduationPerPageSelect');
+
+        window.checkSignature = function(e, uuid) {
+            const g = window.allGraduationsData.find(item => item.uuid === uuid);
+            if (g && !g.has_signature) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tanda Tangan Belum Ada',
+                    text: 'Siswa ini belum mengupload tanda tangan.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                return false;
+            }
+            return true;
+        };
         const cardPerPage = document.getElementById('graduationCardPerPageSelect');
 
         const tableBody = document.getElementById('graduationTableBody');
@@ -792,27 +844,40 @@
                                 </svg>
                             </button>
                             <div class="absolute left-0 mt-0 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-40">
-                                <a href="${routeSuratKelulusan.replace(':id', g.uuid)}" target="_blank"
-                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors first:rounded-t-lg">
-                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Surat Kelulusan
-                                </a>
-                                <a href="${routeSuratPernyataan.replace(':id', g.uuid)}" target="_blank"
-                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors last:rounded-b-lg border-t border-gray-100">
-                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {{-- Opsi Surat Kelulusan --}}
+                                <div class="px-3 py-2 border-b border-gray-50 bg-gray-50/50">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Surat Kelulusan</p>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="doSingleExport('kelulusan', '${g.uuid}', 'none')" title="Tanpa TTD"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">Polos</button>
+                                        <button onclick="doSingleExport('kelulusan', '${g.uuid}', 'sig')" title="Hanya TTD"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">TTD</button>
+                                        <button onclick="doSingleExport('kelulusan', '${g.uuid}', 'both')" title="TTD + Stempel"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">Lengkap</button>
+                                    </div>
+                                </div>
+
+                                {{-- Surat Pernyataan (Selalu default karena TTD siswa) --}}
+                                <button onclick="doSingleExport('pernyataan', '${g.uuid}')"
+                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors border-b border-gray-100">
+                                    <svg class="w-3 h-3 inline-block mr-1.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                     </svg>
                                     Surat Pernyataan
-                                </a>
-                                <a href="${routeTranskripNilai.replace(':id', g.uuid)}" target="_blank"
-                                    class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors last:rounded-b-lg border-t border-gray-100">
-                                    <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Transkrip Nilai
-                                </a>
+                                </button>
+
+                                {{-- Opsi Transkrip Nilai --}}
+                                <div class="px-3 py-2 bg-gray-50/50 rounded-b-lg">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Transkrip Nilai</p>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="doSingleExport('transkrip', '${g.uuid}', 'none')" title="Tanpa TTD"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">Polos</button>
+                                        <button onclick="doSingleExport('transkrip', '${g.uuid}', 'sig')" title="Hanya TTD"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">TTD</button>
+                                        <button onclick="doSingleExport('transkrip', '${g.uuid}', 'both')" title="TTD + Stempel"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">Lengkap</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -920,6 +985,7 @@
                                 Surat Kelulusan
                             </a>
                             <a href="${routeSuratPernyataan.replace(':id', g.uuid)}" target="_blank"
+                                onclick="return checkSignature(event, '${g.uuid}')"
                                 class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors last:rounded-b-lg border-t border-gray-100">
                                 <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -1110,9 +1176,92 @@
             params.set('class_id', val);
         }
 
+        // Add sig_mode (only for kelulusan and transkrip)
+        if (type === 'kelulusan' || type === 'transkrip') {
+            const sigMode = document.getElementById('sigMode' + capitalize(type))?.value || 'both';
+            params.set('sig_mode', sigMode);
+        }
+
+        // Check for signatures if exporting Pernyataan
+        if (type === 'pernyataan') {
+            const allData = window.allGraduationsData || [];
+            let targetStudents = [];
+
+            if (mode === 'semua') {
+                targetStudents = allData;
+            } else if (mode === 'jurusan') {
+                const val = params.get('expertise_id');
+                targetStudents = allData.filter(g => g.expertise_concentration_id == val);
+            } else if (mode === 'kelas') {
+                const val = params.get('class_id');
+                targetStudents = allData.filter(g => g.class_id == val);
+            }
+
+            const missing = targetStudents.filter(s => !s.has_signature);
+            if (missing.length > 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tanda Tangan Belum Lengkap',
+                    text: `Terdapat ${missing.length} siswa yang belum mengupload tanda tangan. Tetap lanjutkan export?`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Lanjutkan',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#1b84ff',
+                    cancelButtonColor: '#ef4444',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+                        window.open(url, '_blank');
+                        document.getElementById('dropdown' + capitalize(type))?.classList.add('hidden');
+                    }
+                });
+                return;
+            }
+        }
+
         const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
         window.open(url, '_blank');
         document.getElementById('dropdown' + capitalize(type))?.classList.add('hidden');
+    }
+
+    window.doSingleExport = function(type, uuid, overrideMode = null) {
+        let baseUrl = '';
+        if (type === 'kelulusan') baseUrl = '{{ route('admin.graduation.showSuratKelulusan', ['id' => ':id']) }}';
+        else if (type === 'pernyataan') baseUrl = '{{ route('admin.graduation.showSuratPernyataan', ['id' => ':id']) }}';
+        else if (type === 'transkrip') baseUrl = '{{ route('admin.graduation.showTranskripNilai', ['id' => ':id']) }}';
+
+        // Check signature for pernyataan
+        if (type === 'pernyataan') {
+            const g = window.allGraduationsData.find(item => item.uuid === uuid);
+            if (g && !g.has_signature) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tanda Tangan Belum Ada',
+                    text: 'Siswa ini belum mengupload tanda tangan.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                return;
+            }
+            window.open(baseUrl.replace(':id', uuid), '_blank');
+            return;
+        }
+
+        const sigMode = overrideMode || document.getElementById('globalSigMode')?.value || 'both';
+        const url = baseUrl.replace(':id', uuid) + '?sig_mode=' + sigMode;
+        window.open(url, '_blank');
+    }
+
+    window.updateAllExportLinks = function() {
+        const sigMode = document.getElementById('globalSigMode').value;
+        // Sync with dropdown selectors for consistency
+        const k = document.getElementById('sigModeKelulusan');
+        const t = document.getElementById('sigModeTranskrip');
+        if (k) k.value = sigMode;
+        if (t) t.value = sigMode;
     }
 
     document.addEventListener('click', function(e) {
