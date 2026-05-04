@@ -565,7 +565,6 @@ class GraduationController extends Controller
                 for ($i = 0; $i < 4; $i++) {
                     $token .= $chars[rand(0, strlen($chars) - 1)];
                 }
-                
                 $graduation->update(['token' => $token]);
                 $updatedCount++;
             }
@@ -583,6 +582,80 @@ class GraduationController extends Controller
                 'success' => false,
                 'message' => 'Gagal meng-generate token: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Generate tokens for a specific class.
+     */
+    public function generateTokensClass(Request $request)
+    {
+        $classId = $request->query('class_id');
+        if (!$classId) {
+            return response()->json(['success' => false, 'message' => 'ID Kelas tidak ditemukan.'], 400);
+        }
+
+        try {
+            $graduations = GoogleGraduation::whereHas('user.academicYears.class', function ($q) use ($classId) {
+                $q->where('class_id', $classId)->where('academic_level', 12);
+            })->get();
+
+            $updatedCount = 0;
+            \DB::beginTransaction();
+            foreach ($graduations as $graduation) {
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $token = '';
+                for ($i = 0; $i < 4; $i++) {
+                    $token .= $chars[rand(0, strlen($chars) - 1)];
+                }
+                $graduation->update(['token' => $token]);
+                $updatedCount++;
+            }
+            \DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Token berhasil di-generate untuk {$updatedCount} siswa di kelas tersebut.",
+                'updated_count' => $updatedCount,
+            ]);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('generateTokensClass error', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Gagal meng-generate token: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Generate token for a single student.
+     */
+    public function generateTokenStudent(Request $request)
+    {
+        $graduationId = $request->input('graduation_id');
+        if (!$graduationId) {
+            return response()->json(['success' => false, 'message' => 'ID Kelulusan tidak ditemukan.'], 400);
+        }
+
+        try {
+            $graduation = GoogleGraduation::where('uuid', $graduationId)->first();
+            if (!$graduation) {
+                return response()->json(['success' => false, 'message' => 'Data kelulusan tidak ditemukan.'], 404);
+            }
+
+            $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $token = '';
+            for ($i = 0; $i < 4; $i++) {
+                $token .= $chars[rand(0, strlen($chars) - 1)];
+            }
+            $graduation->update(['token' => $token]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Token berhasil di-generate.',
+                'token' => $token
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('generateTokenStudent error', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Gagal meng-generate token: ' . $e->getMessage()], 500);
         }
     }
 

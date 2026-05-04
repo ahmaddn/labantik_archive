@@ -160,6 +160,8 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::post('graduation/score/update',      [GraduationController::class, 'updateScore'])->name('graduation.updateScore');
     Route::post('graduation/score/update-bulk', [GraduationController::class, 'updateScoreBulk'])->name('graduation.updateScoreBulk');
     Route::post('graduation/generate-tokens',   [GraduationController::class, 'generateTokens'])->name('graduation.generateTokens');
+    Route::post('graduation/generate-tokens-class', [GraduationController::class, 'generateTokensClass'])->name('graduation.generateTokensClass');
+    Route::post('graduation/generate-token-student', [GraduationController::class, 'generateTokenStudent'])->name('graduation.generateTokenStudent');
     Route::get('graduation/export-tokens',      [GraduationController::class, 'exportTokens'])->name('graduation.exportTokens');
     Route::get('/graduation/{id}',               [GraduationController::class, 'show'])->name('graduation.show');
     Route::delete('/graduation/{id}',            [GraduationController::class, 'destroy'])->name('graduation.destroy');

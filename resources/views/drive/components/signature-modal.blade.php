@@ -5,9 +5,30 @@
 ═══════════════════════════════════════════════════════════════════════════ --}}
 
 @php
-    $sudahTandaTangan = \App\Models\GoogleStatement::where('user_id', auth()->id())->exists();
-    $studentData = \Illuminate\Support\Facades\DB::table('ref_students')->where('user_id', auth()->id())->first();
-    $graduationToken = $studentData ? \Illuminate\Support\Facades\DB::table('google_graduation')->where('user_id', $studentData->id)->value('token') : null;
+    $user = auth()->user();
+    $sudahTandaTangan = \App\Models\GoogleStatement::where('user_id', $user->id)->exists();
+    
+    // Find student record for the logged in user
+    $studentData = \App\Models\RefStudent::where('user_id', $user->id)->first();
+    
+    // Find graduation record for this student
+    $graduationRecord = null;
+    $graduationToken = null;
+    $debugInfo = "";
+
+    if ($studentData) {
+        $graduationRecord = \App\Models\GoogleGraduation::where('user_id', $studentData->id)->first();
+        if ($graduationRecord) {
+            $graduationToken = $graduationRecord->token;
+            if (!$graduationToken) {
+                $debugInfo = "Graduation record found (ID: " . $graduationRecord->uuid . "), but token is empty.";
+            }
+        } else {
+            $debugInfo = "Student found (ID: " . $studentData->id . "), but no record in google_graduation matches this user_id.";
+        }
+    } else {
+        $debugInfo = "No record found in ref_students for user_id: " . $user->id;
+    }
 @endphp
 
 <div class="flex items-center gap-3">
@@ -219,26 +240,53 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         (function() {
             let signaturePad = null;
 
             window.verifyToken = function() {
-                const tokenInput = document.getElementById('tokenInput').value;
+                const tokenInput = document.getElementById('tokenInput').value.trim().toUpperCase();
                 const correctToken = "{{ $graduationToken }}";
+                const debugMsg = "{{ $debugInfo ?? '' }}";
                 
                 if (!correctToken) {
-                    alert('Token belum di-generate oleh admin.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Token Belum Tersedia',
+                        text: 'Token belum di-generate oleh admin. ' + (debugMsg ? '\n\nDebug: ' + debugMsg : ''),
+                        footer: 'Hubungi wali kelas atau admin untuk informasi lebih lanjut.'
+                    });
+                    console.log('Token Debug:', {
+                        student_found: !!{!! json_encode($studentData ?? null) !!},
+                        graduation_found: !!{!! json_encode($graduationRecord ?? null) !!},
+                        debug: debugMsg
+                    });
                     return;
                 }
-
+                
                 if (tokenInput === correctToken) {
-                    document.getElementById('modalToken').classList.add('hidden');
-                    document.getElementById('modalSuratPernyataan').classList.remove('hidden');
-                    document.getElementById('tokenError').classList.add('hidden');
-                    document.getElementById('tokenInput').value = '';
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Token Terverifikasi',
+                        text: 'Silakan tanda tangani surat pernyataan.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        document.getElementById('modalToken').classList.add('hidden');
+                        document.getElementById('modalSuratPernyataan').classList.remove('hidden');
+                        document.getElementById('tokenError').classList.add('hidden');
+                        document.getElementById('tokenInput').value = '';
+                    });
                 } else {
                     document.getElementById('tokenError').classList.remove('hidden');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Token Salah',
+                        text: 'Token yang Anda masukkan tidak sesuai.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 }
             };
 
