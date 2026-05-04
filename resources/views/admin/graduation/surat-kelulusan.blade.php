@@ -396,7 +396,7 @@
             <tr>
                 <td class="label" style="padding:0;">Tempat, Tanggal Lahir</td>
                 <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper($student->birth_place_date ?? '—') }}</td>
+                <td style="padding:0;">{{ strtoupper(preg_replace('/\s*,\s*/', ', ', $student->birth_place_date ?? '—')) }}</td>
             </tr>
             <tr>
                 <td class="label" style="padding:0;">Nama Orang Tua/Wali</td>

@@ -422,7 +422,7 @@
                     </div>
                     <div class="info-row">
                         <span class="info-label">Tempat, Tanggal Lahir</span>
-                        <span class="info-value">{{ $student->birth_place_date ?? '—' }}</span>
+                        <span class="info-value">{{ strtoupper(preg_replace('/\s*,\s*/', ', ', $student->birth_place_date ?? '—')) }}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">NISN</span>

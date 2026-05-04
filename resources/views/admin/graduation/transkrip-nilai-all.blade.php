@@ -378,7 +378,7 @@
                 <tr>
                     <td class="label">Tempat, Tanggal Lahir</td>
                     <td class="sep">:</td>
-                    <td>{{ $item->student->birth_place_date ?? '-' }}</td>
+                    <td>{{ strtoupper(preg_replace('/\s*,\s*/', ', ', $item->student->birth_place_date ?? '-')) }}</td>
                 </tr>
                 <tr>
                     <td class="label">Nomor Induk Siswa Nasional</td>
