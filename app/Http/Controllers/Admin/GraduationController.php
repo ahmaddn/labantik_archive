@@ -42,12 +42,20 @@ class GraduationController extends Controller
             ->values();
 
         $totalMapels = GoogleMapel::count();
-        $totalGraduations = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {
-            $q->where('academic_level', 12);
-        })->count();
-        $totalUsers = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {
-            $q->where('academic_level', 12);
-        })->distinct('user_id')->count('user_id');
+        $totalGraduations = GoogleGraduation::whereHas('user.academicYears', function ($q) {
+            $q->where('status', 'active');
+        })
+            ->whereHas('user.academicYears.class', function ($q) {
+                $q->where('academic_level', 12);
+            })->count();
+        $totalUsers = GoogleGraduation::whereHas('user.academicYears', function ($q) {
+            $q->where('status', 'active');
+        })
+            ->whereHas('user.academicYears.class', function ($q) {
+                $q->where('academic_level', 12);
+            })
+            ->distinct('user_id')
+            ->count('user_id');
 
         $classes   = RefClass::where('academic_level', 12)
             ->select(['id', 'name', 'expertise_concentration_id', 'academic_level'])
