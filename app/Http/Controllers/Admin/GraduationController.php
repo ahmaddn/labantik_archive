@@ -25,6 +25,9 @@ class GraduationController extends Controller
             ->paginate(15);
 
         $graduations = GoogleGraduation::with(['user.academicYears.class', 'user.graduationStatement', 'mapels', 'letter'])
+            ->whereHas('user.academicYears', function ($q) {
+                $q->where('status', 'active');
+            })
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
             })
