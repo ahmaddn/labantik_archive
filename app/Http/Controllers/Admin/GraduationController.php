@@ -24,12 +24,19 @@ class GraduationController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        $graduations = GoogleGraduation::with(['user', 'mapels', 'letter'])
+        $graduations = GoogleGraduation::with(['user.academicYears.class', 'user.graduationStatement', 'mapels', 'letter'])
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
             })
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->sortBy(function ($graduation) {
+                $latestYear = $graduation->user->academicYears->first();
+                $className = $latestYear?->class
+                    ? $latestYear->class->academic_level . ' ' . $latestYear->class->name
+                    : 'ZZZ'; // Put students without class at the end
+                return $className . ' ' . ($graduation->user->full_name ?? '');
+            })
+            ->values();
 
         $totalMapels = GoogleMapel::count();
         $totalGraduations = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {

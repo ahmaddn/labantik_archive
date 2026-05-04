@@ -298,6 +298,7 @@
                 'routeIndex' => 'admin.graduation.index',
                 'routeShow' => 'admin.graduation.show',
                 'routeDelete' => 'admin.graduation.destroy',
+                'graduations' => $graduations,
             ])
         </div>
     </div>

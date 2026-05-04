@@ -8,9 +8,9 @@
 --}}
 
 @php
-    $allGraduationsData = \App\Models\GoogleGraduation::with(['user.graduationStatement', 'mapels', 'user.academicYears.class'])
-        ->get()
-        ->map(function ($graduation) {
+    $items = isset($graduations) ? $graduations : \App\Models\GoogleGraduation::with(['user.graduationStatement', 'mapels', 'user.academicYears.class'])->get();
+    
+    $allGraduationsData = $items->map(function ($graduation) {
             $arr = $graduation->toArray();
             $arr['user_name'] = $graduation->user->full_name ?? 'User Terhapus';
             $arr['letter_number'] = $graduation->letter->letter_number ?? '-';
@@ -21,6 +21,7 @@
 
             // Ambil kelas dari academic year terbaru
             $latestYear = $graduation->user->academicYears->first();
+            $arr['class_id'] = $latestYear?->class_id;
             $arr['class_name'] = $latestYear?->class
                 ? $latestYear->class->academic_level . ' ' . $latestYear->class->name
                 : '-';
@@ -40,8 +41,8 @@
     {{-- Search + controls bar --}}
     <div class="mb-4 flex flex-col gap-3">
         {{-- Search row --}}
-        <div class="flex items-center gap-2">
-            <div class="relative flex-1">
+        <div class="flex flex-col sm:flex-row items-center gap-2">
+            <div class="relative flex-1 w-full">
                 <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none"
                     stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -50,6 +51,17 @@
                 <input type="text" id="graduationSearchInput" placeholder="Cari nama atau no. surat..."
                     class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
             </div>
+
+            <div class="relative w-full sm:w-48">
+                <select id="classFilterSelect"
+                    class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
+                    <option value="">Semua Kelas</option>
+                    @foreach ($classes as $class)
+                        <option value="{{ $class->id }}">{{ $class->academic_level }} {{ $class->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <button id="graduationClearSearch" style="display:none;"
                 class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-500 transition-colors hover:bg-gray-50 flex-shrink-0">✕</button>
         </div>
@@ -629,6 +641,7 @@
         const routeTranskripNilai = container.dataset.routeTranskripNilai;
 
         const searchInput = document.getElementById('graduationSearchInput');
+        const classFilter = document.getElementById('classFilterSelect');
         const clearBtn = document.getElementById('graduationClearSearch');
         const perPageSelect = document.getElementById('graduationPerPageSelect');
 
@@ -672,8 +685,8 @@
         let viewMode = window.innerWidth < 640 ? 'card' : 'table';
 
         // ── Sort state ───────────────────────────────────────────────────
-        let sortCol = null; // 'user_name' | 'letter_number' | 'class_name' | 'graduation_date' | 'mapel_count'
-        let sortDir = null; // 'asc' | 'desc' | null
+        let sortCol = 'class_name'; // Default sort by class
+        let sortDir = 'asc'; // Default sort direction
 
         // SVG icons
         const iconBoth =
@@ -764,14 +777,28 @@
         // ── Filter ───────────────────────────────────────────────────────
         function filterData() {
             const q = searchInput.value.toLowerCase().trim();
+            const classId = classFilter.value;
+
             filteredData = allData.filter(g => {
-                return (g.user_name || '').toLowerCase().includes(q) ||
+                const matchesSearch = (g.user_name || '').toLowerCase().includes(q) ||
                     (g.letter_number || '').toLowerCase().includes(q);
+                const matchesClass = !classId || String(g.class_id) === String(classId);
+
+                return matchesSearch && matchesClass;
             });
             currentPage = 1;
             updateDisplay();
-            clearBtn.style.display = q ? 'block' : 'none';
+            clearBtn.style.display = (q || classId) ? 'block' : 'none';
         }
+
+        searchInput.addEventListener('input', filterData);
+        classFilter.addEventListener('change', filterData);
+
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            classFilter.value = '';
+            filterData();
+        });
 
         // ── View mode ────────────────────────────────────────────────────
         window.setViewMode = function(mode) {
