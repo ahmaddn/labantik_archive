@@ -42,7 +42,7 @@ class AuthController extends Controller
             $candidates = $matched->map(function ($user) {
                 // Cek koneksi ke tabel ref
                 $asStudent = \DB::table('ref_students')->where('user_id', $user->id)->exists();
-                $asPTK     = \DB::table('ref_employees')->where('user_id', $user->id)->exists(); // sesuaikan nama tabelnya
+                $asPTK     = \DB::table('ref_employes')->where('user_id', $user->id)->exists(); // sesuaikan nama tabelnya
 
                 return [
                     'id'        => $user->id,
