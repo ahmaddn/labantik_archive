@@ -36,7 +36,10 @@
     data-route-delete="{{ route($routeDelete, ['id' => ':id']) }}"
     data-route-surat-kelulusan="{{ route('admin.graduation.showSuratKelulusan', ['id' => ':id']) }}"
     data-route-surat-pernyataan="{{ route('admin.graduation.showSuratPernyataan', ['id' => ':id']) }}"
-    data-route-transkrip-nilai="{{ route('admin.graduation.showTranskripNilai', ['id' => ':id']) }}">
+    data-route-transkrip-nilai="{{ route('admin.graduation.showTranskripNilai', ['id' => ':id']) }}"
+    data-route-generate-tokens="{{ route('admin.graduation.generateTokens') }}"
+    data-route-generate-tokens-class="{{ route('admin.graduation.generateTokensClass') }}"
+    data-route-generate-token-student="{{ route('admin.graduation.generateTokenStudent') }}">
 
     {{-- Search + controls bar --}}
     <div class="mb-4 flex flex-col gap-3">
@@ -91,13 +94,22 @@
             <div class="flex items-center gap-2 flex-wrap" id="suratExportGroup">
 
                 {{-- ── Generate Token ─────────────────────────────────── --}}
-                <button id="btnGenerateToken" onclick="doGenerateTokens()"
+                <button id="btnGenerateTokenClass" onclick="doGenerateTokensClass()"
+                    class="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-amber-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Generate Token Kelas</span>
+                </button>
+
+                <button id="btnGenerateTokensAll" onclick="doGenerateTokens()"
                     class="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-amber-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                     </svg>
-                    <span>Generate Token</span>
+                    <span>Generate Token Semua</span>
                 </button>
 
                 {{-- ── Export Token Excel ──────────────────────────────── --}}
@@ -911,10 +923,19 @@
                     </div>
                 </td>
                 <td class="hidden xl:table-cell px-4 sm:px-6 py-4">
-                    ${g.token
-                        ? `<code class="inline-block rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${g.token}</code>`
-                        : `<span class="text-xs text-gray-400 italic">Belum ada</span>`
-                    }
+                    <div class="flex items-center gap-2">
+                        ${g.token
+                            ? `<code id="token-${g.uuid}" class="inline-block rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${g.token}</code>`
+                            : `<span id="token-${g.uuid}" class="text-xs text-gray-400 italic">Belum ada</span>`
+                        }
+                        <button onclick="doGenerateTokenStudent('${g.uuid}', this)" 
+                                title="Generate Token"
+                                class="p-1 rounded-md bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4">
                     <div class="flex items-center gap-2.5">
@@ -998,10 +1019,19 @@
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">${g.class_name ?? '-'}</span>
-                    ${g.token
-                        ? `<code class="rounded-lg bg-amber-50 border border-amber-200 px-2 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${g.token}</code>`
-                        : `<span class="text-xs text-gray-400 italic">Token: -</span>`
-                    }
+                    <div class="flex items-center gap-2">
+                        ${g.token
+                            ? `<code id="token-card-${g.uuid}" class="rounded-lg bg-amber-50 border border-amber-200 px-2 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${g.token}</code>`
+                            : `<span id="token-card-${g.uuid}" class="text-xs text-gray-400 italic">Token: -</span>`
+                        }
+                        <button onclick="doGenerateTokenStudent('${g.uuid}', this)" 
+                                title="Generate Token"
+                                class="p-1 rounded-md bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
                     <span class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
                         <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -1328,41 +1358,144 @@
     function doGenerateTokens() {
         if (!confirm('Token lama akan di-overwrite. Lanjutkan generate token untuk semua siswa kelas 12?')) return;
 
-        const btn = document.getElementById('btnGenerateToken');
+        const btn = document.getElementById('btnGenerateTokensAll');
+        const originalHtml = btn ? btn.innerHTML : '';
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML =
-                `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> Generating...`;
+            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> Generating...`;
         }
 
-        fetch('{{ route('admin.graduation.generateTokens') }}', {
+        const route = document.querySelector('.graduation-table-container').dataset.routeGenerateTokens;
+
+        fetch(route, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ||
-                        '{{ csrf_token() }}',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '{{ csrf_token() }}',
                     'Accept': 'application/json',
                 },
             })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
-                    window.location.reload();
+                    Swal.fire('Berhasil', data.message, 'success').then(() => window.location.reload());
                 } else {
-                    alert('Gagal: ' + data.message);
+                    Swal.fire('Gagal', data.message, 'error');
                 }
             })
             .catch(err => {
-                alert('Terjadi kesalahan koneksi.');
+                Swal.fire('Error', 'Terjadi kesalahan koneksi.', 'error');
                 console.error(err);
             })
             .finally(() => {
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML =
-                        `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg> Generate Token`;
+                    btn.innerHTML = originalHtml;
                 }
+            });
+    }
+
+    function doGenerateTokensClass() {
+        const classId = document.getElementById('classFilterSelect').value;
+        if (!classId) {
+            Swal.fire('Peringatan', 'Pilih kelas terlebih dahulu pada filter kelas.', 'warning');
+            return;
+        }
+
+        const className = document.getElementById('classFilterSelect').options[document.getElementById('classFilterSelect').selectedIndex].text;
+
+        if (!confirm(`Generate token untuk semua siswa di kelas ${className}? Token lama akan di-overwrite.`)) return;
+
+        const btn = document.getElementById('btnGenerateTokenClass');
+        const originalHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> Generating...`;
+        }
+
+        const routeBase = document.querySelector('.graduation-table-container').dataset.routeGenerateTokensClass;
+        const route = `${routeBase}?class_id=${classId}`;
+
+        fetch(route, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Berhasil', data.message, 'success').then(() => window.location.reload());
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            })
+            .catch(err => {
+                Swal.fire('Error', 'Terjadi kesalahan koneksi.', 'error');
+                console.error(err);
+            })
+            .finally(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            });
+    }
+
+    window.doGenerateTokenStudent = function(graduationId, btn) {
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>`;
+
+        const route = document.querySelector('.graduation-table-container').dataset.routeGenerateTokenStudent;
+
+        fetch(route, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ graduation_id: graduationId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the UI without reloading
+                    const tokenEl = document.getElementById(`token-${graduationId}`);
+                    const tokenCardEl = document.getElementById(`token-card-${graduationId}`);
+                    const tokenHtml = `<code class="inline-block rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${data.token}</code>`;
+                    const tokenCardHtml = `<code class="rounded-lg bg-amber-50 border border-amber-200 px-2 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${data.token}</code>`;
+                    
+                    if (tokenEl) tokenEl.outerHTML = tokenHtml;
+                    if (tokenCardEl) tokenCardEl.outerHTML = tokenCardHtml;
+
+                    // Also update window.allGraduationsData
+                    const idx = window.allGraduationsData.findIndex(g => g.uuid === graduationId);
+                    if (idx !== -1) window.allGraduationsData[idx].token = data.token;
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Token berhasil diperbarui.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                } else {
+                    Swal.fire('Gagal', data.message, 'error');
+                }
+            })
+            .catch(err => {
+                Swal.fire('Error', 'Terjadi kesalahan koneksi.', 'error');
+                console.error(err);
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
             });
     }
 </script>
