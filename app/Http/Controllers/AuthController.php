@@ -14,7 +14,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request): RedirectResponse
+   public function login(Request $request): RedirectResponse
 {
     $credentials = $request->validate([
         'email'    => 'required|email',
@@ -22,37 +22,39 @@ class AuthController extends Controller
     ]);
 
     if (Auth::attempt($credentials, $request->boolean('remember'))) {
-    $request->session()->regenerate();
+        $request->session()->regenerate();
 
-    $user = Auth::user();
+        $user = Auth::user();
 
-    // Ambil role user ini
-    $role = \DB::table('assoc_user_roles')
-        ->join('core_roles', 'assoc_user_roles.role_id', '=', 'core_roles.id')
-        ->where('assoc_user_roles.user_id', $user->id)
-        ->value('core_roles.name'); // sesuaikan nama kolomnya
+        $role = \DB::table('assoc_user_roles')
+            ->join('core_roles', 'assoc_user_roles.role_id', '=', 'core_roles.id')
+            ->where('assoc_user_roles.user_id', $user->id)
+            ->value('core_roles.name');
 
-    // Kalau dia siswa, wajib ada di ref_student
-    if ($role === 'siswa') {
-        $isRegistered = \DB::table('ref_students')
-            ->where('user_id', $user->id)
-            ->exists();
+        if ($role === 'siswa') {
+            $isRegistered = \DB::table('ref_students')
+                ->where('user_id', $user->id)
+                ->exists();
 
-        if (!$isRegistered) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+            if (!$isRegistered) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
 
-            return back()->withErrors([
-                'email' => 'Akun ini tidak terdaftar sebagai siswa aktif.',
-            ])->onlyInput('email');
+                return back()->withErrors([
+                    'email' => 'Akun ini tidak terdaftar sebagai siswa aktif.',
+                ])->onlyInput('email');
+            }
         }
-    }
 
-    // Superadmin, guru, dll langsung lolos
-    $user->update(['last_login' => now()]);
-    return redirect()->intended(route('drive.index'));
-}
+        $user->update(['last_login' => now()]);
+        return redirect()->intended(route('drive.index'));
+    } // ← tutup if Auth::attempt
+
+    // ← ini yang hilang sebelumnya!
+    return back()->withErrors([
+        'email' => 'Email atau password tidak valid.',
+    ])->onlyInput('email');
 }
     public function logout(Request $request): RedirectResponse
     {
