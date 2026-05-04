@@ -385,11 +385,11 @@
                     <td class="sep">:</td>
                     <td>{{ $item->student->national_student_number ?? '-' }}</td>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td class="label">Nomor Ijazah</td>
                     <td class="sep">:</td>
                     <td>{{ $item->student->diploma_number ?? '-' }}</td>
-                </tr>
+                </tr> --}}
                 <tr>
                     <td class="label">Tanggal Kelulusan</td>
                     <td class="sep">:</td>
@@ -406,12 +406,12 @@
                     <td class="sep">:</td>
                     <td>{{ $item->program->name ?? '-' }}</td>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td class="label">Tahun Pelajaran</td>
                     <td class="sep">:</td>
                     <td>{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}
                     </td>
-                </tr>
+                </tr> --}}
             </table>
 
             {{-- NILAI TABLE --}}

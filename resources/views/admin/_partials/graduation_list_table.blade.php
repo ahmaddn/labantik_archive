@@ -14,6 +14,7 @@
             $arr = $graduation->toArray();
             $arr['user_name'] = $graduation->user->full_name ?? 'User Terhapus';
             $arr['letter_number'] = $graduation->letter->letter_number ?? '-';
+            $arr['transcript_letter_number'] = $graduation->letter->transcript_letter_number ?? '-';
             $arr['graduation_date'] = $graduation->letter->graduation_date ?? null;
             $arr['mapel_count'] = $graduation->mapels->count();
             $arr['has_signature'] = $graduation->user->graduationStatement?->signature_id ? true : false;
@@ -473,7 +474,7 @@
                                 <button type="button"
                                     class="grad-sort-btn inline-flex items-center gap-1 hover:text-[#1b84ff] transition-colors group"
                                     data-col="letter_number">
-                                    No. Surat
+                                    No. Surat / Transkrip
                                     <span class="grad-sort-icon text-gray-300 group-hover:text-[#1b84ff]"
                                         data-col="letter_number">
                                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor"
@@ -897,7 +898,16 @@
                     </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4">
-                    <code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600 break-all">${g.letter_number ?? '-'}</code>
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tight w-8">SKL:</span>
+                            <code class="rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-mono text-blue-700 break-all border border-blue-100">${g.letter_number ?? '-'}</code>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tight w-8">TRN:</span>
+                            <code class="rounded-lg bg-purple-50 px-2 py-0.5 text-[10px] font-mono text-purple-700 break-all border border-purple-100">${g.transcript_letter_number ?? '-'}</code>
+                        </div>
+                    </div>
                 </td>
                 <td class="hidden sm:table-cell px-4 sm:px-6 py-4">
                     <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
@@ -948,9 +958,19 @@
                         Detail
                     </a>
                 </div>
-                <div class="mt-3 flex items-center gap-2 flex-wrap">
-                    <code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600 max-w-full truncate">${g.letter_number ?? '-'}</code>
-                    <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">${g.class_name ?? '-'}</span>
+                <div class="mt-3 flex flex-col gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tight">SKL:</span>
+                            <code class="rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-mono text-blue-700 truncate border border-blue-100 max-w-[150px]">${g.letter_number ?? '-'}</code>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tight">TRN:</span>
+                            <code class="rounded-lg bg-purple-50 px-2 py-0.5 text-[10px] font-mono text-purple-700 truncate border border-purple-100 max-w-[150px]">${g.transcript_letter_number ?? '-'}</code>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">${g.class_name ?? '-'}</span>
                     ${g.token
                         ? `<code class="rounded-lg bg-amber-50 border border-amber-200 px-2 py-1 text-xs font-mono font-bold text-amber-700 tracking-widest">${g.token}</code>`
                         : `<span class="text-xs text-gray-400 italic">Token: -</span>`

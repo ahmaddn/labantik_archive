@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php $hide_global_alerts = true; @endphp
 @section('title', 'Input Kelulusan Siswa')
 @section('page-title', 'Input Kelulusan')
 
@@ -182,6 +183,38 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                });
+            @endif
+
+            @if ($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Validasi',
+                    html: `
+                        <ul class="text-left text-xs space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    `,
+                });
+            @endif
+
             const classRadios = document.querySelectorAll('.class-radio');
             const classItems = document.querySelectorAll('.class-item');
             const classSearch = document.getElementById('classSearch');

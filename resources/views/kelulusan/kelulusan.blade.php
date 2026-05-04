@@ -12,7 +12,7 @@
         }
 
         body {
-    font-family: "Times New Roman", Times, serif;
+            font-family: "Times New Roman", Times, serif;
             line-height: 1.2;
             margin: 0;
             padding: 20px;
@@ -251,14 +251,16 @@
             font-size: 7.5pt;
             font-family: Arial, sans-serif;
             position: absolute;
-            
+
             left: 15mm;
             right: 15mm;
         }
+
         .doc-qr-footer-text {
             line-height: 1.5;
             color: #222;
         }
+
         .doc-qr-footer-text strong {
             display: block;
             font-size: 8pt;
@@ -701,12 +703,12 @@
                 <td class="sep" style="padding:0;">:</td>
                 <td style="padding:0;">{{ strtoupper($program->name ?? '—') }}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td class="label" style="padding:0;">Tahun Pelajaran</td>
                 <td class="sep" style="padding:0;">:</td>
                 <td style="padding:0;">
                     {{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
-            </tr>
+            </tr> --}}
             <tr>
                 <td class="label" style="padding:0;">Dinyatakan</td>
                 <td class="sep" style="padding:0;">:</td>
@@ -724,7 +726,7 @@
             <thead>
                 <tr>
                     <th class="col-no">No</th>
-                    <th>Mata Pelajaran (Kurikulum Merdeka)</th>
+                    <th>Mata Pelajaran </th>
                     <th class="col-nilai">Nilai</th>
                 </tr>
             </thead>
@@ -834,39 +836,45 @@
 
 
         {{-- TANDA TANGAN --}}
-<div class="ttd-section">
-    <div class="qr-block">
-        @php
-            $verifyUrl = route('graduation.verify', $graduation->uuid);
-            $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl) . '&size=100&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
-        @endphp
-        <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
-    </div>
-    <div class="ttd-block">
-        @if ($letter)
-            Talaga,
-            {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
-        @else
-            Talaga, ___________________<br />
-        @endif
-        Kepala SMK Negeri 1 Talaga,
-        <div class="ttd-space"></div>
-        <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-        <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
-        <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
-    </div>
-</div>
+        <div class="ttd-section">
+            <div class="qr-block">
+                @php
+                    $verifyUrl = route('graduation.verify', $graduation->uuid);
+                    $qrUrl =
+                        'https://quickchart.io/qr?text=' .
+                        urlencode($verifyUrl) .
+                        '&size=100&margin=1&centerImageUrl=' .
+                        urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+                @endphp
+                <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
+            </div>
+            <div class="ttd-block">
+                @if ($letter)
+                    Talaga,
+                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+                @else
+                    Talaga, ___________________<br />
+                @endif
+                Kepala SMK Negeri 1 Talaga,
+                <div class="ttd-space"></div>
+                <div class="nama">
+                    {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
+            </div>
+        </div>
 
-{{-- QR CODE FOOTER --}}
-<div class="doc-qr-footer">
-    <div class="doc-qr-footer-text">
-        <strong>Verifikasi Keaslian Dokumen</strong>
-        Scan QR Code ini untuk memverifikasi keaslian Surat Kelulusan atas nama
-        <strong style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
-        Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
+        {{-- QR CODE FOOTER --}}
+        <div class="doc-qr-footer">
+            <div class="doc-qr-footer-text">
+                <strong>Verifikasi Keaslian Dokumen</strong>
+                Scan QR Code ini untuk memverifikasi keaslian Surat Kelulusan atas nama
+                <strong
+                    style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+                Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
+            </div>
+        </div>
     </div>
-</div>
-</div>
 
     {{-- ══════════════════════════════════════
          HALAMAN 2: TRANSKRIP NILAI
@@ -922,11 +930,11 @@
                 <td class="sep">:</td>
                 <td>{{ $student->national_student_number ?? '-' }}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td class="label">Nomor Ijazah</td>
                 <td class="sep">:</td>
                 <td>{{ $student->diploma_number ?? '-' }}</td>
-            </tr>
+            </tr> --}}
             <tr>
                 <td class="label">Tanggal Kelulusan</td>
                 <td class="sep">:</td>
@@ -943,11 +951,11 @@
                 <td class="sep">:</td>
                 <td>{{ $program->name ?? '-' }}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td class="label">Tahun Pelajaran</td>
                 <td class="sep">:</td>
                 <td>{{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
-            </tr>
+            </tr> --}}
         </table>
 
         {{-- NILAI TABLE --}}
@@ -1103,40 +1111,46 @@
 
 
 
-         {{-- TANDA TANGAN --}}
-<div class="ttd-section">
-    <div class="qr-block">
-        @php
-            $verifyUrl = route('graduation.verify', $graduation->uuid);
-            $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($verifyUrl) . '&size=100&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
-        @endphp
-        <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
-    </div>
-    <div class="ttd-block">
-        @if ($letter)
-            Talaga,
-            {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
-        @else
-            Talaga, ___________________<br />
-        @endif
-        Kepala SMK Negeri 1 Talaga,
-        <div class="ttd-space"></div>
-        <div class="nama">{{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
-        <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
-        <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
-    </div>
-</div>
+        {{-- TANDA TANGAN --}}
+        <div class="ttd-section">
+            <div class="qr-block">
+                @php
+                    $verifyUrl = route('graduation.verify', $graduation->uuid);
+                    $qrUrl =
+                        'https://quickchart.io/qr?text=' .
+                        urlencode($verifyUrl) .
+                        '&size=100&margin=1&centerImageUrl=' .
+                        urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+                @endphp
+                <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
+            </div>
+            <div class="ttd-block">
+                @if ($letter)
+                    Talaga,
+                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}<br />
+                @else
+                    Talaga, ___________________<br />
+                @endif
+                Kepala SMK Negeri 1 Talaga,
+                <div class="ttd-space"></div>
+                <div class="nama">
+                    {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}</div>
+                <div>{{ $principal->employee->rank_end ?? 'Penata Tingkat I/IIId' }}</div>
+                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
+            </div>
+        </div>
 
-{{-- QR CODE FOOTER --}}
-<div class="doc-qr-footer">
-    <div class="doc-qr-footer-text">
-        <strong>Verifikasi Keaslian Dokumen</strong>
-        Scan QR Code ini untuk memverifikasi keaslian Surat Kelulusan atas nama
-        <strong style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
-        Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
+        {{-- QR CODE FOOTER --}}
+        <div class="doc-qr-footer">
+            <div class="doc-qr-footer-text">
+                <strong>Verifikasi Keaslian Dokumen</strong>
+                Scan QR Code ini untuk memverifikasi keaslian Surat Kelulusan atas nama
+                <strong
+                    style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+                Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
+            </div>
+        </div>
     </div>
-</div>
-</div>
 
     {{-- ══════════════════════════════════════
          HALAMAN 3: SURAT PERNYATAAN/FAKTA INTEGRITAS
@@ -1218,7 +1232,7 @@
 
 
         <div class="ttd-pernyataan">
-            
+
             <div class="ttd-pernyataan-block">
                 @if ($letter)
                     Talaga,
@@ -1234,7 +1248,7 @@
         </div>
 
         {{-- QR CODE FOOTER HALAMAN 3 --}}
-        
+
 
     </div>{{-- end .page-pernyataan (halaman 3) --}}
 

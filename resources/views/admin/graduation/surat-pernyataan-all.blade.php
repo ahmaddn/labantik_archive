@@ -222,11 +222,11 @@
                     <td class="sep">:</td>
                     <td>{{ $item->program1->name ?? '—' }}</td>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td class="label">Tahun Pelajaran</td>
                     <td class="sep">:</td>
                     <td>{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}</td>
-                </tr>
+                </tr> --}}
                 <tr>
                     <td class="label">Alamat</td>
                     <td class="sep">:</td>

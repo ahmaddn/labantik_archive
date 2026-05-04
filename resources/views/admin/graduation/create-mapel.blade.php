@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php $hide_global_alerts = true; @endphp
 @section('title', 'Tambah Mapel')
 @section('page-title', 'Tambah Mapel')
 
@@ -125,6 +126,38 @@
     {{-- GANTI script lama dengan ini --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                });
+            @endif
+
+            @if ($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Validasi',
+                    html: `
+                        <ul class="text-left text-xs space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    `,
+                });
+            @endif
+
             const typeSelect = document.getElementById('type');
             const expertiseContainer = document.getElementById('expertise-container');
 

@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php $hide_global_alerts = true; @endphp
 @section('title', 'Edit Mapel')
 @section('page-title', 'Edit Mapel')
 
@@ -167,14 +168,54 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                });
+            @endif
+
+            @if ($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Validasi',
+                    html: `
+                        <ul class="text-left text-xs space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    `,
+                });
+            @endif
 
             // Hapus mapel
             document.getElementById('btnHapusMapel').addEventListener('click', function() {
-                if (confirm(
-                        'Hapus mapel "{{ addslashes($mapel->name) }}"? Tindakan ini tidak dapat dibatalkan.'
-                    )) {
-                    document.getElementById('form-delete-mapel').submit();
-                }
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Hapus mapel "{{ addslashes($mapel->name) }}"? Tindakan ini tidak dapat dibatalkan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('form-delete-mapel').submit();
+                    }
+                });
             });
 
             // Toggle jurusan berdasarkan tipe

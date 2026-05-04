@@ -423,12 +423,12 @@
                 <td class="sep" style="padding:0;">:</td>
                 <td style="padding:0;">{{ strtoupper($program->name ?? '—') }}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td class="label" style="padding:0;">Tahun Pelajaran</td>
                 <td class="sep" style="padding:0;">:</td>
                 <td style="padding:0;">
                     {{ $letter->academic_year ?? ($student->academicYears->first()->academic_year ?? '—') }}</td>
-            </tr>
+            </tr> --}}
             <tr>
                 <td class="label" style="padding:0;">Dinyatakan</td>
                 <td class="sep" style="padding:0;">:</td>
@@ -446,7 +446,7 @@
             <thead>
                 <tr>
                     <th class="col-no">No</th>
-                    <th>Mata Pelajaran (Kurikulum Merdeka)</th>
+                    <th>Mata Pelajaran </th>
                     <th class="col-nilai">Nilai</th>
                 </tr>
             </thead>

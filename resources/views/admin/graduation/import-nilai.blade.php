@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php $hide_global_alerts = true; @endphp
 @section('title', 'Import Nilai Kelulusan')
 @section('page-title', 'Import Nilai Kelulusan')
 
@@ -19,49 +20,6 @@
             </a>
         </div>
 
-        {{-- Success Message --}}
-        @if (session('success'))
-            <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6 flex gap-3">
-                <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                    <p class="text-green-800 font-medium">{{ session('success') }}</p>
-                    @if (session('import_errors') && count(session('import_errors')) > 0)
-                        <details class="mt-2">
-                            <summary class="text-sm text-green-700 cursor-pointer font-medium">Lihat detail error
-                                ({{ count(session('import_errors')) }})</summary>
-                            <ul class="text-xs text-green-700 mt-2 space-y-1 pl-4">
-                                @foreach (session('import_errors') as $error)
-                                    <li>• {{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </details>
-                    @endif
-                </div>
-            </div>
-        @endif
-
-        {{-- Error Message --}}
-        @if ($errors->any())
-            <div class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 flex gap-3">
-                <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                    <p class="text-red-800 font-medium">Terjadi kesalahan saat import</p>
-                    <ul class="text-xs text-red-700 mt-2 space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>• {{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-        @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {{-- Main Form --}}
@@ -224,6 +182,42 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    html: `
+                        <p>{{ session('success') }}</p>
+                        @if (session('import_errors') && count(session('import_errors')) > 0)
+                            <div class="mt-4 text-left">
+                                <p class="text-xs font-bold mb-1">Detail Error ({{ count(session('import_errors')) }}):</p>
+                                <ul class="text-[10px] space-y-1 max-h-40 overflow-y-auto">
+                                    @foreach (session('import_errors') as $error)
+                                        <li>• {{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                    `,
+                });
+            @endif
+
+            @if ($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Import!',
+                    html: `
+                        <ul class="text-left text-xs space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    `,
+                });
+            @endif
+        });
+
         document.getElementById('file').addEventListener('change', function(e) {
             const fileName = e.target.files[0]?.name;
             const fileNameDisplay = document.getElementById('fileName');

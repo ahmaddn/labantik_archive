@@ -421,13 +421,13 @@
                     <td class="sep" style="padding:0;">:</td>
                     <td style="padding:0;">{{ strtoupper($item->program->name ?? '—') }}</td>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td class="label" style="padding:0;">Tahun Pelajaran</td>
                     <td class="sep" style="padding:0;">:</td>
                     <td style="padding:0;">
                         {{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}
                     </td>
-                </tr>
+                </tr> --}}
                 <tr>
                     <td class="label" style="padding:0;">Dinyatakan</td>
                     <td class="sep" style="padding:0;">:</td>

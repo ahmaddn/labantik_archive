@@ -136,6 +136,10 @@ class RefStudent extends Model
     {
         return $this->hasOne(GoogleStatement::class, 'user_id', 'user_id');
     }
+    public function graduation(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(GoogleGraduation::class, 'user_id', 'id');
+    }
 
 
 

@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php $hide_global_alerts = true; @endphp
 @section('title', 'Detail Kelulusan')
 @section('page-title', 'Detail Kelulusan')
 
@@ -520,6 +521,40 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                });
+            @endif
+
+            @if ($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Validasi',
+                    html: `
+                        <ul class="text-left text-xs space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    `,
+                });
+            @endif
+        });
+
         // ══════════════════════════════════════════════════════════
         // STATE
         // ══════════════════════════════════════════════════════════
@@ -610,11 +645,27 @@
 
                     // Refresh Average
                     refreshAverage();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Nilai berhasil diperbarui',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 } else {
-                    alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan')
+                    });
                 }
             } catch (err) {
-                alert('Gagal menyimpan: ' + err.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Gagal menyimpan: ' + err.message
+                });
             } finally {
                 btn.disabled = false;
                 btn.innerHTML =
@@ -691,7 +742,11 @@
                 var val = input.value;
                 var score = val === '' ? null : parseFloat(val);
                 if (score !== null && (score < 0 || score > 100)) {
-                    alert('Nilai harus antara 0 dan 100 untuk semua mapel.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Nilai Tidak Valid',
+                        text: 'Nilai harus antara 0 dan 100 untuk semua mapel.'
+                    });
                     return;
                 }
                 scores.push({
@@ -725,11 +780,27 @@
                         updateScoreBadge(item.uuid, item.score);
                     });
                     closeBulkScoreModal();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Semua nilai berhasil diperbarui',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 } else {
-                    alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan')
+                    });
                 }
             } catch (err) {
-                alert('Gagal menyimpan: ' + err.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Gagal menyimpan: ' + err.message
+                });
             } finally {
                 btn.disabled = false;
                 btn.innerHTML =

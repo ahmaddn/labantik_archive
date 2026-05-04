@@ -578,8 +578,9 @@
             </div>
         </header>
 
+
         {{-- Flash Messages (global) --}}
-        @if (session('success') || session('error') || session('warning'))
+        @if (!isset($hide_global_alerts) && (session('success') || session('error') || session('warning')))
             <div class="space-y-2 px-4 pt-4 sm:px-6">
                 @if (session('success'))
                     <div
