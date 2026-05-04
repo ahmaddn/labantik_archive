@@ -15,26 +15,40 @@ class AuthController extends Controller
     }
 
     public function login(Request $request): RedirectResponse
-    {
-        $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $credentials = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
 
-            // Update last_login
-            Auth::user()->update(['last_login' => now()]);
+        // Cek apakah user ini terdaftar di ref_student
+        $isRegistered = \DB::table('ref_student')
+            ->where('user_id', Auth::id())
+            ->exists();
 
-            return redirect()->intended(route('drive.index'));
+        if (!$isRegistered) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'email' => 'Akun ini tidak terdaftar sebagai siswa.',
+            ])->onlyInput('email');
         }
 
-        return back()->withErrors([
-            'email' => 'Email atau password tidak valid.',
-        ])->onlyInput('email');
+        // Update last_login
+        Auth::user()->update(['last_login' => now()]);
+
+        return redirect()->intended(route('drive.index'));
     }
 
+    return back()->withErrors([
+        'email' => 'Email atau password tidak valid.',
+    ])->onlyInput('email');
+}
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
