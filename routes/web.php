@@ -32,6 +32,7 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login/select', [AuthController::class, 'selectAccount'])->name('login.select'); // ← tambah sini
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])
