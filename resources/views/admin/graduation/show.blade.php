@@ -81,7 +81,17 @@
                             <p class="text-xs text-gray-500 mt-1">Nomor identitas kelulusan</p>
                         </div>
                         <p class="font-mono text-sm font-bold text-gray-900 bg-blue-50 px-3 py-1.5 rounded-lg">
-                            {{ $graduation->letter_number ?: '-' }}
+                            {{ $graduation->letter->letter_number ?? '-' }}
+                        </p>
+                    </div>
+
+                    <div class="flex items-start justify-between pb-4 border-b border-gray-100">
+                        <div>
+                            <p class="text-sm text-gray-600 font-medium">Nomor Surat Transkrip</p>
+                            <p class="text-xs text-gray-500 mt-1">Nomor identitas transkrip nilai</p>
+                        </div>
+                        <p class="font-mono text-sm font-bold text-purple-900 bg-purple-50 px-3 py-1.5 rounded-lg">
+                            {{ $graduation->transcriptLetter->transcript_letter_number ?? '-' }}
                         </p>
                     </div>
 
@@ -91,7 +101,7 @@
                             <p class="text-xs text-gray-500 mt-1">Tanggal siswa lulus</p>
                         </div>
                         <p class="text-sm font-semibold text-gray-900">
-                            {{ $graduation->graduation_date ? \Carbon\Carbon::parse($graduation->graduation_date)->format('d F Y') : '-' }}
+                            {{ $graduation->letter && $graduation->letter->graduation_date ? \Carbon\Carbon::parse($graduation->letter->graduation_date)->translatedFormat('j F Y') : '-' }}
                         </p>
                     </div>
 
@@ -129,7 +139,7 @@
                         <div class="bg-indigo-50 rounded-xl p-4">
                             <p class="text-xs text-indigo-500 font-medium mb-1">Tanggal Surat</p>
                             <p class="text-sm font-bold text-indigo-900">
-                                {{ $letter->letter_date ? \Carbon\Carbon::parse($letter->letter_date)->format('d F Y') : '-' }}
+                                {{ $letter->letter_date ? \Carbon\Carbon::parse($letter->letter_date)->translatedFormat('j F Y') : '-' }}
                             </p>
                         </div>
                         @if ($letter->title)
@@ -142,6 +152,41 @@
                             <div class="bg-gray-50 rounded-xl p-4 sm:col-span-2">
                                 <p class="text-xs text-gray-500 font-medium mb-1">Keterangan</p>
                                 <p class="text-sm text-gray-700">{{ $letter->description }}</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
+            {{-- Card: Template Transkrip (hanya tampil jika ada) --}}
+            @if ($graduation->transcriptLetter)
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Template Transkrip Nilai
+                    </h2>
+
+                    @php $tLetter = $graduation->transcriptLetter; @endphp
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-purple-50 rounded-xl p-4">
+                            <p class="text-xs text-purple-500 font-medium mb-1">Nomor Surat Transkrip</p>
+                            <p class="text-sm font-bold text-purple-900 font-mono">
+                                {{ $tLetter->transcript_letter_number ?? '-' }}</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-4">
+                            <p class="text-xs text-purple-500 font-medium mb-1">Tanggal Surat</p>
+                            <p class="text-sm font-bold text-purple-900">
+                                {{ $tLetter->letter_date ? \Carbon\Carbon::parse($tLetter->letter_date)->translatedFormat('j F Y') : '-' }}
+                            </p>
+                        </div>
+                        @if ($tLetter->title)
+                            <div class="bg-gray-50 rounded-xl p-4 sm:col-span-2">
+                                <p class="text-xs text-gray-500 font-medium mb-1">Judul Template</p>
+                                <p class="text-sm font-semibold text-gray-800">{{ $tLetter->title }}</p>
                             </div>
                         @endif
                     </div>
@@ -330,7 +375,7 @@
                     <div>
                         <p class="text-xs text-gray-500 font-medium mb-1">Dibuat Pada</p>
                         <p class="text-sm font-semibold text-gray-800">
-                            {{ \Carbon\Carbon::parse($graduation->created_at)->format('d F Y H:i') }}
+                            {{ \Carbon\Carbon::parse($graduation->created_at)->translatedFormat('j F Y H:i') }}
                         </p>
                         <p class="text-xs text-gray-400 mt-1">
                             {{ \Carbon\Carbon::parse($graduation->created_at)->diffForHumans() }}
@@ -340,7 +385,7 @@
                     <div class="border-t border-gray-100 pt-4">
                         <p class="text-xs text-gray-500 font-medium mb-1">Diperbarui Pada</p>
                         <p class="text-sm font-semibold text-gray-800">
-                            {{ \Carbon\Carbon::parse($graduation->updated_at)->format('d F Y H:i') }}
+                            {{ \Carbon\Carbon::parse($graduation->updated_at)->translatedFormat('j F Y H:i') }}
                         </p>
                         <p class="text-xs text-gray-400 mt-1">
                             {{ \Carbon\Carbon::parse($graduation->updated_at)->diffForHumans() }}

@@ -242,6 +242,8 @@ class GraduationController extends Controller
             'user',
             'mapels.mapel.class',
             'mapels.mapel.expertise',
+            'letter',
+            'transcriptLetter'
         ])
             ->where('uuid', $id)
             ->firstOrFail();

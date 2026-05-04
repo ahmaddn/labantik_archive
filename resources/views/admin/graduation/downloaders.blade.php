@@ -79,9 +79,9 @@
                                 </td>
                                 <td class="px-6 py-4 text-gray-500 text-xs">
                                     @if($dl->last_print_at)
-                                        {{ \Carbon\Carbon::parse($dl->last_print_at)->translatedFormat('d M Y, H:i') }}
+                                        {{ \Carbon\Carbon::parse($dl->last_print_at)->translatedFormat('j F Y, H:i') }}
                                     @else
-                                        {{ \Carbon\Carbon::parse($dl->updated_at)->translatedFormat('d M Y, H:i') }}
+                                        {{ \Carbon\Carbon::parse($dl->updated_at)->translatedFormat('j F Y, H:i') }}
                                     @endif
                                 </td>
                             </tr>

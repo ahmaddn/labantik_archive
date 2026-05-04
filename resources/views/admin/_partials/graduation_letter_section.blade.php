@@ -86,7 +86,7 @@
                                     {{ $hm->employee->full_name ?? ($hm->name ?? '-') }}
                                 </td>
                                 <td class="py-3.5 pr-4 text-gray-600">
-                                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('d F Y') }}
+                                    {{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') }}
                                 </td>
                                 <td class="py-3.5 pr-4 text-gray-600 max-w-xs">
                                     <p class="truncate" title="{{ $letter->statement }}">{{ $letter->statement }}</p>

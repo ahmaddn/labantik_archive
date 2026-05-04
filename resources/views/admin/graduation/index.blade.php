@@ -170,70 +170,61 @@
         </div>
 
         {{-- Apply template section --}}
-        <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
-            {{-- Block 1: SKL --}}
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div class="flex items-start gap-3">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0 {{ $allHaveLetter ? 'text-green-600' : 'text-blue-600' }}"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        @if ($allHaveLetter)
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        @else
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        @endif
-                    </svg>
-                    <div>
-                        <p class="text-sm font-semibold text-gray-800">Terapkan Template Surat Ke Semua</p>
-                        <p class="text-xs text-gray-600 mt-0.5">
+        <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 border-b border-blue-100">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
+                {{-- Block 1: SKL --}}
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 mt-0.5 flex-shrink-0 {{ $allHaveLetter ? 'text-green-600' : 'text-blue-600' }}"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             @if ($allHaveLetter)
-                                Semua data kelulusan sudah memiliki surat yang ditetapkan.
-                            @else
-                                Pilih template surat, lalu klik tombol untuk mengisi letter_id semua data kelulusan siswa.
-                            @endif
-                        </p>
-                    </div>
-                </div>
-
-                @if ($allHaveLetter)
-                    <div
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-50 border border-green-200 text-green-700 text-xs sm:text-sm font-semibold rounded-lg w-full lg:w-auto justify-center">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Semua data sudah memiliki surat
-                    </div>
-                @else
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
-                        <select id="templateSelectDropdown"
-                            class="flex-1 lg:w-64 px-4 py-2.5 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-blue-300 transition-colors">
-                            <option value="">-- Pilih Template SKL --</option>
-                            @foreach ($letters as $letter)
-                                <option value="{{ $letter->uuid }}">
-                                    {{ $letter->letter_number }}
-                                    ({{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('d M Y') }})
-                                </option>
-                            @endforeach
-                        </select>
-
-                        <button onclick="openApplyTemplateModal()" id="applyTemplateBtn"
-                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg opacity-50 cursor-not-allowed"
-                            disabled>
-                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span class="whitespace-nowrap">Gunakan ke Semua</span>
-                        </button>
+                            @else
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            @endif
+                        </svg>
+                        <div>
+                            <p class="text-[13px] font-bold text-gray-800">Template SKL</p>
+                            <p class="text-[11px] text-gray-500 leading-tight mt-0.5">
+                                @if ($allHaveLetter)
+                                    Sudah ditetapkan semua.
+                                @else
+                                    Terapkan ke semua siswa.
+                                @endif
+                            </p>
+                        </div>
                     </div>
-                @endif
-            </div>
 
-            {{-- Block 2: Transkrip --}}
-            <div class="mt-6 pt-6 border-t border-blue-100/50">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    @if ($allHaveLetter)
+                        <div
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100/50 border border-green-200 text-green-700 text-[11px] font-bold rounded-lg whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Selesai
+                        </div>
+                    @else
+                        <div class="flex items-center gap-2">
+                            <select id="templateSelectDropdown"
+                                class="w-40 px-3 py-1.5 border border-blue-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                                <option value="">-- Pilih --</option>
+                                @foreach ($letters as $letter)
+                                    <option value="{{ $letter->uuid }}">
+                                        {{ $letter->letter_number }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button onclick="openApplyTemplateModal()" id="applyTemplateBtn"
+                                class="px-3 py-1.5 bg-blue-600 text-white font-bold rounded-lg text-xs opacity-50 cursor-not-allowed"
+                                disabled>Gunakan</button>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Block 2: Transkrip --}}
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 lg:border-l lg:border-blue-100 lg:pl-12">
                     <div class="flex items-start gap-3">
                         <svg class="w-5 h-5 mt-0.5 flex-shrink-0 {{ $allHaveTranscriptLetter ? 'text-green-600' : 'text-blue-600' }}"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,12 +237,12 @@
                             @endif
                         </svg>
                         <div>
-                            <p class="text-sm font-semibold text-gray-800">Terapkan Template Transkrip Ke Semua</p>
-                            <p class="text-xs text-gray-600 mt-0.5">
+                            <p class="text-[13px] font-bold text-gray-800">Template Transkrip</p>
+                            <p class="text-[11px] text-gray-500 leading-tight mt-0.5">
                                 @if ($allHaveTranscriptLetter)
-                                    Semua data kelulusan sudah memiliki template transkrip yang ditetapkan.
+                                    Sudah ditetapkan semua.
                                 @else
-                                    Pilih template yang akan digunakan khusus untuk pencetakan Transkrip Nilai.
+                                    Terapkan ke semua siswa.
                                 @endif
                             </p>
                         </div>
@@ -259,35 +250,26 @@
 
                     @if ($allHaveTranscriptLetter)
                         <div
-                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-50 border border-green-200 text-green-700 text-xs sm:text-sm font-semibold rounded-lg w-full lg:w-auto justify-center">
-                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100/50 border border-green-200 text-green-700 text-[11px] font-bold rounded-lg whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            Semua transkrip sudah memiliki template
+                            Selesai
                         </div>
                     @else
-                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
+                        <div class="flex items-center gap-2">
                             <select id="transcriptTemplateSelectDropdown"
-                                class="flex-1 lg:w-64 px-4 py-2.5 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-blue-300 transition-colors">
-                                <option value="">-- Pilih Template Transkrip --</option>
+                                class="w-40 px-3 py-1.5 border border-blue-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                                <option value="">-- Pilih --</option>
                                 @foreach ($letters as $letter)
                                     <option value="{{ $letter->uuid }}">
                                         {{ $letter->transcript_letter_number }}
-                                        ({{ \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('d M Y') }})
                                     </option>
                                 @endforeach
                             </select>
-
                             <button onclick="openApplyTranscriptTemplateModal()" id="applyTranscriptTemplateBtn"
-                                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg opacity-50 cursor-not-allowed"
-                                disabled>
-                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span class="whitespace-nowrap">Gunakan ke Semua</span>
-                            </button>
+                                class="px-3 py-1.5 bg-violet-600 text-white font-bold rounded-lg text-xs opacity-50 cursor-not-allowed"
+                                disabled>Gunakan</button>
                         </div>
                     @endif
                 </div>

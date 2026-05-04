@@ -270,7 +270,7 @@
             <div class="ttd-pernyataan">
 
                 <div class="ttd-pernyataan-block">
-                    Majalengka, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
+                    Majalengka, {{ \Carbon\Carbon::now()->translatedFormat('j F Y') }}<br>
                     Yang menyatakan,<br>
                     @if ($item->signature?->signature_data)
                         <img src="{{ $item->signature->signature_data }}" alt="Tanda Tangan" style="height: 60px;">
