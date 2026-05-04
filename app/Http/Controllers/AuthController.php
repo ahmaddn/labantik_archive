@@ -40,9 +40,8 @@ class AuthController extends Controller
         // Kalau lebih dari 1 akun cocok → tampilkan picker
         if ($matched->count() > 1) {
             $candidates = $matched->map(function ($user) {
-                // Cek koneksi ke tabel ref
                 $asStudent = \DB::table('ref_students')->where('user_id', $user->id)->exists();
-                $asPTK     = \DB::table('core_employees')->where('user_id', $user->id)->exists(); // sesuaikan nama tabelnya
+                $asPTK     = \DB::table('core_employees')->where('user_id', $user->id)->exists();
 
                 return [
                     'id'        => $user->id,
@@ -52,8 +51,8 @@ class AuthController extends Controller
             })->values();
 
             session([
-                'account_candidates' => $matched->pluck('id')->toArray(),
-                'remember_me'        => $request->boolean('remember'),
+                'valid_account_ids' => $matched->pluck('id')->toArray(),
+                'remember_me'       => $request->boolean('remember'),
             ]);
 
             return back()->with('account_candidates', $candidates)->onlyInput('email');
@@ -67,16 +66,16 @@ class AuthController extends Controller
     {
         $request->validate(['user_id' => 'required|string']);
 
-        $candidates = session('account_candidates', []);
+        $validIds = session('valid_account_ids', []);
 
-        if (!in_array($request->user_id, $candidates)) {
+        if (!in_array($request->user_id, $validIds)) {
             return redirect()->route('login')->withErrors(['email' => 'Pilihan akun tidak valid.']);
         }
 
-        $user = User::findOrFail($request->user_id);
+        $user     = User::findOrFail($request->user_id);
         $remember = session('remember_me', false);
 
-        session()->forget(['account_candidates', 'remember_me']);
+        session()->forget(['valid_account_ids', 'remember_me']);
 
         return $this->doLogin($user, $remember);
     }
