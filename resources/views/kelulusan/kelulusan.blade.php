@@ -256,7 +256,6 @@
 
         .ttd-space {
             height: 60px;
-            position: relative;
         }
 
         .ttd-block .nama {
@@ -566,6 +565,26 @@
         .transkrip-ttd-block {
             width: 250px;
             text-align: left;
+            position: relative;
+        }
+
+        .transkrip-stamp-image {
+            position: absolute;
+            left: -60px;
+            top: -30px;
+            width: 120px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .transkrip-signature-image {
+            position: absolute;
+            left: 0px;
+            top: 25px;
+            width: 70px;
+            z-index: 5;
+            pointer-events: none;
         }
 
         .transkrip-ttd-space {
@@ -963,7 +982,7 @@
             <tr>
                 <td class="label">Tempat, Tanggal Lahir</td>
                 <td class="sep">:</td>
-                <td>{{ $student->birth_place_date ?? '-' }}</td>
+                <td>{{ strtoupper(preg_replace('/\s*,\s*/', ', ', $student->birth_place_date ?? '-')) }}</td>
             </tr>
             <tr>
                 <td class="label">Nomor Induk Siswa Nasional</td>
