@@ -568,11 +568,11 @@
                     @endif
                     Kepala SMK Negeri 1 Talaga,
                     <div class="ttd-space">
-                        @if (in_array($sigMode ?? 'both', ['sig', 'both']) && $letter && $letter->signature_image)
-                            <img src="{{ url('storage/', $letter->signature_image) }}" class="signature-image">
+                        @if (in_array($sigMode ?? 'both', ['sig', 'both']) && $item->letter && $item->letter->signature_image)
+                            <img src="{{ url('storage/', $item->letter->signature_image) }}" class="signature-image">
                         @endif
-                        @if (($sigMode ?? 'both') === 'both' && $letter && $letter->stamp_image)
-                            <img src="{{ url('storage/', $letter->stamp_image) }}" class="stamp-image">
+                        @if (($sigMode ?? 'both') === 'both' && $item->letter && $item->letter->stamp_image)
+                            <img src="{{ url('storage/', $item->letter->stamp_image) }}" class="stamp-image">
                         @endif
                     </div>
                     <div class="nama">
