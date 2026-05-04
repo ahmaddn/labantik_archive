@@ -378,9 +378,11 @@
 
         .ttd-pernyataan-block .signature-img {
             width: 200px;
-            height: 80px;
+            height: 90px;
             object-fit: contain;
             display: block;
+            margin-left: -20px;
+            margin-right: auto;
         }
 
         .ttd-pernyataan-block .nama-ttd {
@@ -728,7 +730,8 @@
             <tr>
                 <td class="label" style="padding:0;">Tempat, Tanggal Lahir</td>
                 <td class="sep" style="padding:0;">:</td>
-                <td style="padding:0;">{{ strtoupper(preg_replace('/\s*,\s*/', ', ', $student->birth_place_date ?? '—')) }}</td>
+                <td style="padding:0;">
+                    {{ strtoupper(preg_replace('/\s*,\s*/', ', ', $student->birth_place_date ?? '—')) }}</td>
             </tr>
             <tr>
                 <td class="label" style="padding:0;">Nama Orang Tua/Wali</td>
