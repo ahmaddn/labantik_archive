@@ -158,6 +158,10 @@
             font-size: 10pt;
         }
 
+        .info-table td:nth-child(3) {
+            text-transform: uppercase;
+        }
+
         .info-table td {
             padding: 1px 2px;
             vertical-align: top;
@@ -319,6 +323,10 @@
             font-size: 11pt;
         }
 
+        .pernyataan-info-table td:nth-child(3) {
+            text-transform: uppercase;
+        }
+
         .pernyataan-info-table td {
             padding: 2px 3px;
             vertical-align: top;
@@ -468,6 +476,10 @@
             border-collapse: collapse;
             margin-bottom: 10px;
             font-size: 9pt;
+        }
+
+        .transkrip-info-table td:nth-child(3) {
+            text-transform: uppercase;
         }
 
         .transkrip-info-table td {

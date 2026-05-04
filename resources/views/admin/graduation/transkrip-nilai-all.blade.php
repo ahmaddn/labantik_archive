@@ -153,6 +153,10 @@
             margin-bottom: 10px;
         }
 
+        .info-table td:nth-child(3) {
+            text-transform: uppercase;
+        }
+
         .info-table td {
             padding: 1px 2px;
             vertical-align: top;

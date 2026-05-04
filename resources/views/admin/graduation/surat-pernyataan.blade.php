@@ -85,6 +85,10 @@
             font-size: 11pt;
         }
 
+        .pernyataan-info-table td:nth-child(3) {
+            text-transform: uppercase;
+        }
+
         .pernyataan-info-table td {
             padding: 2px 3px;
             vertical-align: top;

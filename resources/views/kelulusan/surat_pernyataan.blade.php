@@ -77,6 +77,10 @@
             font-size: 11pt;
         }
 
+        .info-table td:nth-child(3) {
+            text-transform: uppercase;
+        }
+
         .info-table td {
             padding: 2px 3px;
             vertical-align: top;
