@@ -138,6 +138,56 @@ class GraduationSuratController extends Controller
         ));
     }
 
+    /**
+     * Tampilkan transkrip nilai ijazah — 1 siswa atau semua (export)
+     */
+    public function showTranskripIjazah($id)
+    {
+        if ($id === 'all') {
+            return $this->transkripIjazahAll();
+        }
+
+        $graduation = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'transcriptLetter', 'mapels.mapel'])
+            ->where('uuid', $id)
+            ->firstOrFail();
+
+        $student    = $graduation->user;
+        $user       = auth()->user();
+        $letter     = $graduation->transcriptLetter ?? $graduation->letter;
+        $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
+
+        $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+        $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+
+        $scores   = $mapelsData->filter(fn($m) => ($m->mapel->has_na ?? true) && $m->score !== null)->pluck('score');
+        $rataRataScore = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
+
+        $latestAcademicYear = $student->academicYears->first();
+        $program            = $latestAcademicYear?->class?->expertiseConcentration;
+        $program1           = $latestAcademicYear?->class?->expertiseProgram;
+        $principal          = $this->getPrincipal($letter->headmaster_id ?? null);
+
+        $sigMode            = request('sig_mode', 'both');
+
+        // Gunakan $rataRata untuk konsistensi dengan view jika diperlukan
+        $rataRata = $rataRataScore;
+
+        return view('admin.graduation.transkrip-ijazah', compact(
+            'graduation',
+            'student',
+            'user',
+            'letter',
+            'mapelUmum',
+            'mapelJurusan',
+            'rataRataScore',
+            'rataRata',
+            'program',
+            'program1',
+            'principal',
+            'sigMode'
+        ));
+    }
+
     // =========================================================================
     // PRIVATE — export semua
     // =========================================================================
@@ -276,5 +326,47 @@ class GraduationSuratController extends Controller
         $sigMode = request('sig_mode', 'both');
 
         return view('admin.graduation.transkrip-nilai-all', compact('data', 'principal', 'sigMode'));
+    }
+
+    private function transkripIjazahAll()
+    {
+        $classId     = request('class_id');
+        $expertiseId = request('expertise_id');
+
+        $graduations = \App\Models\GoogleGraduation::with(['user.academicYears.class.expertiseProgram', 'user.academicYears.class.expertiseConcentration', 'letter', 'transcriptLetter', 'mapels.mapel'])
+            ->whereHas('user.academicYears.class', function ($q) use ($classId, $expertiseId) {
+                $q->where('academic_level', 12);
+                if ($classId)     $q->where('id', $classId);
+                if ($expertiseId) $q->where('expertise_concentration_id', $expertiseId);
+            })
+            ->get()
+            ->sortBy(function($g) {
+                return ($g->user->academicYears->first()?->class?->name ?? '') . ' ' . ($g->user->full_name ?? '');
+            });
+
+        $data = [];
+        foreach ($graduations as $graduation) {
+            $student    = $graduation->user;
+            $user       = auth()->user();
+            $letter     = $graduation->transcriptLetter ?? $graduation->letter;
+            $mapelsData = $graduation->mapels()->with('mapel')->orderBy('mapel_id')->get();
+
+            $mapelUmum    = $mapelsData->filter(fn($m) => $m->mapel->type === 'umum')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+            $mapelJurusan = $mapelsData->filter(fn($m) => $m->mapel->type === 'jurusan')->sortBy(fn($m) => $m->mapel->order ?? '-')->values();
+
+            $scores   = $mapelsData->filter(fn($m) => ($m->mapel->has_na ?? true) && $m->score !== null)->pluck('score');
+            $rataRata = $scores->isNotEmpty() ? number_format($scores->avg(), 2) : '';
+
+            $latestAcademicYear = $student->academicYears->first();
+            $program            = $latestAcademicYear?->class?->expertiseConcentration;
+            $program1           = $latestAcademicYear?->class?->expertiseProgram;
+            $principal          = $this->getPrincipal($letter->headmaster_id ?? null);
+
+            $data[] = (object) compact('graduation', 'student', 'user', 'letter', 'mapelUmum', 'mapelJurusan', 'rataRata', 'program', 'program1', 'principal');
+        }
+
+        $sigMode = request('sig_mode', 'both');
+
+        return view('admin.graduation.transkrip-ijazah-all', compact('data', 'sigMode'));
     }
 }

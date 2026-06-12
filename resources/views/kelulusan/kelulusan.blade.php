@@ -961,8 +961,7 @@
 
         {{-- JUDUL --}}
         <div class="transkrip-doc-title">
-            <h2>TRANSKRIP NILAI</h2>
-            <div class="nomor">{{ $letter->letter_number ?? '261/TU.01.02/SMK-Tlg.CADISDIKWIL.IX/V/2025' }}</div>
+            <h2>TRANSKRIP NILAI RAPOR</h2>
         </div>
 
         {{-- INFO SISWA --}}
@@ -1320,6 +1319,231 @@
 
 
     </div>{{-- end .page-pernyataan (halaman 3) --}}
+
+    {{-- ══════════════════════════════════════
+         HALAMAN 4: TRANSKRIP NILAI IJAZAH
+         page-break-before: always (di CSS print)
+    ══════════════════════════════════════ --}}
+    <div class="page-transkrip">
+        {{-- KOP SURAT --}}
+        <div class="transkrip-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Coat_of_arms_of_West_Java.svg/500px-Coat_of_arms_of_West_Java.svg.png"
+                alt="Logo" />
+            <div class="line1">PEMERINTAH DAERAH PROVINSI JAWA BARAT</div>
+            <div class="line2">CABANG DINAS PENDIDIKAN WILAYAH IX</div>
+            <div class="line3">SEKOLAH MENENGAH KEJURUAN NEGERI 1 TALAGA</div>
+            <div class="address">
+                Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan Manajemen<br />
+                Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
+                Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
+                Telpon ☎ (0233) 319238 FAX ☎ (0233) 319238 POS ✉ 45463 NPSN: 20213872<br />
+                Website www.smkn1talaga.sch.id - Email ✉ mail@smkn1talaga.sch.id
+            </div>
+        </div>
+        <div class="transkrip-header-border"></div>
+
+        {{-- JUDUL --}}
+        <div class="transkrip-doc-title">
+            <h2>TRANSKRIP NILAI</h2>
+            <div class="nomor">242/TU.01.02/SMK-Tlg/CADISDIKWIL.IX/2026</div>
+        </div>
+
+        {{-- INFO SISWA --}}
+        <table class="transkrip-info-table">
+            <tr>
+                <td class="label">Satuan Pendidikan</td>
+                <td class="sep">:</td>
+                <td>SMKN 1 Talaga</td>
+            </tr>
+            <tr>
+                <td class="label">Nomor Pokok Sekolah Nasional</td>
+                <td class="sep">:</td>
+                <td>20213872</td>
+            </tr>
+            <tr>
+                <td class="label">Nama Lengkap</td>
+                <td class="sep">:</td>
+                <td style="font-weight:bold;">{{ strtoupper($student->full_name ?? '—') }}</td>
+            </tr>
+            <tr>
+                <td class="label">Tempat, Tanggal Lahir</td>
+                <td class="sep">:</td>
+                <td>{{ strtoupper(preg_replace('/\s*,\s*/', ', ', $student->birth_place_date ?? '-')) }}</td>
+            </tr>
+            <tr>
+                <td class="label">Nomor Induk Siswa Nasional</td>
+                <td class="sep">:</td>
+                <td>{{ $student->national_student_number ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Nomor Ijazah</td>
+                <td class="sep">:</td>
+                <td>{{ $student->diploma_number ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Tanggal Kelulusan</td>
+                <td class="sep">:</td>
+                <td>{{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Program Keahlian</td>
+                <td class="sep">:</td>
+                <td>{{ $program1->name ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Konsentrasi Keahlian</td>
+                <td class="sep">:</td>
+                <td>{{ $program->name ?? '-' }}</td>
+            </tr>
+        </table>
+
+        {{-- NILAI TABLE IJAZAH --}}
+        <table class="transkrip-nilai-table">
+            <thead>
+                <tr>
+                    <th class="col-no" style="width: 5%">No</th>
+                    <th style="width: 75%">Mata Pelajaran</th>
+                    <th class="col-nilai" style="width: 20%; text-align: center;">Nilai</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{-- A. Kelompok Mata Pelajaran Umum --}}
+                <tr class="group-header">
+                    <td colspan="3" style="text-align: left;">A. Kelompok Mata Pelajaran Umum</td>
+                </tr>
+                @php
+                    $noUmum = 1;
+                    $groupedUmum = [];
+                    foreach ($transkripUmum as $m) {
+                        $joinVal = $m->mapel->join ?? 0;
+                        $key = $joinVal == 0 ? 'solo_' . $m->id : 'grp_' . $joinVal;
+                        $groupedUmum[$key][] = $m;
+                    }
+                @endphp
+
+                @foreach ($groupedUmum as $key => $group)
+                    @php
+                        $rowspan = count($group);
+                        $g =
+                            collect($group)->first(
+                                fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
+                            ) ?? $group[0];
+                    @endphp
+                    @foreach ($group as $idx => $m)
+                        <tr>
+                            @if ($idx === 0)
+                                <td class="col-no"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $noUmum }}
+                                </td>
+                            @endif
+                            <td class="col-mapel">{{ $m->mapel->name }}</td>
+                            @if ($idx === 0)
+                                <td class="col-nilai" style="text-align: center;"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->score ? number_format($g->score, 2, ',', '') : '-' }}</td>
+                            @endif
+                        </tr>
+                    @endforeach
+                    @php $noUmum++; @endphp
+                @endforeach
+
+                {{-- B. Kelompok Mata Pelajaran Kejuruan --}}
+                <tr class="group-header">
+                    <td colspan="3" style="text-align: left;">B. Kelompok Mata Pelajaran Kejuruan</td>
+                </tr>
+                @php
+                    $noJurusan = 1;
+                    $groupedJurusan = [];
+                    foreach ($transkripJurusan as $m) {
+                        $joinVal = $m->mapel->join ?? 0;
+                        $key = $joinVal == 0 ? 'solo_' . $m->id : 'grp_' . $joinVal;
+                        $groupedJurusan[$key][] = $m;
+                    }
+                @endphp
+
+                @foreach ($groupedJurusan as $key => $group)
+                    @php
+                        $rowspan = count($group);
+                        $g =
+                            collect($group)->first(
+                                fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
+                            ) ?? $group[0];
+                    @endphp
+                    @foreach ($group as $idx => $m)
+                        <tr>
+                            @if ($idx === 0)
+                                <td class="col-no"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $noJurusan }}
+                                </td>
+                            @endif
+                            <td class="col-mapel">{{ $m->mapel->name }}</td>
+                            @if ($idx === 0)
+                                <td class="col-nilai" style="text-align: center;"
+                                    @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
+                                    {{ $g->score ? number_format($g->score, 2, ',', '') : '-' }}</td>
+                            @endif
+                        </tr>
+                    @endforeach
+                    @php $noJurusan++; @endphp
+                @endforeach
+
+                <tr class="rata-rata">
+                    <td colspan="2" style="text-align: center;">Rata-rata</td>
+                    <td class="col-nilai" style="text-align: center;">
+                        {{ $rataRata ? number_format((float) $rataRata, 2, ',', '') : '-' }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {{-- TANDA TANGAN --}}
+        <div class="transkrip-ttd-section">
+            <div class="qr-block-transkrip">
+                @php
+                    $verifyUrl = route('graduation.verify', $graduation->uuid);
+                    $qrUrl =
+                        'https://quickchart.io/qr?text=' .
+                        urlencode($verifyUrl) .
+                        '&size=100&margin=1&centerImageUrl=' .
+                        urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png');
+                @endphp
+                <img src="{{ $qrUrl }}" alt="QR Verifikasi" style="width: 80px; height: 80px;" />
+            </div>
+            <div class="transkrip-ttd-block">
+                Talaga,
+                {{ $letter ? \Carbon\Carbon::parse($letter->graduation_date)->translatedFormat('j F Y') : '-' }}<br />
+                Kepala SMK Negeri 1 Talaga,
+                <div class="transkrip-ttd-space">
+                    @if (in_array($sigMode ?? 'both', ['sig', 'both']) && $letter && $letter->signature_image)
+                        <img src="{{ url('storage/', $letter->signature_image) }}"
+                            class="transkrip-signature-image">
+                    @endif
+                    @if (($sigMode ?? 'both') === 'both' && $letter && $letter->stamp_image)
+                        <img src="{{ url('storage/', $letter->stamp_image) }}" class="transkrip-stamp-image">
+                    @endif
+                </div>
+                <div class="transkrip-ttd-name">
+                    {{ $principal->employee->full_name ?? ($principal->name ?? 'Muchamad Eki S.A., S.Kom.') }}
+                </div>
+                <div>{{ $principal->employee->functional_position ?? 'Penata Tingkat I/IIId' }}</div>
+                <div>NIP. {{ $principal->employee->nip ?? '197610012006041011' }}</div>
+            </div>
+        </div>
+
+        {{-- QR CODE FOOTER HALAMAN 4 --}}
+        <div class="doc-qr-footer">
+            <div class="doc-qr-footer-text">
+                <strong>Verifikasi Keaslian Dokumen</strong>
+                Scan QR Code ini untuk memverifikasi keaslian Transkrip Nilai atas nama
+                <strong
+                    style="display:inline; font-size:inherit;">{{ strtoupper($student->full_name ?? '—') }}</strong>.
+                Atau kunjungi: <em>{{ route('graduation.verify', $graduation->uuid) }}</em>
+            </div>
+        </div>
+
+    </div>
 
 </body>
 

@@ -37,6 +37,7 @@
     data-route-surat-kelulusan="{{ route('admin.graduation.showSuratKelulusan', ['id' => ':id']) }}"
     data-route-surat-pernyataan="{{ route('admin.graduation.showSuratPernyataan', ['id' => ':id']) }}"
     data-route-transkrip-nilai="{{ route('admin.graduation.showTranskripNilai', ['id' => ':id']) }}"
+    data-route-transkrip-ijazah="{{ route('admin.graduation.showTranskripIjazah', ['id' => ':id']) }}"
     data-route-generate-tokens="{{ route('admin.graduation.generateTokens') }}"
     data-route-generate-tokens-class="{{ route('admin.graduation.generateTokensClass') }}"
     data-route-generate-token-student="{{ route('admin.graduation.generateTokenStudent') }}">
@@ -651,6 +652,7 @@
         const routeSuratKelulusan = container.dataset.routeSuratKelulusan;
         const routeSuratPernyataan = container.dataset.routeSuratPernyataan;
         const routeTranskripNilai = container.dataset.routeTranskripNilai;
+        const routeTranskripIjazah = container.dataset.routeTranskripIjazah;
 
         const searchInput = document.getElementById('graduationSearchInput');
         const classFilter = document.getElementById('classFilterSelect');
@@ -907,14 +909,27 @@
                                 </button>
 
                                 {{-- Opsi Transkrip Nilai --}}
-                                <div class="px-3 py-2 bg-gray-50/50 rounded-b-lg">
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Transkrip Nilai</p>
+                                <div class="px-3 py-2 border-b border-gray-50 bg-gray-50/50">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Transkrip Nilai (Rapor)</p>
                                     <div class="flex items-center gap-1">
                                         <button onclick="doSingleExport('transkrip', '${g.uuid}', 'none')" title="Tanpa TTD"
                                             class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">Polos</button>
                                         <button onclick="doSingleExport('transkrip', '${g.uuid}', 'sig')" title="Hanya TTD"
                                             class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">TTD</button>
                                         <button onclick="doSingleExport('transkrip', '${g.uuid}', 'both')" title="TTD + Stempel"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">Lengkap</button>
+                                    </div>
+                                </div>
+
+                                {{-- Opsi Transkrip Ijazah --}}
+                                <div class="px-3 py-2 bg-gray-50/50 rounded-b-lg">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Transkrip Ijazah</p>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="doSingleExport('ijazah', '${g.uuid}', 'none')" title="Tanpa TTD"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">Polos</button>
+                                        <button onclick="doSingleExport('ijazah', '${g.uuid}', 'sig')" title="Hanya TTD"
+                                            class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">TTD</button>
+                                        <button onclick="doSingleExport('ijazah', '${g.uuid}', 'both')" title="TTD + Stempel"
                                             class="flex-1 px-2 py-1 text-[10px] bg-white border border-gray-200 rounded-md hover:bg-indigo-50 hover:border-indigo-200 transition-colors">Lengkap</button>
                                     </div>
                                 </div>
@@ -1070,11 +1085,18 @@
                                 Surat Pernyataan
                             </a>
                             <a href="${routeTranskripNilai.replace(':id', g.uuid)}" target="_blank"
+                                class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors border-t border-gray-100">
+                                <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Transkrip Nilai (Rapor)
+                            </a>
+                            <a href="${routeTranskripIjazah.replace(':id', g.uuid)}" target="_blank"
                                 class="block w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-indigo-50 transition-colors last:rounded-b-lg border-t border-gray-100">
                                 <svg class="w-3 h-3 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                Transkrip Nilai
+                                Transkrip Ijazah
                             </a>
                         </div>
                     </div>
@@ -1306,6 +1328,7 @@
         if (type === 'kelulusan') baseUrl = '{{ route('admin.graduation.showSuratKelulusan', ['id' => ':id']) }}';
         else if (type === 'pernyataan') baseUrl = '{{ route('admin.graduation.showSuratPernyataan', ['id' => ':id']) }}';
         else if (type === 'transkrip') baseUrl = '{{ route('admin.graduation.showTranskripNilai', ['id' => ':id']) }}';
+        else if (type === 'ijazah') baseUrl = '{{ route('admin.graduation.showTranskripIjazah', ['id' => ':id']) }}';
 
         // Check signature for pernyataan
         if (type === 'pernyataan') {

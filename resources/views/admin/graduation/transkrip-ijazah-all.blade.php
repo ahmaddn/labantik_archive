@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Export Transkrip Nilai - Semua Siswa</title>
+    <title>Export Transkrip Nilai Ijazah - Semua Siswa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
         * {
@@ -198,25 +198,13 @@
             text-align: left;
         }
 
-        .nilai-table .col-semester {
-            width: 25px;
+        .nilai-table .col-nilai {
+            width: 60px;
             text-align: center;
-        }
-
-        .nilai-table .col-nr {
-            width: 30px;
-            text-align: center;
-        }
-
-        .nilai-table .col-na {
-            width: 40px;
-            text-align: center;
-            font-weight: bold;
         }
 
         .nilai-table .group-header {
             font-weight: bold;
-            font-style: italic;
         }
 
         .nilai-table .rata-rata {
@@ -355,9 +343,9 @@
             <div class="header-border-thin"></div>
             {{-- JUDUL --}}
             <div class="doc-title">
-                <h2>TRANSKRIP NILAI RAPOR</h2>
+                <h2>TRANSKRIP NILAI</h2>
+                <div class="nomor">242/TU.01.02/SMK-Tlg/CADISDIKWIL.IX/2026</div>
             </div>
-
 
             {{-- INFO SISWA --}}
             <table class="info-table">
@@ -386,11 +374,11 @@
                     <td class="sep">:</td>
                     <td>{{ $item->student->national_student_number ?? '-' }}</td>
                 </tr>
-                {{-- <tr>
+                <tr>
                     <td class="label">Nomor Ijazah</td>
                     <td class="sep">:</td>
                     <td>{{ $item->student->diploma_number ?? '-' }}</td>
-                </tr> --}}
+                </tr>
                 <tr>
                     <td class="label">Tanggal Kelulusan</td>
                     <td class="sep">:</td>
@@ -407,36 +395,21 @@
                     <td class="sep">:</td>
                     <td>{{ $item->program->name ?? '-' }}</td>
                 </tr>
-                {{-- <tr>
-                    <td class="label">Tahun Pelajaran</td>
-                    <td class="sep">:</td>
-                    <td>{{ $item->letter->academic_year ?? ($item->student->academicYears->first()->academic_year ?? '—') }}
-                    </td>
-                </tr> --}}
             </table>
 
             {{-- NILAI TABLE --}}
             <table class="nilai-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" class="col-no">No</th>
-                        <th rowspan="2">Mata Pelajaran</th>
-                        <th colspan="6">Nilai Rapor</th>
-                        <th rowspan="2" class="col-nr">NR</th>
-                    </tr>
-                    <tr>
-                        <th class="col-semester">1</th>
-                        <th class="col-semester">2</th>
-                        <th class="col-semester">3</th>
-                        <th class="col-semester">4</th>
-                        <th class="col-semester">5</th>
-                        <th class="col-semester">6</th>
+                        <th class="col-no" style="width: 5%">No</th>
+                        <th style="width: 75%">Mata Pelajaran</th>
+                        <th class="col-nilai" style="width: 20%">Nilai</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{-- A. Kelompok Mata Pelajaran Umum --}}
                     <tr class="group-header">
-                        <td colspan="9">A. Kelompok Mata Pelajaran Umum</td>
+                        <td colspan="3" style="text-align: left;">A. Kelompok Mata Pelajaran Umum</td>
                     </tr>
                     @php
                         $noUmum = 1;
@@ -466,27 +439,9 @@
                                 @endif
                                 <td class="col-mapel">{{ $m->mapel->name }}</td>
                                 @if ($idx === 0)
-                                    <td class="col-semester"
+                                    <td class="col-nilai"
                                         @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_1 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_2 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_3 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_4 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_5 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_6 }}</td>
-                                    <td class="col-nr"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->nr }}</td>
+                                        {{ $g->score ? number_format($g->score, 2, ',', '') : '-' }}</td>
                                 @endif
                             </tr>
                         @endforeach
@@ -495,7 +450,7 @@
 
                     {{-- B. Kelompok Mata Pelajaran Kejuruan --}}
                     <tr class="group-header">
-                        <td colspan="9">B. Kelompok Mata Pelajaran Kejuruan</td>
+                        <td colspan="3" style="text-align: left;">B. Kelompok Mata Pelajaran Kejuruan</td>
                     </tr>
                     @php
                         $noJurusan = 1;
@@ -525,27 +480,9 @@
                                 @endif
                                 <td class="col-mapel">{{ $m->mapel->name }}</td>
                                 @if ($idx === 0)
-                                    <td class="col-semester"
+                                    <td class="col-nilai"
                                         @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_1 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_2 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_3 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_4 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_5 }}</td>
-                                    <td class="col-semester"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->sem_6 }}</td>
-                                    <td class="col-nr"
-                                        @if ($rowspan > 1) rowspan="{{ $rowspan }}" @endif>
-                                        {{ $g->nr }}</td>
+                                        {{ $g->score ? number_format($g->score, 2, ',', '') : '-' }}</td>
                                 @endif
                             </tr>
                         @endforeach
@@ -553,15 +490,11 @@
                     @endforeach
 
                     <tr class="rata-rata">
-                        <td colspan="8" style="text-align: center;">Rata-rata</td>
-                        <td class="col-nr">{{ $item->rataRata }}</td>
+                        <td colspan="2" style="text-align: center;">Rata-rata</td>
+                        <td class="col-nilai">{{ $item->rataRata }}</td>
                     </tr>
                 </tbody>
             </table>
-
-            <div style="font-size: 8pt; margin-top: 5px; font-style: italic;">
-                * NR = Rata-rata Nilai Rapor
-            </div>
 
             {{-- TANDA TANGAN --}}
             <div class="ttd-section">

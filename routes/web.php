@@ -145,6 +145,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::get('/graduation/{id}/surat-kelulusan',  [GraduationSuratController::class, 'showSuratKelulusan'])->name('graduation.showSuratKelulusan');
     Route::get('/graduation/{id}/surat-pernyataan', [GraduationSuratController::class, 'showSuratPernyataan'])->name('graduation.showSuratPernyataan');
     Route::get('/graduation/{id}/transkrip-nilai',  [GraduationSuratController::class, 'showTranskripNilai'])->name('graduation.showTranskripNilai');
+    Route::get('/graduation/{id}/transkrip-ijazah', [GraduationSuratController::class, 'showTranskripIjazah'])->name('graduation.showTranskripIjazah');
 
     // ── Graduation Letter (Template Surat) ────────────────────────────────────
     Route::post('/graduation/letter',            [GraduationLetterController::class, 'store'])->name('graduation.letter.store');
