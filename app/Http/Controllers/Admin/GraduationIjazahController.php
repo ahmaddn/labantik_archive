@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GoogleGraduation;
 use App\Models\RefStudent;
+use App\Models\RefClass;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\IjazahTemplateExport;
@@ -19,10 +20,17 @@ class GraduationIjazahController extends Controller
     public function index(Request $request)
     {
         $statusFilter = $request->input('status');
+        $classFilter = $request->input('class_id');
+
+        // Get list of grade 12 classes for dropdown
+        $classes = RefClass::where('academic_level', 12)->orderBy('name')->get();
 
         $query = GoogleGraduation::with(['user.academicYears.class'])
-            ->whereHas('user.academicYears', function ($q) {
+            ->whereHas('user.academicYears', function ($q) use ($classFilter) {
                 $q->where('status', 'active');
+                if ($classFilter) {
+                    $q->where('class_id', $classFilter);
+                }
             })
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
@@ -40,13 +48,13 @@ class GraduationIjazahController extends Controller
         }
 
         // Sort by student name to make pagination consistent
-        $graduations = $query->join('ref_students', 'google_graduations.user_id', '=', 'ref_students.id')
-            ->select('google_graduations.*')
+        $graduations = $query->join('ref_students', 'google_graduation.user_id', '=', 'ref_students.id')
+            ->select('google_graduation.*')
             ->orderBy('ref_students.full_name', 'asc')
             ->paginate(50)
             ->withQueryString();
 
-        return view('admin.graduation.ijazah.index', compact('graduations', 'statusFilter'));
+        return view('admin.graduation.ijazah.index', compact('graduations', 'statusFilter', 'classes', 'classFilter'));
     }
 
     /**

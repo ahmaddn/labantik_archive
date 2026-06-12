@@ -57,8 +57,17 @@
         <h2 class="text-base font-semibold text-gray-800">Daftar Nomor Ijazah Siswa</h2>
         
         <div class="flex items-center gap-3">
-            <form method="GET" action="{{ route('admin.graduation.ijazah.index') }}" class="flex items-center gap-2">
-                <label for="statusFilter" class="text-sm text-gray-600 font-medium hidden sm:block">Filter:</label>
+            <form method="GET" action="{{ route('admin.graduation.ijazah.index') }}" class="flex flex-col sm:flex-row sm:items-center gap-2">
+                <label for="classFilter" class="text-sm text-gray-600 font-medium hidden sm:block">Filter:</label>
+                
+                <select name="class_id" id="classFilter" onchange="this.form.submit()" 
+                    class="text-sm border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Semua Kelas</option>
+                    @foreach($classes as $c)
+                        <option value="{{ $c->id }}" {{ $classFilter == $c->id ? 'selected' : '' }}>{{ $c->academic_level }} {{ $c->name }}</option>
+                    @endforeach
+                </select>
+
                 <select name="status" id="statusFilter" onchange="this.form.submit()" 
                     class="text-sm border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">Semua Status</option>
