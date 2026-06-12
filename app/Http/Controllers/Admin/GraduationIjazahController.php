@@ -19,52 +19,35 @@ class GraduationIjazahController extends Controller
      */
     public function index(Request $request)
     {
-        $statusFilter = $request->input('status');
-        $classFilter = $request->input('class_id');
-        $search = $request->input('search');
-
         // Get list of grade 12 classes for dropdown
         $classes = RefClass::where('academic_level', 12)->orderBy('name')->get();
 
         $query = GoogleGraduation::with(['user.academicYears.class'])
-            ->whereHas('user.academicYears', function ($q) use ($classFilter) {
+            ->whereHas('user.academicYears', function ($q) {
                 $q->where('status', 'active');
-                if ($classFilter) {
-                    $q->where('class_id', $classFilter);
-                }
             })
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
             });
 
-        if ($search) {
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('full_name', 'like', "%{$search}%")
-                  ->orWhere('student_number', 'like', "%{$search}%")
-                  ->orWhere('national_student_number', 'like', "%{$search}%")
-                  ->orWhere('diploma_number', 'like', "%{$search}%");
-            });
-        }
-
-        // Apply filter based on status
-        if ($statusFilter === 'filled') {
-            $query->whereHas('user', function ($q) {
-                $q->whereNotNull('diploma_number')->where('diploma_number', '!=', '');
-            });
-        } elseif ($statusFilter === 'empty') {
-            $query->whereHas('user', function ($q) {
-                $q->whereNull('diploma_number')->orWhere('diploma_number', '');
-            });
-        }
-
-        // Sort by student name to make pagination consistent
-        $graduations = $query->join('ref_students', 'google_graduation.user_id', '=', 'ref_students.id')
-            ->select('google_graduation.*')
+        $graduationsData = $query->join('ref_students', 'google_graduation.user_id', '=', 'ref_students.id')
+            ->select('google_graduation.*', 'ref_students.full_name', 'ref_students.student_number', 'ref_students.national_student_number', 'ref_students.diploma_number', 'ref_students.id as student_id')
             ->orderBy('ref_students.full_name', 'asc')
-            ->paginate(50)
-            ->withQueryString();
+            ->get();
 
-        return view('admin.graduation.ijazah.index', compact('graduations', 'statusFilter', 'classes', 'classFilter', 'search'));
+        $allGraduationsData = $graduationsData->map(function ($graduation) {
+            $arr = $graduation->toArray();
+            
+            $latestYear = $graduation->user->academicYears->first();
+            $arr['class_id'] = $latestYear?->class_id;
+            $arr['class_name'] = $latestYear?->class
+                ? $latestYear->class->academic_level . ' ' . $latestYear->class->name
+                : '-';
+            
+            return $arr;
+        })->toArray();
+
+        return view('admin.graduation.ijazah.index', compact('allGraduationsData', 'classes'));
     }
 
     /**
