@@ -21,6 +21,7 @@ class GraduationIjazahController extends Controller
     {
         $statusFilter = $request->input('status');
         $classFilter = $request->input('class_id');
+        $search = $request->input('search');
 
         // Get list of grade 12 classes for dropdown
         $classes = RefClass::where('academic_level', 12)->orderBy('name')->get();
@@ -35,6 +36,15 @@ class GraduationIjazahController extends Controller
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
             });
+
+        if ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                  ->orWhere('student_number', 'like', "%{$search}%")
+                  ->orWhere('national_student_number', 'like', "%{$search}%")
+                  ->orWhere('diploma_number', 'like', "%{$search}%");
+            });
+        }
 
         // Apply filter based on status
         if ($statusFilter === 'filled') {
@@ -54,7 +64,7 @@ class GraduationIjazahController extends Controller
             ->paginate(50)
             ->withQueryString();
 
-        return view('admin.graduation.ijazah.index', compact('graduations', 'statusFilter', 'classes', 'classFilter'));
+        return view('admin.graduation.ijazah.index', compact('graduations', 'statusFilter', 'classes', 'classFilter', 'search'));
     }
 
     /**

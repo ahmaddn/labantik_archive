@@ -53,32 +53,51 @@
 @endif
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 class="text-base font-semibold text-gray-800">Daftar Nomor Ijazah Siswa</h2>
+    <div class="px-6 py-5 border-b border-gray-100 flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-gray-50/30">
+        <h2 class="text-base font-bold text-gray-800 shrink-0">Daftar Nomor Ijazah Siswa</h2>
         
-        <div class="flex items-center gap-3">
-            <form method="GET" action="{{ route('admin.graduation.ijazah.index') }}" class="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label for="classFilter" class="text-sm text-gray-600 font-medium hidden sm:block">Filter:</label>
-                
-                <select name="class_id" id="classFilter" onchange="this.form.submit()" 
-                    class="text-sm border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">Semua Kelas</option>
-                    @foreach($classes as $c)
-                        <option value="{{ $c->id }}" {{ $classFilter == $c->id ? 'selected' : '' }}>{{ $c->academic_level }} {{ $c->name }}</option>
-                    @endforeach
-                </select>
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+            <form method="GET" action="{{ route('admin.graduation.ijazah.index') }}" class="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+                {{-- Search Bar --}}
+                <div class="relative w-full sm:w-64">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIS..." 
+                        class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder-gray-400 bg-white">
+                </div>
 
-                <select name="status" id="statusFilter" onchange="this.form.submit()" 
-                    class="text-sm border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">Semua Status</option>
-                    <option value="filled" {{ $statusFilter === 'filled' ? 'selected' : '' }}>Sudah Terisi</option>
-                    <option value="empty" {{ $statusFilter === 'empty' ? 'selected' : '' }}>Belum Terisi</option>
-                </select>
+                {{-- Class Filter --}}
+                <div class="relative w-full sm:w-auto shrink-0">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <select name="class_id" onchange="this.form.submit()" 
+                        class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white appearance-none cursor-pointer">
+                        <option value="">Semua Kelas</option>
+                        @foreach($classes as $c)
+                            <option value="{{ $c->id }}" {{ $classFilter == $c->id ? 'selected' : '' }}>{{ $c->academic_level }} {{ $c->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Status Filter --}}
+                <div class="relative w-full sm:w-auto shrink-0">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <select name="status" onchange="this.form.submit()" 
+                        class="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white appearance-none cursor-pointer">
+                        <option value="">Semua Status</option>
+                        <option value="filled" {{ $statusFilter === 'filled' ? 'selected' : '' }}>Sudah Terisi</option>
+                        <option value="empty" {{ $statusFilter === 'empty' ? 'selected' : '' }}>Belum Terisi</option>
+                    </select>
+                </div>
             </form>
 
-            <button onclick="saveAll()" id="btnSaveAll" class="hidden inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm">
+            <button onclick="saveAll()" id="btnSaveAll" class="hidden shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-sm shadow-blue-200 text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                <span>Simpan Perubahan</span>
+                <span>Simpan</span>
             </button>
         </div>
     </div>
@@ -125,7 +144,7 @@
     </div>
     
     @if($graduations->hasPages())
-    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+    <div class="px-6 py-4 border-t border-gray-100">
         {{ $graduations->links() }}
     </div>
     @endif
