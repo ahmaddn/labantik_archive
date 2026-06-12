@@ -49,6 +49,9 @@
                                 Nomor Transkrip</th>
                             <th
                                 class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-3 pr-4">
+                                Nomor Ijazah</th>
+                            <th
+                                class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-3 pr-4">
                                 Tahun Pelajaran</th>
                             <th
                                 class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-3 pr-4">
@@ -75,6 +78,9 @@
                                 </td>
                                 <td class="py-3.5 pr-4">
                                     <span class="text-gray-600">{{ $letter->transcript_letter_number ?? '-' }}</span>
+                                </td>
+                                <td class="py-3.5 pr-4">
+                                    <span class="text-gray-600">{{ $letter->ijazah_letter_number ?? '-' }}</span>
                                 </td>
                                 <td class="py-3.5 pr-4 text-gray-600">
                                     {{ $letter->academic_year ?? '-' }}
@@ -115,7 +121,7 @@
                                         class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         {{-- Tombol Preview --}}
                                         <button
-                                            onclick="previewLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->transcript_letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }}, '{{ $letter->stamp_image }}', '{{ $letter->signature_image }}')"
+                                            onclick="previewLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->transcript_letter_number) }}, {{ json_encode($letter->ijazah_letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }}, '{{ $letter->stamp_image }}', '{{ $letter->signature_image }}')"
                                             class="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                                             title="Preview">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -129,7 +135,7 @@
 
                                         {{-- Tombol Edit --}}
                                         <button
-                                            onclick="editLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->transcript_letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }}, '{{ $letter->stamp_image }}', '{{ $letter->signature_image }}')"
+                                            onclick="editLetter('{{ $letter->uuid }}', {{ json_encode($letter->letter_number) }}, {{ json_encode($letter->transcript_letter_number) }}, {{ json_encode($letter->ijazah_letter_number) }}, {{ json_encode($letter->graduation_date) }}, {{ json_encode($letter->statement) }}, {{ json_encode($letter->content) }}, {{ json_encode($letter->academic_year) }}, {{ json_encode($letter->headmaster_id) }}, '{{ $letter->stamp_image }}', '{{ $letter->signature_image }}')"
                                             class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                             title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -196,14 +202,14 @@
 
                 <div class="px-6 py-5 space-y-4">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {{-- Nomor Surat SKL --}}
                         <div>
                             <label for="letter_number" class="block text-sm font-medium text-gray-700 mb-1.5">
                                 Nomor SKL <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="letter_number" name="letter_number"
-                                placeholder="Contoh: 260/TU.01.02/SMK-Tig.CADISDIKWIL.IX/V/2025"
+                                placeholder="Contoh: 260/TU.01.02/SMK..."
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
                                 required>
                         </div>
@@ -214,7 +220,17 @@
                                 Nomor Transkrip
                             </label>
                             <input type="text" id="transcript_letter_number" name="transcript_letter_number"
-                                placeholder="Contoh: 261/TU.01.02/SMK-Tig.CADISDIKWIL.IX/V/2025"
+                                placeholder="Contoh: 261/TU.01.02/SMK..."
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400">
+                        </div>
+
+                        {{-- Nomor Transkrip Ijazah --}}
+                        <div>
+                            <label for="ijazah_letter_number" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Nomor Transkrip Ijazah
+                            </label>
+                            <input type="text" id="ijazah_letter_number" name="ijazah_letter_number"
+                                placeholder="Contoh: 242/TU.01.02/SMK..."
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400">
                         </div>
                     </div>
@@ -476,6 +492,7 @@
         document.getElementById('letterUuid').value = '';
         document.getElementById('letter_number').value = '';
         document.getElementById('transcript_letter_number').value = '';
+        document.getElementById('ijazah_letter_number').value = '';
         document.getElementById('academic_year').value = '';
         document.getElementById('headmaster_id').value = '';
         document.getElementById('graduation_date').value = '';
@@ -496,7 +513,7 @@
         document.getElementById('letterModal').classList.add('hidden');
     }
 
-    function editLetter(uuid, letterNumber, transcriptLetterNumber, graduationDate, statement, content, academicYear, headmasterId, stampImage, signatureImage) {
+    function editLetter(uuid, letterNumber, transcriptLetterNumber, ijazahLetterNumber, graduationDate, statement, content, academicYear, headmasterId, stampImage, signatureImage) {
         document.getElementById('letterModalTitle').textContent = 'Edit Template Surat';
         document.getElementById('letterSubmitText').textContent = 'Perbarui Template';
         document.getElementById('letterFormMethod').value = 'PUT';
@@ -504,6 +521,7 @@
         document.getElementById('letterUuid').value = uuid;
         document.getElementById('letter_number').value = letterNumber;
         document.getElementById('transcript_letter_number').value = transcriptLetterNumber || '';
+        document.getElementById('ijazah_letter_number').value = ijazahLetterNumber || '';
         document.getElementById('academic_year').value = academicYear || '';
         document.getElementById('headmaster_id').value = headmasterId || '';
         document.getElementById('graduation_date').value = graduationDate;
@@ -635,8 +653,8 @@
     // --------------------------------------------------------
     // Modal: Preview Surat
     // --------------------------------------------------------
-    function previewLetter(uuid, letterNumber, transcriptLetterNumber, graduationDate, statement, content, academicYear, headmasterId, stampImage, signatureImage) {
-        document.getElementById('previewLetterNumber').textContent = 'Nomor SKL: ' + letterNumber + ' | Transkrip: ' + (transcriptLetterNumber || '-');
+    function previewLetter(uuid, letterNumber, transcriptLetterNumber, ijazahLetterNumber, graduationDate, statement, content, academicYear, headmasterId, stampImage, signatureImage) {
+        document.getElementById('previewLetterNumber').textContent = 'Nomor SKL: ' + letterNumber + ' | Transkrip: ' + (transcriptLetterNumber || '-') + ' | Ijazah: ' + (ijazahLetterNumber || '-');
         document.getElementById('previewStatement').textContent = statement;
 
         const dateObj = new Date(graduationDate);

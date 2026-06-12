@@ -16,6 +16,7 @@ class GraduationLetterController extends Controller
         $validated = $request->validate([
             'letter_number'            => 'required|string|max:255',
             'transcript_letter_number' => 'nullable|string|max:255',
+            'ijazah_letter_number'     => 'nullable|string|max:255',
             'academic_year'            => 'required|string|max:10',
             'headmaster_id'            => 'required|exists:core_users,id',
             'graduation_date'          => 'required|date',
@@ -76,6 +77,7 @@ class GraduationLetterController extends Controller
         $validated = $request->validate([
             'letter_number'            => 'required|string|max:255',
             'transcript_letter_number' => 'nullable|string|max:255',
+            'ijazah_letter_number'     => 'nullable|string|max:255',
             'academic_year'            => 'required|string|max:10',
             'headmaster_id'            => 'required|exists:core_users,id',
             'graduation_date'          => 'required|date',

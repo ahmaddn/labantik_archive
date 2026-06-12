@@ -1345,7 +1345,7 @@
         {{-- JUDUL --}}
         <div class="transkrip-doc-title">
             <h2>TRANSKRIP NILAI</h2>
-            <div class="nomor">242/TU.01.02/SMK-Tlg/CADISDIKWIL.IX/2026</div>
+            <div class="nomor">Nomor : {{ $letter->ijazah_letter_number ?? '—' }}</div>
         </div>
 
         {{-- INFO SISWA --}}

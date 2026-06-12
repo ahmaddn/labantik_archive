@@ -15,6 +15,7 @@ use App\Http\Controllers\SignatureController;
 use App\Http\Controllers\Admin\GraduationMapelController;
 use App\Http\Controllers\Admin\GraduationImportController;
 use App\Http\Controllers\Admin\GraduationSuratController;
+use App\Http\Controllers\Admin\GraduationIjazahController;
 
 // ── Verifikasi Dokumen Kelulusan (PUBLIK — tanpa login) ───────
 Route::get('/verify/{uuid}', [GraduationVerifyController::class, 'show'])->name('graduation.verify');
@@ -152,6 +153,13 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->grou
     Route::get('/graduation/letter/{id}',        [GraduationLetterController::class, 'show'])->name('graduation.letter.show');
     Route::put('/graduation/letter/{id}',        [GraduationLetterController::class, 'update'])->name('graduation.letter.update');
     Route::delete('/graduation/letter/{id}',     [GraduationLetterController::class, 'destroy'])->name('graduation.letter.destroy');
+
+    // ─── Manajemen Nomor Ijazah ──────────────────────────────────────────────────────────────────────────────────────────────────────
+    Route::get('/graduation/ijazah',             [GraduationIjazahController::class, 'index'])->name('graduation.ijazah.index');
+    Route::post('/graduation/ijazah/update-bulk', [GraduationIjazahController::class, 'updateBulk'])->name('graduation.ijazah.updateBulk');
+    Route::post('/graduation/ijazah/update-single', [GraduationIjazahController::class, 'updateSingle'])->name('graduation.ijazah.updateSingle');
+    Route::get('/graduation/ijazah/export',      [GraduationIjazahController::class, 'export'])->name('graduation.ijazah.export');
+    Route::post('/graduation/ijazah/import',     [GraduationIjazahController::class, 'import'])->name('graduation.ijazah.import');
 
     // ── Graduation CRUD — dynamic {id} HARUS paling bawah ────────────────────
     Route::get('/graduation/downloaders',       [GraduationController::class, 'downloaders'])->name('graduation.downloaders');

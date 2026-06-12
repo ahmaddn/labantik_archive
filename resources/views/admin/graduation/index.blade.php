@@ -18,6 +18,16 @@
             {{-- Action Buttons --}}
             <div class="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-end gap-2">
 
+                <a href="{{ route('admin.graduation.ijazah.index') }}"
+                    class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
+               bg-green-50 hover:bg-green-100 text-green-700 border border-green-200
+               font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm w-full sm:w-auto">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Kelola Nomor Ijazah</span>
+                </a>
+
                 {{-- ── Mapel Group (Biru) ── --}}
                 <a href="{{ route('admin.graduation.showImportMapel') }}"
                     class="inline-flex items-center justify-center gap-2 px-3 py-2.5 sm:px-5
