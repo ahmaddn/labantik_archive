@@ -18,25 +18,35 @@ class GraduationIjazahController extends Controller
      */
     public function index(Request $request)
     {
-        // Get graduations with user -> class
-        $graduations = GoogleGraduation::with(['user.academicYears.class'])
+        $statusFilter = $request->input('status');
+
+        $query = GoogleGraduation::with(['user.academicYears.class'])
             ->whereHas('user.academicYears', function ($q) {
                 $q->where('status', 'active');
             })
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
-            })
-            ->get()
-            ->sortBy(function ($graduation) {
-                $latestYear = $graduation->user->academicYears->first();
-                $className = $latestYear?->class
-                    ? $latestYear->class->academic_level . ' ' . $latestYear->class->name
-                    : 'ZZZ';
-                return $className . ' ' . ($graduation->user->full_name ?? '');
-            })
-            ->values();
+            });
 
-        return view('admin.graduation.ijazah.index', compact('graduations'));
+        // Apply filter based on status
+        if ($statusFilter === 'filled') {
+            $query->whereHas('user', function ($q) {
+                $q->whereNotNull('diploma_number')->where('diploma_number', '!=', '');
+            });
+        } elseif ($statusFilter === 'empty') {
+            $query->whereHas('user', function ($q) {
+                $q->whereNull('diploma_number')->orWhere('diploma_number', '');
+            });
+        }
+
+        // Sort by student name to make pagination consistent
+        $graduations = $query->join('ref_students', 'google_graduations.user_id', '=', 'ref_students.id')
+            ->select('google_graduations.*')
+            ->orderBy('ref_students.full_name', 'asc')
+            ->paginate(50)
+            ->withQueryString();
+
+        return view('admin.graduation.ijazah.index', compact('graduations', 'statusFilter'));
     }
 
     /**

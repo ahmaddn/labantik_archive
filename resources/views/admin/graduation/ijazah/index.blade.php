@@ -53,12 +53,25 @@
 @endif
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+    <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 class="text-base font-semibold text-gray-800">Daftar Nomor Ijazah Siswa</h2>
-        <button onclick="saveAll()" id="btnSaveAll" class="hidden inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            <span>Simpan Perubahan</span>
-        </button>
+        
+        <div class="flex items-center gap-3">
+            <form method="GET" action="{{ route('admin.graduation.ijazah.index') }}" class="flex items-center gap-2">
+                <label for="statusFilter" class="text-sm text-gray-600 font-medium hidden sm:block">Filter:</label>
+                <select name="status" id="statusFilter" onchange="this.form.submit()" 
+                    class="text-sm border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Semua Status</option>
+                    <option value="filled" {{ $statusFilter === 'filled' ? 'selected' : '' }}>Sudah Terisi</option>
+                    <option value="empty" {{ $statusFilter === 'empty' ? 'selected' : '' }}>Belum Terisi</option>
+                </select>
+            </form>
+
+            <button onclick="saveAll()" id="btnSaveAll" class="hidden inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Simpan Perubahan</span>
+            </button>
+        </div>
     </div>
     
     <div class="overflow-x-auto">
@@ -101,6 +114,12 @@
             </tbody>
         </table>
     </div>
+    
+    @if($graduations->hasPages())
+    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+        {{ $graduations->links() }}
+    </div>
+    @endif
 </div>
 
 {{-- MODAL IMPORT --}}
