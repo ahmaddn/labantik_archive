@@ -139,10 +139,27 @@ class GraduationIjazahController extends Controller
         ]);
 
         try {
-            Excel::import(new IjazahImport, $request->file('file'));
+            $import = new IjazahImport;
+            Excel::import($import, $request->file('file'));
+
+            $message = "<strong>Import Nomor Ijazah berhasil dilakukan!</strong><br><br>" .
+                       "• Total baris berisi nomor ijazah diproses: <strong>{$import->processedCount}</strong><br>" .
+                       "• Berhasil diupdate ke database: <strong style='color: green;'>{$import->updatedCount}</strong>";
+
+            if (count($import->failedRows) > 0) {
+                $message .= "<br><br><strong style='color: red;'>Detail data di Excel yang TIDAK ditemukan/cocok di DB (Silakan cek NIS/NISN atau Nama siswa berikut):</strong><br>";
+                $message .= "<ul style='max-height: 250px; overflow-y: auto; padding-left: 20px; margin-top: 5px;'>";
+                foreach (array_slice($import->failedRows, 0, 50) as $failed) {
+                    $message .= "<li>{$failed}</li>";
+                }
+                $message .= "</ul>";
+                if (count($import->failedRows) > 50) {
+                    $message .= "dan " . (count($import->failedRows) - 50) . " siswa lainnya.";
+                }
+            }
 
             return redirect()->route('admin.graduation.ijazah.index')
-                ->with('success', 'Import Nomor Ijazah berhasil dilakukan!');
+                ->with('success', $message);
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
             $errorMsg = '';
