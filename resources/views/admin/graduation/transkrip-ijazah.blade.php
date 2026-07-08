@@ -427,6 +427,9 @@
                                 fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
                             ) ?? $group[0];
                     @endphp
+                    @if ($rowspan == 1 && ($g->score === null || trim($g->score) === ''))
+                        @continue
+                    @endif
                     @foreach ($group as $idx => $m)
                         <tr>
                             @if ($idx === 0)
@@ -468,6 +471,9 @@
                                 fn($m) => $m->score !== null || $m->nr !== null || $m->sem_1 !== null,
                             ) ?? $group[0];
                     @endphp
+                    @if ($rowspan == 1 && ($g->score === null || trim($g->score) === ''))
+                        @continue
+                    @endif
                     @foreach ($group as $idx => $m)
                         <tr>
                             @if ($idx === 0)
