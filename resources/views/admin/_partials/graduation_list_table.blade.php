@@ -316,7 +316,7 @@
                     </div>
                 </div>
 
-                {{-- ── Transkrip Nilai ───────────────────────────────── --}}
+                {{-- ── Transkrip Nilai Rapor ─────────────────────────── --}}
                 <div class="relative" id="dropdownWrapperTranskrip">
                     <button onclick="toggleExportDropdown('transkrip')"
                         class="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-blue-200">
@@ -324,7 +324,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span>Transkrip Nilai</span>
+                        <span>Transkrip Rapor</span>
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 9l-7 7-7-7" />
@@ -342,14 +342,11 @@
                                 <option value="both" selected>Lengkap (TTD + Stempel)</option>
                             </select>
                         </div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export
-                            sebagai
-                        </p>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export sebagai</p>
 
                         <button onclick="doExport('transkrip', 'all')"
                             class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors">
-                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                             </svg>
@@ -360,17 +357,14 @@
                             <button onclick="toggleSubFilter('transkrip','jurusan')"
                                 class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors">
                                 <span class="flex items-center gap-2.5">
-                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                     </svg>
                                     Per Jurusan
                                 </span>
-                                <svg class="w-3 h-3 transition-transform" id="arrowTranskripJurusan" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
+                                <svg class="w-3 h-3 transition-transform" id="arrowTranskripJurusan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
                             <div id="subTranskripJurusan" class="hidden px-3 pt-1 pb-2 space-y-2">
@@ -390,17 +384,14 @@
                             <button onclick="toggleSubFilter('transkrip','kelas')"
                                 class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors">
                                 <span class="flex items-center gap-2.5">
-                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.123-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
                                     Per Kelas
                                 </span>
-                                <svg class="w-3 h-3 transition-transform" id="arrowTranskripKelas" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
+                                <svg class="w-3 h-3 transition-transform" id="arrowTranskripKelas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
                             <div id="subTranskripKelas" class="hidden px-3 pt-1 pb-2 space-y-2">
@@ -414,6 +405,100 @@
                                 </select>
                                 <button onclick="doExport('transkrip', 'kelas')"
                                     class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ── Transkrip Ijazah ───────────────────────────────── --}}
+                <div class="relative" id="dropdownWrapperTranskripIjazah">
+                    <button onclick="toggleExportDropdown('transkripIjazah')"
+                        class="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-semibold rounded-xl transition-colors text-xs sm:text-sm shadow-sm border border-cyan-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Transkrip Ijazah</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div id="dropdownTranskripIjazah"
+                        class="hidden absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-3 space-y-1">
+                        <div class="px-1 pb-2 border-b border-gray-100 mb-1">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Mode Tanda Tangan</p>
+                            <select id="sigModeTranskripIjazah" 
+                                class="w-full text-xs rounded-lg border-gray-200 focus:ring-cyan-500 focus:border-cyan-500 py-1.5">
+                                <option value="none">Polos (Tanpa TTD)</option>
+                                <option value="sig">Hanya Tanda Tangan</option>
+                                <option value="both" selected>Lengkap (TTD + Stempel)</option>
+                            </select>
+                        </div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-1">Export sebagai</p>
+
+                        <button onclick="doExport('transkripIjazah', 'all')"
+                            class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 rounded-xl transition-colors">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                            Semua
+                        </button>
+
+                        <div>
+                            <button onclick="toggleSubFilter('transkripIjazah','jurusan')"
+                                class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 rounded-xl transition-colors">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    Per Jurusan
+                                </span>
+                                <svg class="w-3 h-3 transition-transform" id="arrowTranskripIjazahJurusan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="subTranskripIjazahJurusan" class="hidden px-3 pt-1 pb-2 space-y-2">
+                                <select id="selectTranskripIjazahJurusan"
+                                    class="w-full rounded-xl border border-gray-200 bg-white py-2 px-3 text-sm text-gray-700 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-200">
+                                    <option value="">-- Pilih Jurusan --</option>
+                                    @foreach ($expertise as $exp)
+                                        <option value="{{ $exp->id }}">{{ $exp->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="doExport('transkripIjazah', 'jurusan')"
+                                    class="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold transition-colors">Export</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button onclick="toggleSubFilter('transkripIjazah','kelas')"
+                                class="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-700 rounded-xl transition-colors">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.123-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Per Kelas
+                                </span>
+                                <svg class="w-3 h-3 transition-transform" id="arrowTranskripIjazahKelas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="subTranskripIjazahKelas" class="hidden px-3 pt-1 pb-2 space-y-2">
+                                <select id="selectTranskripIjazahKelas"
+                                    class="w-full rounded-xl border border-gray-200 bg-white py-2 px-3 text-sm text-gray-700 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-200">
+                                    <option value="">-- Pilih Kelas --</option>
+                                    @foreach ($classes as $class)
+                                        <option value="{{ $class->id }}">{{ $class->academic_level }}
+                                            {{ $class->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="doExport('transkripIjazah', 'kelas')"
+                                    class="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold transition-colors">Export</button>
                             </div>
                         </div>
                     </div>
@@ -1221,7 +1306,7 @@
 </script>
 <script>
     function toggleExportDropdown(type) {
-        const others = ['kelulusan', 'pernyataan', 'transkrip'].filter(t => t !== type);
+        const others = ['kelulusan', 'pernyataan', 'transkrip', 'transkripIjazah'].filter(t => t !== type);
         others.forEach(o => {
             document.getElementById('dropdown' + capitalize(o))?.classList.add('hidden');
         });
@@ -1255,6 +1340,8 @@
             baseUrl = '{{ route('admin.graduation.showSuratPernyataan', ['id' => 'all']) }}';
         } else if (type === 'transkrip') {
             baseUrl = '{{ route('admin.graduation.showTranskripNilai', ['id' => 'all']) }}';
+        } else if (type === 'transkripIjazah') {
+            baseUrl = '{{ route('admin.graduation.showTranskripIjazah', ['id' => 'all']) }}';
         }
 
         const params = new URLSearchParams();
@@ -1275,8 +1362,8 @@
             params.set('class_id', val);
         }
 
-        // Add sig_mode (only for kelulusan and transkrip)
-        if (type === 'kelulusan' || type === 'transkrip') {
+        // Add sig_mode (only for kelulusan, transkrip, and transkripIjazah)
+        if (type === 'kelulusan' || type === 'transkrip' || type === 'transkripIjazah') {
             const sigMode = document.getElementById('sigMode' + capitalize(type))?.value || 'both';
             params.set('sig_mode', sigMode);
         }
@@ -1360,12 +1447,14 @@
         // Sync with dropdown selectors for consistency
         const k = document.getElementById('sigModeKelulusan');
         const t = document.getElementById('sigModeTranskrip');
+        const ti = document.getElementById('sigModeTranskripIjazah');
         if (k) k.value = sigMode;
         if (t) t.value = sigMode;
+        if (ti) ti.value = sigMode;
     }
 
     document.addEventListener('click', function(e) {
-        ['Kelulusan', 'Pernyataan', 'Transkrip'].forEach(type => {
+        ['Kelulusan', 'Pernyataan', 'Transkrip', 'TranskripIjazah'].forEach(type => {
             const wrapper = document.getElementById('dropdownWrapper' + type);
             if (wrapper && !wrapper.contains(e.target)) {
                 document.getElementById('dropdown' + type)?.classList.add('hidden');
