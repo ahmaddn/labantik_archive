@@ -24,32 +24,55 @@ class GraduationController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
+        // Fetch distinct academic years from student academic years
+        $academicYearsList = \DB::table('ref_student_academic_years')
+            ->whereNotNull('academic_year')
+            ->distinct()
+            ->orderBy('academic_year', 'desc')
+            ->pluck('academic_year')
+            ->toArray();
+
+        // Get default academic year (defaults to the latest academic year with graduation data)
+        $defaultYear = reset($academicYearsList) ?: null;
+
+        // Selected academic year
+        $selectedYear = $request->query('academic_year', $defaultYear);
+
         $graduations = GoogleGraduation::with(['user.academicYears.class', 'user.graduationStatement', 'mapels', 'letter'])
-            ->whereHas('user.academicYears', function ($q) {
-                $q->where('status', 'active');
+            ->whereHas('user.academicYears', function ($q) use ($selectedYear) {
+                if ($selectedYear) {
+                    $q->where('academic_year', $selectedYear);
+                }
             })
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
             })
             ->get()
-            ->sortBy(function ($graduation) {
-                $latestYear = $graduation->user->academicYears->first();
-                $className = $latestYear?->class
-                    ? $latestYear->class->academic_level . ' ' . $latestYear->class->name
+            ->sortBy(function ($graduation) use ($selectedYear) {
+                $yearRecord = $graduation->user->academicYears
+                    ->first(fn($ay) => $ay->academic_year === $selectedYear)
+                    ?? $graduation->user->academicYears->first();
+                $className = $yearRecord?->class
+                    ? $yearRecord->class->academic_level . ' ' . $yearRecord->class->name
                     : 'ZZZ'; // Put students without class at the end
                 return $className . ' ' . ($graduation->user->full_name ?? '');
             })
             ->values();
 
         $totalMapels = GoogleMapel::count();
-        $totalGraduations = GoogleGraduation::whereHas('user.academicYears', function ($q) {
-            $q->where('status', 'active');
+        $totalGraduations = GoogleGraduation::whereHas('user.academicYears', function ($q) use ($selectedYear) {
+            if ($selectedYear) {
+                $q->where('academic_year', $selectedYear);
+            }
         })
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
             })->count();
-        $totalUsers = GoogleGraduation::whereHas('user.academicYears', function ($q) {
-            $q->where('status', 'active');
+            
+        $totalUsers = GoogleGraduation::whereHas('user.academicYears', function ($q) use ($selectedYear) {
+            if ($selectedYear) {
+                $q->where('academic_year', $selectedYear);
+            }
         })
             ->whereHas('user.academicYears.class', function ($q) {
                 $q->where('academic_level', 12);
@@ -58,18 +81,37 @@ class GraduationController extends Controller
             ->count('user_id');
 
         $classes   = RefClass::where('academic_level', 12)
+            ->when($selectedYear, function ($q) use ($selectedYear) {
+                $q->where('academic_year', $selectedYear);
+            })
             ->select(['id', 'name', 'expertise_concentration_id', 'academic_level'])
             ->get();
+            
         $expertise = ExpertiseConcentration::select(['id', 'name'])->get();
-        $letters   = GoogleGraduationLetter::orderBy('created_at', 'desc')->get();
+        
+        $letters   = GoogleGraduationLetter::orderBy('created_at', 'desc')
+            ->when($selectedYear, function ($q) use ($selectedYear) {
+                $q->where('academic_year', $selectedYear);
+            })
+            ->get();
 
-        $allHaveLetter = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {
-            $q->where('academic_level', 12);
-        })->whereNull('letter_id')->doesntExist();
+        $allHaveLetter = GoogleGraduation::whereHas('user.academicYears', function ($q) use ($selectedYear) {
+            if ($selectedYear) {
+                $q->where('academic_year', $selectedYear);
+            }
+        })
+            ->whereHas('user.academicYears.class', function ($q) {
+                $q->where('academic_level', 12);
+            })->whereNull('letter_id')->doesntExist();
 
-        $allHaveTranscriptLetter = GoogleGraduation::whereHas('user.academicYears.class', function ($q) {
-            $q->where('academic_level', 12);
-        })->whereNull('transcript_letter_id')->doesntExist();
+        $allHaveTranscriptLetter = GoogleGraduation::whereHas('user.academicYears', function ($q) use ($selectedYear) {
+            if ($selectedYear) {
+                $q->where('academic_year', $selectedYear);
+            }
+        })
+            ->whereHas('user.academicYears.class', function ($q) {
+                $q->where('academic_level', 12);
+            })->whereNull('transcript_letter_id')->doesntExist();
 
         // 5. Statistik download dokumen kelulusan
         $totalDownloaders = GoogleStatement::where('print_count', '>', 0)->count();
@@ -90,7 +132,9 @@ class GraduationController extends Controller
             'totalDownloaders',
             'allHaveLetter',
             'allHaveTranscriptLetter',
-            'headmasters'
+            'headmasters',
+            'academicYearsList',
+            'selectedYear'
         ));
     }
 

@@ -56,15 +56,52 @@
                     class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
             </div>
 
+            <div class="relative w-full sm:w-56">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </span>
+                <select id="academicYearFilterSelect" onchange="filterByAcademicYear(this.value)"
+                    class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-8 text-sm text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff] appearance-none cursor-pointer">
+                    @foreach ($academicYearsList as $ay)
+                        <option value="{{ $ay }}" {{ $selectedYear == $ay ? 'selected' : '' }}>Tahun Ajaran {{ $ay }}</option>
+                    @endforeach
+                </select>
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </span>
+            </div>
+
             <div class="relative w-full sm:w-48">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </span>
                 <select id="classFilterSelect"
-                    class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff]">
+                    class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-8 text-sm text-gray-700 shadow-sm focus:border-[#1b84ff] focus:outline-none focus:ring-1 focus:ring-[#1b84ff] appearance-none cursor-pointer">
                     <option value="">Semua Kelas</option>
                     @foreach ($classes as $class)
                         <option value="{{ $class->id }}">{{ $class->academic_level }} {{ $class->name }}</option>
                     @endforeach
                 </select>
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </span>
             </div>
+
+            <script>
+                function filterByAcademicYear(year) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('academic_year', year);
+                    window.location.href = url.toString();
+                }
+            </script>
 
             <button id="graduationClearSearch" style="display:none;"
                 class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-500 transition-colors hover:bg-gray-50 flex-shrink-0">✕</button>
