@@ -344,7 +344,7 @@
             {{-- JUDUL --}}
             <div class="doc-title">
                 <h2>TRANSKRIP NILAI</h2>
-                <div class="nomor">Nomor : {{ $letter->ijazah_letter_number ?? '—' }}</div>
+                <div class="nomor">Nomor : {{ $item->letter->ijazah_letter_number ?? '—' }}</div>
             </div>
 
             {{-- INFO SISWA --}}
