@@ -6,6 +6,64 @@
     $docType = $docType ?? 'default';
 @endphp
 
+{{-- Self-contained Page Loader for Export Views --}}
+<style>
+    #exportPageLoader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        transition: opacity 0.3s ease;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+    .export-spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #e5e7eb;
+        border-top-color: #4f46e5;
+        border-radius: 50%;
+        animation: export-spin 1s linear infinite;
+        margin-bottom: 16px;
+    }
+    .export-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #4b5563;
+        animation: export-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes export-spin {
+        to { transform: rotate(360deg); }
+    }
+    @keyframes export-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+</style>
+
+<div id="exportPageLoader">
+    <div class="export-spinner"></div>
+    <div class="export-text">Menyiapkan dokumen...</div>
+</div>
+
+<script>
+    window.addEventListener('load', function() {
+        const loader = document.getElementById('exportPageLoader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 300);
+        }
+    });
+</script>
+
 <div class="print-settings-wrapper" style="position: relative; display: inline-block;">
     <button type="button" class="btn btn-settings" id="btn-toggle-settings" style="background-color: #4f46e5; color: white;">
         <i class="fa-solid fa-sliders"></i> Atur Margin/Padding

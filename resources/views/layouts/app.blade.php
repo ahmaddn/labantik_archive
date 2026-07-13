@@ -126,7 +126,7 @@
 <body class="min-h-screen bg-[#f1f5f9]">
 
     {{-- Global Page Loader --}}
-    <div id="globalPageLoader" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+    <div id="globalPageLoader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300">
         <div class="flex flex-col items-center">
             <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mb-4"></div>
             <p id="globalPageLoaderText" class="text-sm font-semibold text-gray-600 animate-pulse">Memuat data...</p>
@@ -707,6 +707,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             const loader = document.getElementById('globalPageLoader');
             const loaderText = document.getElementById('globalPageLoaderText');
+            
+            // Customize text if currently on the graduation page
+            if (window.location.pathname.includes('graduation')) {
+                if (loaderText) loaderText.textContent = 'Memuat data kelulusan...';
+            }
             
             // Listen to clicks on sidebar links (both desktop and mobile)
             const links = document.querySelectorAll('.sidebar-link');

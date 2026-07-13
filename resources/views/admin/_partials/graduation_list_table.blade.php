@@ -97,6 +97,16 @@
 
             <script>
                 function filterByAcademicYear(year) {
+                    const loader = document.getElementById('globalPageLoader');
+                    if (loader) {
+                        const loaderText = document.getElementById('globalPageLoaderText');
+                        if (loaderText) loaderText.textContent = 'Memuat data kelulusan...';
+                        loader.classList.remove('hidden');
+                        loader.classList.add('flex');
+                        setTimeout(() => {
+                            loader.classList.remove('opacity-0');
+                        }, 10);
+                    }
                     const url = new URL(window.location.href);
                     url.searchParams.set('academic_year', year);
                     window.location.href = url.toString();
@@ -564,8 +574,17 @@
         </div>
     </div>
 
-    {{-- Empty state --}}
-    <div id="graduationEmptyState" style="display:none;"
+    {{-- Main content container with Loader --}}
+    <div class="relative">
+        <div id="tableLoader" class="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-20 flex items-center justify-center hidden opacity-0 transition-opacity duration-150 rounded-2xl">
+            <div class="flex flex-col items-center">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600 mb-2"></div>
+                <p class="text-xs font-semibold text-gray-500">Memproses data...</p>
+            </div>
+        </div>
+
+        {{-- Empty state --}}
+        <div id="graduationEmptyState" style="display:none;"
         class="py-16 text-center text-gray-400 rounded-2xl border border-gray-200 bg-white">
         <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50">
             <svg class="h-7 w-7 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -724,8 +743,8 @@
                 <span class="text-xs text-gray-500">/ hal</span>
             </div>
             <div class="flex items-center gap-1" id="graduationCardPaginationButtons"></div>
-        </div>
     </div>
+    </div> {{-- end loader wrapper --}}
 </div>
 
 <style>
@@ -875,24 +894,42 @@
             });
         }
 
+        // Helper function for visual table load transition
+        function triggerTableLoader(callback) {
+            const tableLoader = document.getElementById('tableLoader');
+            if (tableLoader) {
+                tableLoader.classList.remove('hidden');
+                setTimeout(() => tableLoader.classList.remove('opacity-0'), 10);
+            }
+            setTimeout(() => {
+                if (callback) callback();
+                if (tableLoader) {
+                    tableLoader.classList.add('opacity-0');
+                    setTimeout(() => tableLoader.classList.add('hidden'), 150);
+                }
+            }, 250);
+        }
+
         // Attach sort button listeners
         document.querySelectorAll('.grad-sort-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const col = this.dataset.col;
-                if (sortCol === col) {
-                    if (sortDir === 'asc') {
-                        sortDir = 'desc';
-                    } else if (sortDir === 'desc') {
-                        sortCol = null;
-                        sortDir = null;
+                triggerTableLoader(() => {
+                    if (sortCol === col) {
+                        if (sortDir === 'asc') {
+                            sortDir = 'desc';
+                        } else if (sortDir === 'desc') {
+                            sortCol = null;
+                            sortDir = null;
+                        }
+                    } else {
+                        sortCol = col;
+                        sortDir = 'asc';
                     }
-                } else {
-                    sortCol = col;
-                    sortDir = 'asc';
-                }
-                currentPage = 1;
-                updateSortIcons();
-                updateDisplay();
+                    currentPage = 1;
+                    updateSortIcons();
+                    updateDisplay();
+                });
             });
         });
 
@@ -912,19 +949,21 @@
 
         // ── Filter ───────────────────────────────────────────────────────
         function filterData() {
-            const q = searchInput.value.toLowerCase().trim();
-            const classId = classFilter.value;
+            triggerTableLoader(() => {
+                const q = searchInput.value.toLowerCase().trim();
+                const classId = classFilter.value;
 
-            filteredData = allData.filter(g => {
-                const matchesSearch = (g.user_name || '').toLowerCase().includes(q) ||
-                    (g.letter_number || '').toLowerCase().includes(q);
-                const matchesClass = !classId || String(g.class_id) === String(classId);
+                filteredData = allData.filter(g => {
+                    const matchesSearch = (g.user_name || '').toLowerCase().includes(q) ||
+                        (g.letter_number || '').toLowerCase().includes(q);
+                    const matchesClass = !classId || String(g.class_id) === String(classId);
 
-                return matchesSearch && matchesClass;
+                    return matchesSearch && matchesClass;
+                });
+                currentPage = 1;
+                updateDisplay();
+                clearBtn.style.display = (q || classId) ? 'block' : 'none';
             });
-            currentPage = 1;
-            updateDisplay();
-            clearBtn.style.display = (q || classId) ? 'block' : 'none';
         }
 
         searchInput.addEventListener('input', filterData);
@@ -1259,8 +1298,10 @@
         function buildPageButtons(cont, lastPage) {
             cont.innerHTML = '';
             cont.appendChild(makeNavBtn(currentPage === 1, 'prev', () => {
-                currentPage--;
-                updateDisplay();
+                triggerTableLoader(() => {
+                    currentPage--;
+                    updateDisplay();
+                });
             }));
 
             const win = 1;
@@ -1286,8 +1327,10 @@
                         b.className =
                             'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-[#1b84ff] hover:border-blue-200';
                         b.addEventListener('click', () => {
-                            currentPage = i;
-                            updateDisplay();
+                            triggerTableLoader(() => {
+                                currentPage = i;
+                                updateDisplay();
+                            });
                         });
                         cont.appendChild(b);
                     }
@@ -1295,8 +1338,10 @@
                 }
             }
             cont.appendChild(makeNavBtn(currentPage === lastPage, 'next', () => {
-                currentPage++;
-                updateDisplay();
+                triggerTableLoader(() => {
+                    currentPage++;
+                    updateDisplay();
+                });
             }));
         }
 
@@ -1311,18 +1356,24 @@
         // ── Events ───────────────────────────────────────────────────────
         searchInput.addEventListener('input', filterData);
         clearBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            filterData();
+            triggerTableLoader(() => {
+                searchInput.value = '';
+                filterData();
+            });
         });
         perPageSelect.addEventListener('change', e => {
-            perPage = parseInt(e.target.value);
-            currentPage = 1;
-            updateDisplay();
+            triggerTableLoader(() => {
+                perPage = parseInt(e.target.value);
+                currentPage = 1;
+                updateDisplay();
+            });
         });
         cardPerPage.addEventListener('change', e => {
-            perPage = parseInt(e.target.value);
-            currentPage = 1;
-            updateDisplay();
+            triggerTableLoader(() => {
+                perPage = parseInt(e.target.value);
+                currentPage = 1;
+                updateDisplay();
+            });
         });
 
         window.addEventListener('resize', () => {
