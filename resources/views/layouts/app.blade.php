@@ -125,6 +125,14 @@
 
 <body class="min-h-screen bg-[#f1f5f9]">
 
+    {{-- Global Page Loader --}}
+    <div id="globalPageLoader" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mb-4"></div>
+            <p id="globalPageLoaderText" class="text-sm font-semibold text-gray-600 animate-pulse">Memuat data...</p>
+        </div>
+    </div>
+
     {{-- ────────────────────────────────────────────────
      DESKTOP SIDEBAR (fixed, always visible ≥ lg)
 ──────────────────────────────────────────────── --}}
@@ -682,6 +690,49 @@
                     setTimeout(() => d.classList.add('hidden'), 150);
                 }
             }
+        });
+
+        // Global Page Loader handling
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('globalPageLoader');
+            if (loader) {
+                loader.classList.add('opacity-0');
+                setTimeout(() => {
+                    loader.classList.remove('flex');
+                    loader.classList.add('hidden');
+                }, 300);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const loader = document.getElementById('globalPageLoader');
+            const loaderText = document.getElementById('globalPageLoaderText');
+            
+            // Listen to clicks on sidebar links (both desktop and mobile)
+            const links = document.querySelectorAll('.sidebar-link');
+            links.forEach(link => {
+                if (link.tagName === 'A' && link.getAttribute('href') && !link.getAttribute('href').startsWith('#') && !link.getAttribute('href').startsWith('javascript:')) {
+                    link.addEventListener('click', function(e) {
+                        // Check if it's a normal click (not command/ctrl click to open in new tab)
+                        if (!e.metaKey && !e.ctrlKey && !e.shiftKey) {
+                            if (loader) {
+                                // Customize text if it is the graduation link
+                                if (link.textContent.trim().includes('Kelulusan')) {
+                                    if (loaderText) loaderText.textContent = 'Memuat data kelulusan...';
+                                } else {
+                                    if (loaderText) loaderText.textContent = 'Memuat data...';
+                                }
+                                
+                                loader.classList.remove('hidden');
+                                loader.classList.add('flex');
+                                setTimeout(() => {
+                                    loader.classList.remove('opacity-0');
+                                }, 10);
+                            }
+                        }
+                    });
+                }
+            });
         });
     </script>
 

@@ -316,6 +316,13 @@
             style="background-color: #6b7280; color: white;">
             <i class="fa-solid fa-arrow-left"></i> Kembali
         </a>
+        @include('admin.graduation.partials.print-settings-toolbar', [
+            'defaultTop' => 8,
+            'defaultBottom' => 0,
+            'defaultLeft' => 15,
+            'defaultRight' => 15,
+            'docType' => 'transkrip-ijazah'
+        ])
         <button onclick="window.print()" class="btn btn-print">
             <i class="fa-solid fa-print"></i> Print
         </button>

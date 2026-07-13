@@ -178,6 +178,13 @@
         <a href="{{ route('admin.graduation.index') }}" class="btn btn-back">
             <i class="fa-solid fa-arrow-left"></i> Kembali
         </a>
+        @include('admin.graduation.partials.print-settings-toolbar', [
+            'defaultTop' => 20,
+            'defaultBottom' => 20,
+            'defaultLeft' => 25,
+            'defaultRight' => 20,
+            'docType' => 'surat-pernyataan'
+        ])
         <button onclick="window.print()" class="btn btn-print">
             <i class="fa-solid fa-print"></i> Print
         </button>

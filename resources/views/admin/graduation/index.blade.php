@@ -4,24 +4,6 @@
 @section('page-title', 'Kelulusan')
 
 @section('content')
-    {{-- Global Loading Overlay --}}
-    <div id="pageLoader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300">
-        <div class="flex flex-col items-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mb-4"></div>
-            <p class="text-sm font-semibold text-gray-600 animate-pulse">Memuat data kelulusan...</p>
-        </div>
-    </div>
-    <script>
-        window.addEventListener('load', function() {
-            const loader = document.getElementById('pageLoader');
-            if (loader) {
-                loader.classList.add('opacity-0');
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 300);
-            }
-        });
-    </script>
     {{-- Header --}}
     <div class="mb-6">
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
