@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('google_graduation_letters', function (Blueprint $table) {
-            $table->string('stamp_image')->nullable()->after('transcript_letter_number');
-            $table->string('signature_image')->nullable()->after('stamp_image');
+            if (!Schema::hasColumn('google_graduation_letters', 'stamp_image')) {
+                $table->string('stamp_image')->nullable()->after('transcript_letter_number');
+            }
+            if (!Schema::hasColumn('google_graduation_letters', 'signature_image')) {
+                $table->string('signature_image')->nullable()->after('stamp_image');
+            }
         });
     }
 
@@ -23,7 +27,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('google_graduation_letters', function (Blueprint $table) {
-            $table->dropColumn(['stamp_image', 'signature_image']);
+            $columnsToDrop = [];
+            if (Schema::hasColumn('google_graduation_letters', 'stamp_image')) {
+                $columnsToDrop[] = 'stamp_image';
+            }
+            if (Schema::hasColumn('google_graduation_letters', 'signature_image')) {
+                $columnsToDrop[] = 'signature_image';
+            }
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };

@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('google_graduation_letters', function (Blueprint $table) {
-            $table->string('transcript_letter_number')->nullable()->after('letter_number');
+            if (!Schema::hasColumn('google_graduation_letters', 'transcript_letter_number')) {
+                $table->string('transcript_letter_number')->nullable()->after('letter_number');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('google_graduation_letters', function (Blueprint $table) {
-            $table->dropColumn('transcript_letter_number');
+            if (Schema::hasColumn('google_graduation_letters', 'transcript_letter_number')) {
+                $table->dropColumn('transcript_letter_number');
+            }
         });
     }
 };

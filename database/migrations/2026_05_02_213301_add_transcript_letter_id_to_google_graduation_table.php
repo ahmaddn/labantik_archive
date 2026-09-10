@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('google_graduation', function (Blueprint $table) {
-            $table->uuid('transcript_letter_id')->nullable()->after('letter_id');
-            $table->foreign('transcript_letter_id')->references('uuid')->on('google_graduation_letters')->onDelete('set null');
+            if (!Schema::hasColumn('google_graduation', 'transcript_letter_id')) {
+                $table->uuid('transcript_letter_id')->nullable()->after('letter_id');
+                $table->foreign('transcript_letter_id')->references('uuid')->on('google_graduation_letters')->onDelete('set null');
+            }
         });
     }
 
@@ -23,8 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('google_graduation', function (Blueprint $table) {
-            $table->dropForeign(['transcript_letter_id']);
-            $table->dropColumn('transcript_letter_id');
+            if (Schema::hasColumn('google_graduation', 'transcript_letter_id')) {
+                $table->dropForeign(['transcript_letter_id']);
+                $table->dropColumn('transcript_letter_id');
+            }
         });
     }
 };
