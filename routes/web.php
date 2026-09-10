@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\GraduationMapelController;
 use App\Http\Controllers\Admin\GraduationImportController;
 use App\Http\Controllers\Admin\GraduationSuratController;
 use App\Http\Controllers\Admin\GraduationIjazahController;
+use App\Http\Controllers\Admin\GoogleCertificateController;
+use App\Http\Controllers\UserCertificateController;
 
 // ── Verifikasi Dokumen Kelulusan (PUBLIK — tanpa login) ───────
 Route::get('/verify/{uuid}', [GraduationVerifyController::class, 'show'])->name('graduation.verify');
@@ -60,8 +62,23 @@ Route::middleware('auth')->prefix('profile')->name('profile.')->group(function (
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
 });
 
+// ── Sertifikat User (semua user login) ────────────
+Route::middleware('auth')->prefix('my-certificates')->name('user.certificates.')->group(function () {
+    Route::get('/',    [UserCertificateController::class, 'index'])->name('index');
+    Route::get('/{id}', [UserCertificateController::class, 'show'])->name('show');
+});
+
 // ── Admin (Super Admin only) ──────────────────────
 Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // ─── Certificate Builder (Sertifikat Dinamis) ─────────────────────
+    Route::get('/certificates',               [GoogleCertificateController::class, 'index'])->name('certificates.index');
+    Route::get('/certificates/create',        [GoogleCertificateController::class, 'create'])->name('certificates.create');
+    Route::post('/certificates',               [GoogleCertificateController::class, 'store'])->name('certificates.store');
+    Route::get('/certificates/{id}/edit',     [GoogleCertificateController::class, 'edit'])->name('certificates.edit');
+    Route::put('/certificates/{id}',          [GoogleCertificateController::class, 'update'])->name('certificates.update');
+    Route::delete('/certificates/{id}',       [GoogleCertificateController::class, 'destroy'])->name('certificates.destroy');
+    Route::get('/certificates/{id}/preview',   [GoogleCertificateController::class, 'preview'])->name('certificates.preview');
 
     // Google Drive OAuth
     Route::get('/google',               [AdminGoogleController::class, 'showConnect'])->name('google.connect');

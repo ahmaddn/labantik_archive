@@ -1,0 +1,399 @@
+@extends('layouts.app')
+@section('title', 'Buat Sertifikat Baru')
+@section('page-title', 'Buat Sertifikat')
+
+@section('styles')
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            background-color: #f9fafb !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 0.75rem !important; /* rounded-xl */
+            height: 44px !important;
+            display: flex !important;
+            align-items: center !important;
+            padding-left: 8px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #374151 !important;
+            font-size: 0.875rem !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px !important;
+            right: 10px !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 0.75rem !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+            overflow: hidden !important;
+            font-size: 0.875rem !important;
+        }
+        .select2-search__field {
+            border-radius: 0.5rem !important;
+            border: 1px solid #d1d5db !important;
+            padding: 6px 10px !important;
+            outline: none !important;
+        }
+    </style>
+@endsection
+
+@section('content')
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-gray-900">Buat Sertifikat Dinamis</h1>
+            <p class="text-gray-500 text-sm mt-1">Lengkapi data sertifikat, penandatangan, dan susunan materi halaman belakang.</p>
+        </div>
+        <a href="{{ route('admin.certificates.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition-colors w-fit">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Kembali
+        </a>
+    </div>
+
+    @if ($errors->any())
+        <div class="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm">
+            <div class="font-bold mb-1">Terjadi kesalahan pada input data:</div>
+            <ul class="list-disc list-inside space-y-0.5">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('admin.certificates.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        @csrf
+
+        {{-- Section 1: Data Umum & Orientasi --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6">
+            <h2 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
+                <span class="w-7 h-7 bg-blue-50 text-[#1b84ff] rounded-lg flex items-center justify-center text-xs font-bold">1</span>
+                Informasi Dasar & Orientasi
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Sertifikat (Internal) <span class="text-rose-500">*</span></label>
+                    <input type="text" name="title" value="{{ old('title') }}" required placeholder="Contoh: Sertifikat IHT Pancawaluya 2026"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Orientasi Sertifikat <span class="text-rose-500">*</span></label>
+                    <div class="flex items-center gap-6 h-[42px] px-4 bg-gray-50 border border-gray-200 rounded-xl">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
+                            <input type="radio" name="orientation" value="portrait" {{ old('orientation', 'portrait') == 'portrait' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                            <span>Portrait (Berdiri)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
+                            <input type="radio" name="orientation" value="landscape" {{ old('orientation') == 'landscape' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                            <span>Landscape (Mendatar)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Status Publikasi <span class="text-rose-500">*</span></label>
+                    <select name="status" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Aktif (Dapat Diakses User)</option>
+                        <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft (Disembunyikan)</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Media Upload Card Group --}}
+            <div class="bg-gray-50/70 p-5 rounded-xl border border-gray-200 space-y-4">
+                <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    File Gambar & Logo Sertifikat
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-2">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Gambar Background</label>
+                        <input type="file" name="background_image" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <p class="text-[11px] text-gray-400">Gambar latar belakang sertifikat (A4)</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-2">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Custom Logo Kiri (Kop)</label>
+                        <input type="file" name="header_left_logo" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <label class="flex items-center gap-2 pt-1 cursor-pointer">
+                            <input type="checkbox" name="remove_logo_bg_auto" value="1" checked class="w-4 h-4 text-blue-600 rounded border-gray-300">
+                            <span class="text-xs text-gray-600 font-medium">Hapus BG putih otomatis</span>
+                        </label>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-2">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Custom Logo Kanan (Kop)</label>
+                        <input type="file" name="header_right_logo" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <label class="flex items-center gap-2 pt-1 cursor-pointer">
+                            <input type="checkbox" name="remove_logo_bg_auto" value="1" checked class="w-4 h-4 text-blue-600 rounded border-gray-300">
+                            <span class="text-xs text-gray-600 font-medium">Hapus BG putih otomatis</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Toggle Checkboxes --}}
+            <div class="pt-3 border-t border-gray-100 flex flex-wrap gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="show_header" value="1" {{ old('show_header', '1') ? 'checked' : '' }} class="w-4 h-4 text-blue-600 rounded">
+                    <span class="text-sm font-medium text-gray-700">Tampilkan Kop Surat</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="show_number" value="1" {{ old('show_number', '1') ? 'checked' : '' }} class="w-4 h-4 text-blue-600 rounded">
+                    <span class="text-sm font-medium text-gray-700">Tampilkan Nomor Sertifikat</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="show_back_page" value="1" {{ old('show_back_page', '1') ? 'checked' : '' }} class="w-4 h-4 text-blue-600 rounded">
+                    <span class="text-sm font-medium text-gray-700">Tampilkan Halaman Belakang (Struktur Program)</span>
+                </label>
+            </div>
+        </div>
+
+        {{-- Section 2: Role Attachment & Dynamic Cheatsheet --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+            <h2 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
+                <span class="w-7 h-7 bg-blue-50 text-[#1b84ff] rounded-lg flex items-center justify-center text-xs font-bold">2</span>
+                Attachment Role Pengguna & Variable Helper
+            </h2>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Role Pengguna yang Memiliki Akses Sertifikat Ini <span class="text-rose-500">*</span></label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    @foreach($roles as $role)
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
+                            <input type="checkbox" name="roles[]" value="{{ $role->id }}"
+                                   {{ is_array(old('roles')) && in_array($role->id, old('roles')) ? 'checked' : '' }}
+                                   class="w-4 h-4 text-blue-600 rounded">
+                            <span>{{ $role->name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-900">
+                <div class="font-bold text-sm mb-1 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Daftar Variable Dynamic (Otomatis diganti sesuai user login):
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2 font-mono text-gray-800">
+                    <div><span class="bg-white px-1.5 py-0.5 rounded border border-blue-200 text-blue-700 font-bold">{nama}</span> : Nama Pengguna</div>
+                    <div><span class="bg-white px-1.5 py-0.5 rounded border border-blue-200 text-blue-700 font-bold">{nip}</span> : NIP Guru/Staf</div>
+                    <div><span class="bg-white px-1.5 py-0.5 rounded border border-blue-200 text-blue-700 font-bold">{nis}</span> : NIS Siswa</div>
+                    <div><span class="bg-white px-1.5 py-0.5 rounded border border-blue-200 text-blue-700 font-bold">{nisn}</span> : NISN Siswa</div>
+                    <div><span class="bg-white px-1.5 py-0.5 rounded border border-blue-200 text-blue-700 font-bold">{kelas}</span> : Nama Kelas</div>
+                    <div><span class="bg-white px-1.5 py-0.5 rounded border border-blue-200 text-blue-700 font-bold">{year}</span> : Tahun Berjalan</div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Section 3: Konten Sertifikat Halaman Depan --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
+            <h2 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
+                <span class="w-7 h-7 bg-blue-50 text-[#1b84ff] rounded-lg flex items-center justify-center text-xs font-bold">3</span>
+                Konten Halaman Depan
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Judul Utama</label>
+                    <input type="text" name="main_title" value="{{ old('main_title', 'SERTIFIKAT') }}" required
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Sub Judul</label>
+                    <input type="text" name="sub_title" value="{{ old('sub_title', 'Diberikan kepada') }}" required
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Format Nomor Sertifikat (Dapat Diinput) <span class="text-rose-500">*</span></label>
+                    <input type="text" name="certificate_number_format" value="{{ old('certificate_number_format', '422/TU.01.02/SMK-71g/CADISDIKWIL.IX/' . date('Y')) }}"
+                           placeholder="Contoh: 422/TU.01.02/SMK-71g/CADISDIKWIL.IX/{year}"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Keterangan Peran / Sub-Caption</label>
+                    <input type="text" name="role_caption" value="{{ old('role_caption', 'Sebagai Peserta') }}"
+                           placeholder="Contoh: Sebagai Peserta / Sebagai Panitia"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Teks Narasi Kegiatan / Deskripsi Sertifikat</label>
+                <textarea name="content_text" rows="4" placeholder="Contoh: In House Training (IHT) Pendidikan Karakter Pancawaluya... Bertempat di SMKN 1 Talaga pada tanggal 3 - 4 September 2026, selama 18 Jam."
+                          class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">{{ old('content_text') }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tempat & Tanggal Terbit</label>
+                    <input type="text" name="place_date" value="{{ old('place_date', 'Majalengka, 9 September ' . date('Y')) }}"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Penandatangan 1 (Depan)</label>
+                    <input type="text" name="signer_1_title" value="{{ old('signer_1_title', 'Kepala Sekolah') }}"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Penandatangan 1 (Employee) <span class="text-rose-500">*</span></label>
+                    <select name="signer_1_employee_id" class="select2-search w-full">
+                        <option value="">-- Cari / Pilih Pegawai / Guru --</option>
+                        @foreach($employees as $emp)
+                            <option value="{{ $emp->id }}" {{ old('signer_1_employee_id') == $emp->id ? 'selected' : '' }}>
+                                {{ $emp->full_name }} (NIP: {{ $emp->nip ?? '-' }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        {{-- Section 4: Halaman Belakang (Struktur Program) --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
+            <h2 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
+                <span class="w-7 h-7 bg-blue-50 text-[#1b84ff] rounded-lg flex items-center justify-center text-xs font-bold">4</span>
+                Halaman Belakang (Struktur Program / Materi)
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="md:col-span-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Judul Struktur Program</label>
+                    <input type="text" name="back_page_title" value="{{ old('back_page_title', 'STRUKTUR PROGRAM IHT PANCAWALUYA SMKN 1 TALAGA TAHUN ' . date('Y')) }}"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Penandatangan 2 (Belakang)</label>
+                    <input type="text" name="signer_2_title" value="{{ old('signer_2_title', 'Ketua Pelaksana') }}"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Penandatangan 2 (Employee)</label>
+                    <select name="signer_2_employee_id" class="select2-search w-full">
+                        <option value="">-- Cari / Pilih Pegawai / Guru --</option>
+                        @foreach($employees as $emp)
+                            <option value="{{ $emp->id }}" {{ old('signer_2_employee_id') == $emp->id ? 'selected' : '' }}>
+                                {{ $emp->full_name }} (NIP: {{ $emp->nip ?? '-' }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            {{-- Table Repeater Materi --}}
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Daftar Materi & Alokasi Waktu</label>
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-sm" id="materi-table">
+                        <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 text-xs uppercase">
+                            <tr>
+                                <th class="px-4 py-3 w-12 text-center">No</th>
+                                <th class="px-4 py-3">Nama Materi / Modul</th>
+                                <th class="px-4 py-3 w-44">Alokasi Waktu</th>
+                                <th class="px-4 py-3 w-20 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materi-container" class="divide-y divide-gray-100">
+                            <tr class="materi-row">
+                                <td class="px-4 py-3 text-center row-num font-semibold text-gray-500">1</td>
+                                <td class="px-4 py-3">
+                                    <input type="text" name="materi[0][name]" placeholder="Nama Materi Kegiatan" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white">
+                                </td>
+                                <td class="px-4 py-3">
+                                    <input type="text" name="materi[0][hours]" placeholder="Contoh: 2 JP" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white">
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <button type="button" class="btn-remove-row text-rose-500 hover:text-rose-700 font-bold text-lg">&times;</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <button type="button" id="btn-add-materi" class="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold rounded-xl text-xs transition-colors inline-flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        + Tambah Baris Materi
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Form Actions --}}
+        <div class="flex items-center justify-end gap-3 pt-2">
+            <a href="{{ route('admin.certificates.index') }}" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition-colors">
+                Batal
+            </a>
+            <button type="submit" class="px-6 py-2.5 bg-[#1b84ff] hover:bg-[#1570e0] text-white font-semibold rounded-xl text-sm transition-colors shadow-sm shadow-blue-200">
+                Simpan Sertifikat
+            </button>
+        </div>
+    </form>
+@endsection
+
+@section('scripts')
+    <!-- jQuery & Select2 JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2-search').select2({
+                placeholder: "-- Cari / Pilih Pegawai / Guru --",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let rowCount = 1;
+            const container = document.getElementById('materi-container');
+            const btnAdd = document.getElementById('btn-add-materi');
+
+            function updateNumbers() {
+                const rows = container.querySelectorAll('.materi-row');
+                rows.forEach((row, idx) => {
+                    row.querySelector('.row-num').textContent = idx + 1;
+                });
+            }
+
+            btnAdd.addEventListener('click', function() {
+                const newRow = document.createElement('tr');
+                newRow.className = 'materi-row';
+                newRow.innerHTML = `
+                    <td class="px-4 py-3 text-center row-num font-semibold text-gray-500">${container.children.length + 1}</td>
+                    <td class="px-4 py-3">
+                        <input type="text" name="materi[${rowCount}][name]" placeholder="Nama Materi Kegiatan" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white">
+                    </td>
+                    <td class="px-4 py-3">
+                        <input type="text" name="materi[${rowCount}][hours]" placeholder="Contoh: 2 JP" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <button type="button" class="btn-remove-row text-rose-500 hover:text-rose-700 font-bold text-lg">&times;</button>
+                    </td>
+                `;
+                container.appendChild(newRow);
+                rowCount++;
+                updateNumbers();
+            });
+
+            container.addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn-remove-row')) {
+                    if (container.querySelectorAll('.materi-row').length > 1) {
+                        e.target.closest('tr').remove();
+                        updateNumbers();
+                    }
+                }
+            });
+        });
+    </script>
+@endsection
