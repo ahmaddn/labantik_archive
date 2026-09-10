@@ -230,7 +230,7 @@
                     <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-2">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Gambar Background</label>
                         <input type="file" name="background_image" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        <p class="text-[11px] text-gray-400">Gambar latar belakang sertifikat (A4)</p>
+                        <p class="text-[11px] text-gray-400">Orientasi file gambar harus sesuai dengan orientasi sertifikat terpilih (Portrait/Landscape).</p>
                     </div>
 
                     <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-2">

@@ -234,7 +234,7 @@
                         @if($certificate->background_image)
                             <p class="text-xs text-emerald-600">File aktif: <a href="{{ asset('storage/' . $certificate->background_image) }}" target="_blank" class="underline font-medium">Lihat File</a></p>
                         @else
-                            <p class="text-[11px] text-gray-400">Gambar latar belakang sertifikat (A4)</p>
+                            <p class="text-[11px] text-gray-400">Orientasi file gambar harus sesuai dengan orientasi sertifikat terpilih (Portrait/Landscape).</p>
                         @endif
                     </div>
 

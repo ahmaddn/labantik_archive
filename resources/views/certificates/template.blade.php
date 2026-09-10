@@ -360,10 +360,14 @@
         }
 
         .table-materi th {
-            background-color: #f3f4f6;
+            background-color: #ffffff;
             font-weight: bold;
             text-align: center;
             text-transform: uppercase;
+        }
+
+        .table-materi td {
+            text-align: left;
         }
 
         .table-materi td.center {
@@ -540,9 +544,9 @@
                     <table class="table-materi">
                         <thead>
                             <tr>
-                                <th style="width: 8%;">No</th>
-                                <th>Materi / Modul Kegiatan</th>
-                                <th style="width: 25%;">Alokasi Waktu</th>
+                                <th style="width: 8%;">NO</th>
+                                <th>MATERI</th>
+                                <th style="width: 25%;">ALOKASI WAKTU</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -560,8 +564,8 @@
                         </tbody>
                         @if($hasParsedHours && count($certificate->structures) > 0)
                             <tfoot>
-                                <tr style="font-weight: bold; background-color: #f9fafb;">
-                                    <td colspan="2" style="text-align: right; padding-right: 15px; text-transform: uppercase;">Jumlah Total</td>
+                                <tr style="font-weight: bold;">
+                                    <td colspan="2" class="center" style="text-transform: uppercase;">JUMLAH TOTAL</td>
                                     <td class="center">{{ $totalHours }} {{ $suffixText }}</td>
                                 </tr>
                             </tfoot>

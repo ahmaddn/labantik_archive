@@ -123,9 +123,30 @@ class GoogleCertificateController extends Controller
             'word_art_style'            => $validated['word_art_style'] ?? 'none',
         ];
 
-        // Handle File Uploads
+        // Handle File Uploads & Check Background Orientation / Resolution
         if ($request->hasFile('background_image')) {
-            $data['background_image'] = $request->file('background_image')->store('certificates/backgrounds', 'public');
+            $bgFile = $request->file('background_image');
+            $imageDimensions = @getimagesize($bgFile->getRealPath());
+
+            if ($imageDimensions) {
+                $width = $imageDimensions[0];
+                $height = $imageDimensions[1];
+                $orientation = $request->input('orientation', 'portrait');
+
+                if ($orientation === 'landscape' && $height > $width) {
+                    return back()->withErrors([
+                        'background_image' => "File gambar background berorientasi Portrait ({$width}x{$height}px), sedangkan orientasi sertifikat yang Anda pilih adalah Landscape (Mendatar)."
+                    ])->withInput();
+                }
+
+                if ($orientation === 'portrait' && $width > $height) {
+                    return back()->withErrors([
+                        'background_image' => "File gambar background berorientasi Landscape ({$width}x{$height}px), sedangkan orientasi sertifikat yang Anda pilih adalah Portrait (Berdiri)."
+                    ])->withInput();
+                }
+            }
+
+            $data['background_image'] = $bgFile->store('certificates/backgrounds', 'public');
         }
         if ($request->hasFile('header_left_logo')) {
             $data['header_left_logo'] = $request->file('header_left_logo')->store('certificates/logos', 'public');
@@ -270,10 +291,31 @@ class GoogleCertificateController extends Controller
 
         // Upload updates
         if ($request->hasFile('background_image')) {
+            $bgFile = $request->file('background_image');
+            $imageDimensions = @getimagesize($bgFile->getRealPath());
+
+            if ($imageDimensions) {
+                $width = $imageDimensions[0];
+                $height = $imageDimensions[1];
+                $orientation = $request->input('orientation', $certificate->orientation);
+
+                if ($orientation === 'landscape' && $height > $width) {
+                    return back()->withErrors([
+                        'background_image' => "File gambar background berorientasi Portrait ({$width}x{$height}px), sedangkan orientasi sertifikat yang Anda pilih adalah Landscape (Mendatar)."
+                    ])->withInput();
+                }
+
+                if ($orientation === 'portrait' && $width > $height) {
+                    return back()->withErrors([
+                        'background_image' => "File gambar background berorientasi Landscape ({$width}x{$height}px), sedangkan orientasi sertifikat yang Anda pilih adalah Portrait (Berdiri)."
+                    ])->withInput();
+                }
+            }
+
             if ($certificate->background_image) {
                 Storage::disk('public')->delete($certificate->background_image);
             }
-            $data['background_image'] = $request->file('background_image')->store('certificates/backgrounds', 'public');
+            $data['background_image'] = $bgFile->store('certificates/backgrounds', 'public');
         }
         if ($request->hasFile('header_left_logo')) {
             if ($certificate->header_left_logo) {
