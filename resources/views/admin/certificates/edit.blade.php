@@ -153,6 +153,53 @@
             border-radius: 0.5rem !important;
             padding: 4px 0 !important;
         }
+
+        /* WordArt Font Family Variants */
+        .font-cinzel { font-family: 'Cinzel', serif !important; }
+        .font-great-vibes { font-family: 'Great Vibes', cursive !important; }
+        .font-dancing-script { font-family: 'Dancing Script', cursive !important; }
+        .font-alex-brush { font-family: 'Alex Brush', cursive !important; }
+        .font-sacramento { font-family: 'Sacramento', cursive !important; }
+        .font-pacifico { font-family: 'Pacifico', cursive !important; }
+        .font-playfair { font-family: 'Playfair Display', serif !important; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif !important; }
+        .font-times { font-family: 'Times New Roman', Times, serif !important; }
+
+        /* WordArt Style Variants for Live Preview */
+        .wordart-gold-gradient {
+            background: linear-gradient(180deg, #ffe57f 0%, #d4af37 40%, #aa7c11 75%, #593e00 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5)) !important;
+        }
+        .wordart-blue-royal {
+            background: linear-gradient(180deg, #60a5fa 0%, #1d4ed8 50%, #1e3a8a 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            filter: drop-shadow(1px 2px 3px rgba(30, 58, 138, 0.5)) !important;
+        }
+        .wordart-emboss-classic {
+            color: #e2e8f0 !important;
+            text-shadow: -1px -1px 1px #ffffff, 1px 1px 3px rgba(0,0,0,0.8) !important;
+        }
+        .wordart-emerald-lux {
+            background: linear-gradient(180deg, #6ee7b7 0%, #059669 50%, #064e3b 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            filter: drop-shadow(1px 2px 3px rgba(6, 78, 59, 0.5)) !important;
+        }
+        .wordart-ruby-crimson {
+            background: linear-gradient(180deg, #fca5a5 0%, #dc2626 50%, #7f1d1d 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            filter: drop-shadow(1px 2px 3px rgba(127, 29, 29, 0.5)) !important;
+        }
+        .wordart-silver-metallic {
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 40%, #64748b 75%, #334155 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.6)) !important;
+        }
     </style>
 @endsection
 
@@ -408,7 +455,13 @@
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
                 </div>
 
-                <div class="md:col-span-2">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Keterangan Peran / Sub-Caption</label>
+                    <input type="text" name="role_caption" value="{{ old('role_caption', $certificate->role_caption) }}"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Format Nomor Sertifikat</label>
                     <input type="text" name="certificate_number_format" value="{{ old('certificate_number_format', $certificate->certificate_number_format) }}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 font-mono">
@@ -416,15 +469,12 @@
             </div>
 
             {{-- Live WordArt Preview Card --}}
-            <div class="p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center space-y-2 shadow-inner">
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Live Preview WordArt Judul Utama</span>
-                <div id="wordart-live-preview" class="text-3xl font-extrabold py-3 transition-all duration-300 tracking-wider">
-                    {{ old('main_title', $certificate->main_title) }}
-                </div>
-            </div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Keterangan Peran / Sub-Caption</label>
-                    <input type="text" name="role_caption" value="{{ old('role_caption', $certificate->role_caption) }}"
-                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+            <div class="p-5 bg-white rounded-2xl border border-blue-200 shadow-sm text-center space-y-2">
+                <span class="text-[11px] font-bold text-blue-600 uppercase tracking-widest block bg-blue-50 py-1 px-3 rounded-md w-fit mx-auto">Live Preview WordArt Judul Utama</span>
+                <div class="py-4 px-2 min-h-[70px] flex items-center justify-center bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                    <div id="wordart-live-preview" class="text-3xl font-extrabold transition-all duration-300 tracking-wider">
+                        {{ old('main_title', $certificate->main_title) }}
+                    </div>
                 </div>
             </div>
 

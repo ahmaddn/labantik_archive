@@ -138,69 +138,77 @@
         /* ── KOP SURAT (2 LOGO RAPI DAN DENGAN RENTANG PRESISI) ── */
         .header {
             text-align: center;
-            padding-left: 95px;
-            padding-right: 95px;
+            padding-left: 115px;
+            padding-right: 115px;
             position: relative;
-            min-height: 96px;
+            min-height: 94px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
         }
 
         .header img.logo-left {
             position: absolute;
-            left: 0;
-            top: 0;
+            left: 5px;
+            top: 2px;
             width: auto;
-            height: 96px;
+            height: 92px;
             object-fit: contain;
             mix-blend-mode: multiply;
         }
 
         .header img.logo-right {
             position: absolute;
-            right: 0;
-            top: 0;
+            right: 5px;
+            top: 2px;
             width: auto;
-            height: 96px;
+            height: 92px;
             object-fit: contain;
             mix-blend-mode: multiply;
         }
 
         .header .line1 {
-            font-size: 14pt;
+            font-size: 11.5pt;
             font-weight: bold;
             margin: 0;
-            letter-spacing: -0.2px;
+            line-height: 1.15;
+            letter-spacing: 0.2px;
             white-space: nowrap;
+            text-transform: uppercase;
         }
 
         .header .line2 {
-            font-size: 14pt;
+            font-size: 15.5pt;
             font-weight: bold;
             margin: 0;
-            letter-spacing: -0.2px;
+            line-height: 1.15;
+            letter-spacing: 0.2px;
             white-space: nowrap;
+            text-transform: uppercase;
         }
 
         .header .line3 {
-            font-size: 12pt;
+            font-size: 12.5pt;
             font-weight: bold;
             margin: 0;
-            letter-spacing: -0.2px;
+            line-height: 1.15;
+            letter-spacing: 0px;
             white-space: nowrap;
+            text-transform: uppercase;
         }
 
         .header .address {
-            font-size: 7.5pt;
-            font-family: Arial, sans-serif;
+            font-size: 6.8pt;
+            font-family: 'Times New Roman', Times, serif;
             font-weight: normal;
             text-align: center;
-            line-height: 1.25;
+            line-height: 1.15;
             color: #000;
-            margin-top: 3px;
+            margin-top: 2px;
         }
 
         .header-border-top {
-            border-top: 3px solid #000;
-            margin-top: 5px;
+            border-top: 2.5px solid #000;
+            margin-top: 4px;
         }
 
         .header-border-thin {
@@ -465,15 +473,15 @@
                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Coat_of_arms_of_West_Java.svg/500px-Coat_of_arms_of_West_Java.svg.png" class="logo-left" alt="Logo Jawa Barat">
                         @endif
 
-                        <div class="line1">{{ $certificate->header_title ?? 'PEMERINTAH PROVINSI JAWA BARAT' }}</div>
+                        <div class="line1">{{ ($certificate->header_title && $certificate->header_title !== 'PEMERINTAH PROVINSI JAWA BARAT') ? $certificate->header_title : 'PEMERINTAH DAERAH PROVINSI JAWA BARAT' }}</div>
                         <div class="line2">{{ $certificate->header_subtitle ?? 'CABANG DINAS PENDIDIKAN WILAYAH IX' }}</div>
                         <div class="line3">SEKOLAH MENENGAH KEJURUAN NEGERI 1 TALAGA</div>
                         <div class="address">
-                            Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi dan Komunikasi, Bisnis dan Manajemen<br />
-                            Kampus 1 : Jalan Sekolah No.20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
-                            Kampus 2 : Jalan Talaga - Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
-                            Telepon (0233) 319238 &nbsp; Fax (0233) 319238 &nbsp; Kode Pos 45463 &nbsp; NPSN 20.21.38.72<br />
-                            Website https://smkn1talaga.sch.id/ &nbsp; E-mail: mailsmkn1talaga@gmail.com
+                            Bidang Keahlian: Teknologi dan Rekayasa, Teknologi Informasi komunikasi, Bisnis dan Manajemen<br />
+                            Kampus 1: Jalan Sekolah Nomor 20 Desa Talagakulon Kecamatan Talaga Kabupaten Majalengka<br />
+                            Kampus 2: Jalan Talaga-Bantarujeg Desa Mekarraharja Kecamatan Talaga Kabupaten Majalengka<br />
+                            Telpon &#9742; (0233) 319238 FAX &#9993; (0233) 319238 POS &#9993; 45463 NPSN: 20213872<br />
+                            Website &#128187; www.smkn1talaga.sch.id &ndash; Email &#9993; admin@smkn1talaga.sch.id
                         </div>
 
                         @if($certificate->header_right_logo)
