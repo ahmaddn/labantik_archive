@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\GoogleCertificate;
 use App\Models\GoogleCertificateStructure;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -32,8 +33,9 @@ class GoogleCertificateController extends Controller
     {
         $roles     = Role::orderBy('name')->get();
         $employees = Employee::orderBy('full_name')->get();
+        $users     = User::with('roles')->orderBy('name')->get();
 
-        return view('admin.certificates.create', compact('roles', 'employees'));
+        return view('admin.certificates.create', compact('roles', 'employees', 'users'));
     }
 
     /**
@@ -41,7 +43,7 @@ class GoogleCertificateController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'title'                     => 'required|string|max:255',
             'certificate_number_format' => 'nullable|string|max:255',
             'orientation'               => 'required|in:portrait,landscape',
@@ -64,15 +66,36 @@ class GoogleCertificateController extends Controller
             'signer_2_title'            => 'nullable|string|max:255',
             'signer_2_employee_id'      => 'nullable|exists:core_employees,id',
             'roles'                     => 'nullable|array',
-            'roles.*'                   => 'exists:core_roles,id',
+            'roles.*'                   => 'nullable|exists:core_roles,id',
+            'users'                     => 'nullable|array',
+            'users.*'                   => 'nullable|exists:core_users,id',
+            'all_users_selected'        => 'nullable|boolean',
             'status'                    => 'required|in:active,draft',
             'recipient_type'            => 'required|in:peserta,narasumber',
             'custom_recipient_name'     => 'nullable|string|max:255',
             'word_art_style'            => 'nullable|string|max:100',
             'materi'                    => 'nullable|array',
-            'materi.*.name'             => 'required_with:materi|string|max:255',
+            'materi.*.name'             => 'nullable|string|max:255',
             'materi.*.hours'            => 'nullable|string|max:100',
-        ]);
+        ];
+
+        $messages = [
+            'title.required'             => 'Nama sertifikat internal wajib diisi.',
+            'main_title.required'        => 'Judul utama sertifikat (misal: SERTIFIKAT) wajib diisi.',
+            'sub_title.required'         => 'Sub judul sertifikat (misal: Diberikan kepada) wajib diisi.',
+            'orientation.required'       => 'Orientasi sertifikat (Portrait/Landscape) wajib dipilih.',
+            'status.required'            => 'Status publikasi sertifikat wajib dipilih.',
+            'recipient_type.required'    => 'Tipe penerima (Peserta/Narasumber) wajib dipilih.',
+            'background_image.image'     => 'File gambar background harus berupa format gambar (JPG, PNG, WebP).',
+            'background_image.max'       => 'Ukuran file gambar background maksimal 5 MB.',
+            'header_left_logo.image'     => 'Logo kiri harus berupa format gambar (JPG, PNG, WebP).',
+            'header_right_logo.image'    => 'Logo kanan harus berupa format gambar (JPG, PNG, WebP).',
+            'roles.*.exists'             => 'Role yang dipilih tidak valid di dalam sistem.',
+            'users.*.exists'             => 'Pengguna yang dipilih tidak valid di dalam sistem.',
+            'materi.*.name.max'          => 'Nama materi tidak boleh lebih dari 255 karakter.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
 
         $data = [
             'id'                        => (string) Str::uuid(),
@@ -119,8 +142,13 @@ class GoogleCertificateController extends Controller
 
         $certificate = GoogleCertificate::create($data);
 
-        // Attach Roles
-        $certificate->roles()->sync($validated['roles']);
+        // Attach Roles & Users
+        $certificate->roles()->sync($validated['roles'] ?? []);
+        if ($request->has('all_users_selected')) {
+            $certificate->users()->detach();
+        } else {
+            $certificate->users()->sync($validated['users'] ?? []);
+        }
 
         // Attach Dynamic Structure (Halaman Belakang)
         if (!empty($validated['materi'])) {
@@ -146,11 +174,12 @@ class GoogleCertificateController extends Controller
      */
     public function edit($id)
     {
-        $certificate = GoogleCertificate::with(['roles', 'structures', 'signer1Employee', 'signer2Employee'])->findOrFail($id);
+        $certificate = GoogleCertificate::with(['roles', 'users', 'structures', 'signer1Employee', 'signer2Employee'])->findOrFail($id);
         $roles       = Role::orderBy('name')->get();
         $employees   = Employee::orderBy('full_name')->get();
+        $users       = User::with('roles')->orderBy('name')->get();
 
-        return view('admin.certificates.edit', compact('certificate', 'roles', 'employees'));
+        return view('admin.certificates.edit', compact('certificate', 'roles', 'employees', 'users'));
     }
 
     /**
@@ -160,7 +189,7 @@ class GoogleCertificateController extends Controller
     {
         $certificate = GoogleCertificate::findOrFail($id);
 
-        $validated = $request->validate([
+        $rules = [
             'title'                     => 'required|string|max:255',
             'certificate_number_format' => 'nullable|string|max:255',
             'orientation'               => 'required|in:portrait,landscape',
@@ -183,15 +212,36 @@ class GoogleCertificateController extends Controller
             'signer_2_title'            => 'nullable|string|max:255',
             'signer_2_employee_id'      => 'nullable|exists:core_employees,id',
             'roles'                     => 'nullable|array',
-            'roles.*'                   => 'exists:core_roles,id',
+            'roles.*'                   => 'nullable|exists:core_roles,id',
+            'users'                     => 'nullable|array',
+            'users.*'                   => 'nullable|exists:core_users,id',
+            'all_users_selected'        => 'nullable|boolean',
             'status'                    => 'required|in:active,draft',
             'recipient_type'            => 'required|in:peserta,narasumber',
             'custom_recipient_name'     => 'nullable|string|max:255',
             'word_art_style'            => 'nullable|string|max:100',
             'materi'                    => 'nullable|array',
-            'materi.*.name'             => 'required_with:materi|string|max:255',
+            'materi.*.name'             => 'nullable|string|max:255',
             'materi.*.hours'            => 'nullable|string|max:100',
-        ]);
+        ];
+
+        $messages = [
+            'title.required'             => 'Nama sertifikat internal wajib diisi.',
+            'main_title.required'        => 'Judul utama sertifikat (misal: SERTIFIKAT) wajib diisi.',
+            'sub_title.required'         => 'Sub judul sertifikat (misal: Diberikan kepada) wajib diisi.',
+            'orientation.required'       => 'Orientasi sertifikat (Portrait/Landscape) wajib dipilih.',
+            'status.required'            => 'Status publikasi sertifikat wajib dipilih.',
+            'recipient_type.required'    => 'Tipe penerima (Peserta/Narasumber) wajib dipilih.',
+            'background_image.image'     => 'File gambar background harus berupa format gambar (JPG, PNG, WebP).',
+            'background_image.max'       => 'Ukuran file gambar background maksimal 5 MB.',
+            'header_left_logo.image'     => 'Logo kiri harus berupa format gambar (JPG, PNG, WebP).',
+            'header_right_logo.image'    => 'Logo kanan harus berupa format gambar (JPG, PNG, WebP).',
+            'roles.*.exists'             => 'Role yang dipilih tidak valid di dalam sistem.',
+            'users.*.exists'             => 'Pengguna yang dipilih tidak valid di dalam sistem.',
+            'materi.*.name.max'          => 'Nama materi tidak boleh lebih dari 255 karakter.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
 
         $data = [
             'title'                     => $validated['title'],
@@ -246,8 +296,13 @@ class GoogleCertificateController extends Controller
 
         $certificate->update($data);
 
-        // Sync Roles
-        $certificate->roles()->sync($validated['roles']);
+        // Sync Roles & Users
+        $certificate->roles()->sync($validated['roles'] ?? []);
+        if ($request->has('all_users_selected')) {
+            $certificate->users()->detach();
+        } else {
+            $certificate->users()->sync($validated['users'] ?? []);
+        }
 
         // Sync Structure Materi
         $certificate->structures()->delete();

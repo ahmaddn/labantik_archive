@@ -10,6 +10,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@700&family=Dancing+Script:wght@600&family=Great+Vibes&family=Montserrat:wght@500;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;1,400&family=Sacramento&display=swap" rel="stylesheet">
     <style>
+        /* Select2 Modern & Clean Theme Styling */
+        .select2-container {
+            width: 100% !important;
+        }
         .select2-container--default .select2-selection--single {
             background-color: #f9fafb !important;
             border: 1px solid #e5e7eb !important;
@@ -17,28 +21,93 @@
             height: 44px !important;
             display: flex !important;
             align-items: center !important;
-            padding-left: 8px !important;
+            padding: 0 12px !important;
+            transition: all 0.15s ease-in-out;
         }
         .select2-container--default .select2-selection--single .select2-selection__rendered {
-            color: #374151 !important;
+            color: #1f2937 !important;
             font-size: 0.875rem !important;
+            line-height: normal !important;
+            padding-left: 0 !important;
         }
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             height: 42px !important;
             right: 10px !important;
         }
+        .select2-container--default .select2-selection--multiple {
+            background-color: #f9fafb !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 0.75rem !important;
+            min-height: 44px !important;
+            padding: 4px 8px !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            gap: 4px !important;
+            transition: all 0.15s ease-in-out;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--multiple,
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #3b82f6 !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #eff6ff !important;
+            border: 1px solid #bfdbfe !important;
+            color: #1d4ed8 !important;
+            border-radius: 0.5rem !important;
+            padding: 3px 8px !important;
+            font-size: 0.8125rem !important;
+            font-weight: 500 !important;
+            margin: 2px 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            float: none !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #3b82f6 !important;
+            margin-right: 5px !important;
+            border: none !important;
+            font-weight: bold !important;
+            float: none !important;
+            position: relative !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #1e40af !important;
+            background-color: transparent !important;
+        }
+        .select2-container--default .select2-search--inline .select2-search__field {
+            margin-top: 0 !important;
+            height: 32px !important;
+            font-size: 0.875rem !important;
+            font-family: inherit !important;
+            color: #374151 !important;
+        }
         .select2-dropdown {
             border: 1px solid #e5e7eb !important;
             border-radius: 0.75rem !important;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
             overflow: hidden !important;
             font-size: 0.875rem !important;
+            z-index: 99999 !important;
+            background-color: #ffffff !important;
+        }
+        .select2-results__option {
+            padding: 8px 14px !important;
+            font-size: 0.875rem !important;
+            color: #374151 !important;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
         }
         .select2-search__field {
             border-radius: 0.5rem !important;
             border: 1px solid #d1d5db !important;
-            padding: 6px 10px !important;
+            padding: 8px 12px !important;
             outline: none !important;
+            font-size: 0.875rem !important;
         }
 
         /* Quill fontpicker styling */
@@ -50,6 +119,40 @@
         .ql-font-playfair { font-family: 'Playfair Display', serif; }
         .ql-font-cinzel { font-family: 'Cinzel', serif; }
         .ql-font-tahoma { font-family: 'Tahoma', sans-serif; }
+
+        /* Quill Picker Dropdown Item Labels & Font Previews */
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="great-vibes"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="great-vibes"]::before { content: "Great Vibes"; font-family: 'Great Vibes', cursive; font-size: 16px; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="dancing-script"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="dancing-script"]::before { content: "Dancing Script"; font-family: 'Dancing Script', cursive; font-size: 15px; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="alex-brush"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="alex-brush"]::before { content: "Alex Brush"; font-family: 'Alex Brush', cursive; font-size: 16px; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="sacramento"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="sacramento"]::before { content: "Sacramento"; font-family: 'Sacramento', cursive; font-size: 16px; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="pacifico"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="pacifico"]::before { content: "Pacifico"; font-family: 'Pacifico', cursive; font-size: 14px; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="playfair"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="playfair"]::before { content: "Playfair Display"; font-family: 'Playfair Display', serif; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="cinzel"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="cinzel"]::before { content: "Cinzel"; font-family: 'Cinzel', serif; }
+
+        .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="tahoma"]::before,
+        .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="tahoma"]::before { content: "Tahoma"; font-family: 'Tahoma', sans-serif; }
+
+        /* Quill Picker Dropdown Scrollbar Fix */
+        .ql-snow .ql-picker-options {
+            max-height: 220px !important;
+            overflow-y: auto !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+            border-radius: 0.5rem !important;
+            padding: 4px 0 !important;
+        }
     </style>
 @endsection
 
@@ -197,7 +300,7 @@
             </div>
 
             {{-- Container untuk Peserta (Checkboxes Role & Select All) --}}
-            <div id="peserta-container" class="space-y-3 {{ old('recipient_type', 'peserta') == 'peserta' ? '' : 'hidden' }}">
+            <div id="peserta-container" class="space-y-4 {{ old('recipient_type', 'peserta') == 'peserta' ? '' : 'hidden' }}">
                 <div class="flex items-center justify-between">
                     <label class="block text-sm font-semibold text-gray-700">Pilih Role Pengguna yang Memiliki Akses Sertifikat Ini <span class="text-rose-500">*</span></label>
                     <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-600 hover:text-blue-800">
@@ -214,6 +317,28 @@
                             <span>{{ $role->name }}</span>
                         </label>
                     @endforeach
+                </div>
+
+                {{-- Dropdown Pilih User Spesifik (Opsional) --}}
+                <div class="pt-3 border-t border-gray-100 space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700">Filter / Pilih User Spesifik (Opsional)</label>
+
+                    <div id="user-select-container">
+                        <select name="users[]" id="users-select" class="select2-users w-full" multiple="multiple">
+                            @foreach($users as $usr)
+                                @php
+                                    $userRoleIds = $usr->roles->pluck('id')->toArray();
+                                    $userRoleNames = implode(', ', $usr->roles->pluck('name')->toArray());
+                                @endphp
+                                <option value="{{ $usr->id }}"
+                                        data-roles="{{ json_encode($userRoleIds) }}"
+                                        {{ is_array(old('users')) && in_array($usr->id, old('users')) ? 'selected' : '' }}>
+                                    {{ $usr->name }} — [{{ $userRoleNames ?: 'Tanpa Role' }}]
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1">Kosongkan pilihan jika ingin memberikan akses ke semua pengguna yang ada di dalam role yang dipilih di atas.</p>
+                    </div>
                 </div>
             </div>
 
@@ -409,6 +534,61 @@
                 placeholder: "-- Cari / Pilih Pegawai / Guru --",
                 allowClear: true,
                 width: '100%'
+            });
+
+            function getSelectedRoleIds() {
+                return $('.role-checkbox:checked').map(function() {
+                    return String($(this).val());
+                }).get();
+            }
+
+            function matchUserByRole(params, data) {
+                const element = data.element;
+                if (!element) return null;
+
+                const selectedRoles = getSelectedRoleIds();
+                if (selectedRoles.length === 0) return null;
+
+                const userRoles = $(element).data('roles') || [];
+                const userRoleStrings = userRoles.map(r => String(r));
+
+                const hasMatchingRole = userRoleStrings.some(roleId => selectedRoles.includes(roleId));
+                if (!hasMatchingRole) return null;
+
+                const term = $.trim(params.term || '').toLowerCase();
+                if (term === '') return data;
+
+                if (data.text.toLowerCase().indexOf(term) > -1) {
+                    return data;
+                }
+
+                return null;
+            }
+
+            const $usersSelect = $('.select2-users').select2({
+                placeholder: "-- Pilih beberapa user spesifik (Opsional) --",
+                allowClear: true,
+                width: '100%',
+                matcher: matchUserByRole
+            });
+
+            function syncUserSelectionWithRoles() {
+                const selectedRoles = getSelectedRoleIds();
+
+                $('#users-select option:selected').each(function() {
+                    const userRoles = $(this).data('roles') || [];
+                    const userRoleStrings = userRoles.map(r => String(r));
+                    const hasMatchingRole = userRoleStrings.some(roleId => selectedRoles.includes(roleId));
+                    if (!hasMatchingRole) {
+                        $(this).prop('selected', false);
+                    }
+                });
+
+                $usersSelect.trigger('change');
+            }
+
+            $('.role-checkbox, #select-all-roles').on('change', function() {
+                syncUserSelectionWithRoles();
             });
         });
 

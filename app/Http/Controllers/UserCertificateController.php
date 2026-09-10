@@ -16,22 +16,32 @@ class UserCertificateController extends Controller
         $roleIds   = $user->roles->pluck('id')->toArray();
         $roleCodes = $user->roles->pluck('code')->toArray();
 
-        // Jika user adalah super admin, atau memiliki role yang cocok (berdasarkan ID atau code)
-        $certificates = GoogleCertificate::where(function ($query) use ($user, $roleIds, $roleCodes) {
-            if ($user->isSuperAdmin()) {
-                $query->whereRaw('1 = 1');
-            } else {
-                $query->where('recipient_type', 'narasumber')
-                      ->orWhereHas('roles', function ($q) use ($roleIds, $roleCodes) {
-                          $q->whereIn('core_roles.id', $roleIds)
-                            ->orWhereIn('core_roles.code', $roleCodes);
-                      });
-            }
-        })
-        ->where('status', 'active')
-        ->with(['signer1Employee', 'signer2Employee', 'structures'])
-        ->latest()
-        ->paginate(10);
+        $certificates = GoogleCertificate::where('status', 'active')
+            ->where(function ($query) use ($user, $roleIds, $roleCodes) {
+                if ($user->isSuperAdmin()) {
+                    $query->whereRaw('1 = 1');
+                } else {
+                    $query->where('recipient_type', 'narasumber')
+                          ->orWhere(function ($qPeserta) use ($user, $roleIds, $roleCodes) {
+                              $qPeserta->where('recipient_type', 'peserta')
+                                       ->where(function ($qTarget) use ($user, $roleIds, $roleCodes) {
+                                           $qTarget->whereHas('users', function ($qUser) use ($user) {
+                                               $qUser->where('core_users.id', $user->id);
+                                           })
+                                           ->orWhere(function ($qAllRoleUsers) use ($roleIds, $roleCodes) {
+                                               $qAllRoleUsers->whereDoesntHave('users')
+                                                             ->whereHas('roles', function ($qRole) use ($roleIds, $roleCodes) {
+                                                                 $qRole->whereIn('core_roles.id', $roleIds)
+                                                                       ->orWhereIn('core_roles.code', $roleCodes);
+                                                             });
+                                           });
+                                       });
+                          });
+                }
+            })
+            ->with(['signer1Employee', 'signer2Employee', 'structures'])
+            ->latest()
+            ->paginate(10);
 
         return view('user.certificates.index', compact('certificates', 'user'));
     }
@@ -45,20 +55,31 @@ class UserCertificateController extends Controller
         $roleIds   = $user->roles->pluck('id')->toArray();
         $roleCodes = $user->roles->pluck('code')->toArray();
 
-        $certificate = GoogleCertificate::where(function ($query) use ($user, $roleIds, $roleCodes) {
-            if ($user->isSuperAdmin()) {
-                $query->whereRaw('1 = 1');
-            } else {
-                $query->where('recipient_type', 'narasumber')
-                      ->orWhereHas('roles', function ($q) use ($roleIds, $roleCodes) {
-                          $q->whereIn('core_roles.id', $roleIds)
-                            ->orWhereIn('core_roles.code', $roleCodes);
-                      });
-            }
-        })
-        ->where('status', 'active')
-        ->with(['signer1Employee', 'signer2Employee', 'structures'])
-        ->findOrFail($id);
+        $certificate = GoogleCertificate::where('status', 'active')
+            ->where(function ($query) use ($user, $roleIds, $roleCodes) {
+                if ($user->isSuperAdmin()) {
+                    $query->whereRaw('1 = 1');
+                } else {
+                    $query->where('recipient_type', 'narasumber')
+                          ->orWhere(function ($qPeserta) use ($user, $roleIds, $roleCodes) {
+                              $qPeserta->where('recipient_type', 'peserta')
+                                       ->where(function ($qTarget) use ($user, $roleIds, $roleCodes) {
+                                           $qTarget->whereHas('users', function ($qUser) use ($user) {
+                                               $qUser->where('core_users.id', $user->id);
+                                           })
+                                           ->orWhere(function ($qAllRoleUsers) use ($roleIds, $roleCodes) {
+                                               $qAllRoleUsers->whereDoesntHave('users')
+                                                             ->whereHas('roles', function ($qRole) use ($roleIds, $roleCodes) {
+                                                                 $qRole->whereIn('core_roles.id', $roleIds)
+                                                                       ->orWhereIn('core_roles.code', $roleCodes);
+                                                             });
+                                           });
+                                       });
+                          });
+                }
+            })
+            ->with(['signer1Employee', 'signer2Employee', 'structures'])
+            ->findOrFail($id);
 
         return view('certificates.template', compact('certificate', 'user'));
     }

@@ -68,6 +68,14 @@ class GoogleCertificate extends Model
     }
 
     /**
+     * Relasi ke Users spesifik yang di-attach
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'google_certificate_users', 'certificate_id', 'user_id');
+    }
+
+    /**
      * Penandatangan 1 (e.g. Kepala Sekolah) -> Employee
      */
     public function signer1Employee(): BelongsTo
