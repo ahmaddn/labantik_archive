@@ -57,15 +57,22 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="flex flex-wrap gap-1">
-                                    @forelse($cert->roles as $role)
-                                        <span class="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-md text-xs font-medium">
-                                            {{ $role->name }}
-                                        </span>
-                                    @empty
-                                        <span class="text-gray-400 text-xs italic">Semua Role</span>
-                                    @endforelse
-                                </div>
+                                @if($cert->recipient_type == 'narasumber')
+                                    <span class="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        Narasumber: {{ $cert->custom_recipient_name }}
+                                    </span>
+                                @else
+                                    <div class="flex flex-wrap gap-1">
+                                        @forelse($cert->roles as $role)
+                                            <span class="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-md text-xs font-medium">
+                                                {{ $role->name }}
+                                            </span>
+                                        @empty
+                                            <span class="text-gray-400 text-xs italic">Semua Role Peserta</span>
+                                        @endforelse
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-xs text-gray-700">
                                 <div><strong class="text-gray-900">Ttd 1:</strong> {{ $cert->signer1Employee ? $cert->signer1Employee->full_name : '-' }}</div>

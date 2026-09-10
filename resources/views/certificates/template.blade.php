@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sertifikat - {{ $certificate->parsePlaceholder('{nama}', $user) }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@700&family=Dancing+Script:wght@600&family=Great+Vibes&family=Montserrat:wght@500;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;1,400&family=Sacramento&display=swap" rel="stylesheet">
     <style>
         @page {
             size: A4 {{ $certificate->orientation == 'landscape' ? 'landscape' : 'portrait' }};
@@ -213,13 +216,43 @@
             padding: 5px 0;
         }
 
+        /* ── BODY CONTENT & WORDART ── */
+        .cert-body {
+            text-align: center;
+            margin: auto 0;
+            padding: 5px 0;
+        }
+
         .main-title {
-            font-size: 26pt;
+            font-size: 28pt;
             font-weight: 900;
             letter-spacing: 4px;
             color: #1e3a8a;
             text-transform: uppercase;
             margin-bottom: 4px;
+        }
+
+        /* WordArt Variants */
+        .main-title.wordart-gold-gradient {
+            background: linear-gradient(180deg, #ffe57f 0%, #d4af37 40%, #aa7c11 75%, #593e00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
+            font-weight: 900;
+        }
+
+        .main-title.wordart-blue-royal {
+            background: linear-gradient(180deg, #60a5fa 0%, #1d4ed8 50%, #1e3a8a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(1px 2px 3px rgba(30, 58, 138, 0.4));
+            font-weight: 900;
+        }
+
+        .main-title.wordart-emboss-classic {
+            color: #1e293b;
+            text-shadow: -1px -1px 1px #ffffff, 1px 1px 2px rgba(0,0,0,0.5);
+            font-weight: 900;
         }
 
         .cert-number {
@@ -237,12 +270,15 @@
             margin-bottom: 10px;
         }
 
+        /* Diberikan Kepada (Recipient Name in Tahoma, smaller size, no underline) */
         .user-name {
-            font-size: 26pt;
+            font-size: 19pt;
             font-weight: bold;
-            color: #000000;
-            text-decoration: underline;
-            margin: 10px 0 6px 0;
+            font-family: Tahoma, Geneva, Verdana, sans-serif;
+            color: #111827;
+            text-decoration: none;
+            margin: 8px 0 6px 0;
+            letter-spacing: 0.2px;
         }
 
         .role-caption {
@@ -259,6 +295,16 @@
             margin: 0 auto 16px auto;
             color: #000000;
         }
+
+        /* Quill font classes mapping */
+        .ql-font-great-vibes { font-family: 'Great Vibes', cursive !important; }
+        .ql-font-dancing-script { font-family: 'Dancing Script', cursive !important; }
+        .ql-font-alex-brush { font-family: 'Alex Brush', cursive !important; }
+        .ql-font-sacramento { font-family: 'Sacramento', cursive !important; }
+        .ql-font-pacifico { font-family: 'Pacifico', cursive !important; }
+        .ql-font-playfair { font-family: 'Playfair Display', serif !important; }
+        .ql-font-cinzel { font-family: 'Cinzel', serif !important; }
+        .ql-font-tahoma { font-family: 'Tahoma', sans-serif !important; }
 
         /* ── SIGNATURE SECTION ── */
         .cert-footer {
@@ -404,7 +450,9 @@
 
             <!-- Body Sertifikat -->
             <div class="cert-body">
-                <div class="main-title">{{ $certificate->main_title }}</div>
+                <div class="main-title {{ $certificate->word_art_style && $certificate->word_art_style != 'none' ? 'wordart-' . $certificate->word_art_style : '' }}">
+                    {{ $certificate->main_title }}
+                </div>
                 
                 @if($certificate->show_number && $certificate->certificate_number_format)
                     <div class="cert-number">
@@ -415,7 +463,11 @@
                 <div class="sub-title">{{ $certificate->sub_title }}</div>
 
                 <div class="user-name">
-                    {{ $certificate->parsePlaceholder('{nama}', $user) }}
+                    @if($certificate->recipient_type == 'narasumber' && !empty($certificate->custom_recipient_name))
+                        {{ $certificate->custom_recipient_name }}
+                    @else
+                        {{ $certificate->parsePlaceholder('{nama}', $user) }}
+                    @endif
                 </div>
 
                 @if($certificate->role_caption)
@@ -426,7 +478,7 @@
 
                 @if($certificate->content_text)
                     <div class="content-narration">
-                        {!! nl2br(e($certificate->parsePlaceholder($certificate->content_text, $user))) !!}
+                        {!! $certificate->parsePlaceholder($certificate->content_text, $user) !!}
                     </div>
                 @endif
             </div>
@@ -466,6 +518,25 @@
                     </h3>
 
                     <!-- Tabel Struktur Program -->
+                    @php
+                        $totalHours = 0;
+                        $hasParsedHours = false;
+                        $suffixText = 'Jam';
+
+                        foreach($certificate->structures as $item) {
+                            if ($item->time_allocation) {
+                                // Match pattern like "18 - Jam", "2 JP", "10 Jam"
+                                if (preg_match('/^(\d+)\s*(?:-\s*|\s*)(.*)$/i', trim($item->time_allocation), $matches)) {
+                                    $totalHours += (int)$matches[1];
+                                    $hasParsedHours = true;
+                                    if (!empty($matches[2])) {
+                                        $suffixText = trim($matches[2]);
+                                    }
+                                }
+                            }
+                        }
+                    @endphp
+
                     <table class="table-materi">
                         <thead>
                             <tr>
@@ -487,6 +558,14 @@
                                 </tr>
                             @endforelse
                         </tbody>
+                        @if($hasParsedHours && count($certificate->structures) > 0)
+                            <tfoot>
+                                <tr style="font-weight: bold; background-color: #f9fafb;">
+                                    <td colspan="2" style="text-align: right; padding-right: 15px; text-transform: uppercase;">Jumlah Total</td>
+                                    <td class="center">{{ $totalHours }} {{ $suffixText }}</td>
+                                </tr>
+                            </tfoot>
+                        @endif
                     </table>
                 </div>
 

@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('google_graduation', function (Blueprint $table) {
-            if (!Schema::hasColumn('google_graduation', 'transcript_letter_id')) {
-                $table->uuid('transcript_letter_id')->nullable()->after('letter_id');
-                $table->foreign('transcript_letter_id')->references('uuid')->on('google_graduation_letters')->onDelete('set null');
-            }
-        });
+        if (Schema::hasTable('google_graduation')) {
+            Schema::table('google_graduation', function (Blueprint $table) {
+                if (!Schema::hasColumn('google_graduation', 'transcript_letter_id')) {
+                    $table->uuid('transcript_letter_id')->nullable()->after('letter_id');
+                    $table->foreign('transcript_letter_id')->references('uuid')->on('google_graduation_letters')->onDelete('set null');
+                }
+            });
+        }
     }
 
     /**

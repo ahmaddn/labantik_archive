@@ -48,17 +48,25 @@ return new class extends Migration
             $table->uuid('signer_2_employee_id')->nullable();
             
             $table->enum('status', ['active', 'draft'])->default('active');
+            
+            // New options: recipient selection & wordart
+            $table->enum('recipient_type', ['peserta', 'narasumber'])->default('peserta');
+            $table->string('custom_recipient_name')->nullable();
+            $table->string('word_art_style')->default('none');
+            
             $table->timestamps();
 
-            $table->foreign('signer_1_employee_id')
-                ->references('id')
-                ->on('core_employees')
-                ->nullOnDelete();
+            if (Schema::hasTable('core_employees')) {
+                $table->foreign('signer_1_employee_id')
+                    ->references('id')
+                    ->on('core_employees')
+                    ->nullOnDelete();
 
-            $table->foreign('signer_2_employee_id')
-                ->references('id')
-                ->on('core_employees')
-                ->nullOnDelete();
+                $table->foreign('signer_2_employee_id')
+                    ->references('id')
+                    ->on('core_employees')
+                    ->nullOnDelete();
+            }
         });
 
         Schema::create('google_certificate_structures', function (Blueprint $table) {
@@ -86,10 +94,12 @@ return new class extends Migration
                 ->on('google_certificates')
                 ->onDelete('cascade');
 
-            $table->foreign('role_id')
-                ->references('id')
-                ->on('core_roles')
-                ->onDelete('cascade');
+            if (Schema::hasTable('core_roles')) {
+                $table->foreign('role_id')
+                    ->references('id')
+                    ->on('core_roles')
+                    ->onDelete('cascade');
+            }
         });
     }
 

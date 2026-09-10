@@ -21,10 +21,11 @@ class UserCertificateController extends Controller
             if ($user->isSuperAdmin()) {
                 $query->whereRaw('1 = 1');
             } else {
-                $query->whereHas('roles', function ($q) use ($roleIds, $roleCodes) {
-                    $q->whereIn('core_roles.id', $roleIds)
-                      ->orWhereIn('core_roles.code', $roleCodes);
-                });
+                $query->where('recipient_type', 'narasumber')
+                      ->orWhereHas('roles', function ($q) use ($roleIds, $roleCodes) {
+                          $q->whereIn('core_roles.id', $roleIds)
+                            ->orWhereIn('core_roles.code', $roleCodes);
+                      });
             }
         })
         ->where('status', 'active')
@@ -48,10 +49,11 @@ class UserCertificateController extends Controller
             if ($user->isSuperAdmin()) {
                 $query->whereRaw('1 = 1');
             } else {
-                $query->whereHas('roles', function ($q) use ($roleIds, $roleCodes) {
-                    $q->whereIn('core_roles.id', $roleIds)
-                      ->orWhereIn('core_roles.code', $roleCodes);
-                });
+                $query->where('recipient_type', 'narasumber')
+                      ->orWhereHas('roles', function ($q) use ($roleIds, $roleCodes) {
+                          $q->whereIn('core_roles.id', $roleIds)
+                            ->orWhereIn('core_roles.code', $roleCodes);
+                      });
             }
         })
         ->where('status', 'active')

@@ -3,13 +3,17 @@
 @section('page-title', 'Buat Sertifikat')
 
 @section('styles')
-    <!-- Select2 CSS -->
+    <!-- Select2 CSS & Summernote / Google Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@700&family=Dancing+Script:wght@600&family=Great+Vibes&family=Montserrat:wght@500;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;1,400&family=Sacramento&display=swap" rel="stylesheet">
     <style>
         .select2-container--default .select2-selection--single {
             background-color: #f9fafb !important;
             border: 1px solid #e5e7eb !important;
-            border-radius: 0.75rem !important; /* rounded-xl */
+            border-radius: 0.75rem !important;
             height: 44px !important;
             display: flex !important;
             align-items: center !important;
@@ -36,6 +40,16 @@
             padding: 6px 10px !important;
             outline: none !important;
         }
+
+        /* Quill fontpicker styling */
+        .ql-font-great-vibes { font-family: 'Great Vibes', cursive; }
+        .ql-font-dancing-script { font-family: 'Dancing Script', cursive; }
+        .ql-font-alex-brush { font-family: 'Alex Brush', cursive; }
+        .ql-font-sacramento { font-family: 'Sacramento', cursive; }
+        .ql-font-pacifico { font-family: 'Pacifico', cursive; }
+        .ql-font-playfair { font-family: 'Playfair Display', serif; }
+        .ql-font-cinzel { font-family: 'Cinzel', serif; }
+        .ql-font-tahoma { font-family: 'Tahoma', sans-serif; }
     </style>
 @endsection
 
@@ -153,21 +167,50 @@
             </div>
         </div>
 
-        {{-- Section 2: Role Attachment & Dynamic Cheatsheet --}}
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+        {{-- Section 2: Recipient Type & Attachment Role --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
             <h2 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
                 <span class="w-7 h-7 bg-blue-50 text-[#1b84ff] rounded-lg flex items-center justify-center text-xs font-bold">2</span>
-                Attachment Role Pengguna & Variable Helper
+                Tipe Penerima & Attachment Role Pengguna
             </h2>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Role Pengguna yang Memiliki Akses Sertifikat Ini <span class="text-rose-500">*</span></label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Tipe Penerima Sertifikat <span class="text-rose-500">*</span></label>
+                <div class="flex items-center gap-6 h-[46px] px-4 bg-gray-50 border border-gray-200 rounded-xl">
+                    <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
+                        <input type="radio" name="recipient_type" value="peserta" {{ old('recipient_type', 'peserta') == 'peserta' ? 'checked' : '' }} id="type_peserta" class="w-4 h-4 text-blue-600">
+                        <span>Sebagai Peserta (Otomatis Sesuai Account User)</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
+                        <input type="radio" name="recipient_type" value="narasumber" {{ old('recipient_type') == 'narasumber' ? 'checked' : '' }} id="type_narasumber" class="w-4 h-4 text-blue-600">
+                        <span>Sebagai Narasumber (Custom Nama Penerima)</span>
+                    </label>
+                </div>
+            </div>
+
+            {{-- Container untuk Narasumber (Custom Input) --}}
+            <div id="narasumber-container" class="space-y-2 {{ old('recipient_type') == 'narasumber' ? '' : 'hidden' }}">
+                <label class="block text-sm font-semibold text-gray-700">Nama Lengkap & Gelar Narasumber <span class="text-rose-500">*</span></label>
+                <input type="text" name="custom_recipient_name" value="{{ old('custom_recipient_name') }}" placeholder="Contoh: Dr. H. Ahmad Sudrajat, M.Pd."
+                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-400">Nama ini akan langsung tercetak pada bagian "Diberikan Kepada".</p>
+            </div>
+
+            {{-- Container untuk Peserta (Checkboxes Role & Select All) --}}
+            <div id="peserta-container" class="space-y-3 {{ old('recipient_type', 'peserta') == 'peserta' ? '' : 'hidden' }}">
+                <div class="flex items-center justify-between">
+                    <label class="block text-sm font-semibold text-gray-700">Pilih Role Pengguna yang Memiliki Akses Sertifikat Ini <span class="text-rose-500">*</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-600 hover:text-blue-800">
+                        <input type="checkbox" id="select-all-roles" class="w-4 h-4 text-blue-600 rounded">
+                        <span>Pilih Semua Role</span>
+                    </label>
+                </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
                     @foreach($roles as $role)
                         <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
                             <input type="checkbox" name="roles[]" value="{{ $role->id }}"
                                    {{ is_array(old('roles')) && in_array($role->id, old('roles')) ? 'checked' : '' }}
-                                   class="w-4 h-4 text-blue-600 rounded">
+                                   class="role-checkbox w-4 h-4 text-blue-600 rounded">
                             <span>{{ $role->name }}</span>
                         </label>
                     @endforeach
@@ -194,14 +237,24 @@
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
             <h2 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
                 <span class="w-7 h-7 bg-blue-50 text-[#1b84ff] rounded-lg flex items-center justify-center text-xs font-bold">3</span>
-                Konten Halaman Depan
+                Konten Halaman Depan & Tipografi
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Judul Utama</label>
                     <input type="text" name="main_title" value="{{ old('main_title', 'SERTIFIKAT') }}" required
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Gaya WordArt Judul Utama</label>
+                    <select name="word_art_style" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                        <option value="none" {{ old('word_art_style') == 'none' ? 'selected' : '' }}>Standar Modern Blue</option>
+                        <option value="gold-gradient" {{ old('word_art_style') == 'gold-gradient' ? 'selected' : '' }}>WordArt Gold Metallic (Emas Lux)</option>
+                        <option value="blue-royal" {{ old('word_art_style') == 'blue-royal' ? 'selected' : '' }}>WordArt Royal Gradient (Biru Kerajaan)</option>
+                        <option value="emboss-classic" {{ old('word_art_style') == 'emboss-classic' ? 'selected' : '' }}>WordArt Emboss 3D Classic</option>
+                    </select>
                 </div>
 
                 <div>
@@ -211,13 +264,13 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Format Nomor Sertifikat (Dapat Diinput) <span class="text-rose-500">*</span></label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Format Nomor Sertifikat <span class="text-rose-500">*</span></label>
                     <input type="text" name="certificate_number_format" value="{{ old('certificate_number_format', '422/TU.01.02/SMK-71g/CADISDIKWIL.IX/' . date('Y')) }}"
                            placeholder="Contoh: 422/TU.01.02/SMK-71g/CADISDIKWIL.IX/{year}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 font-mono">
                 </div>
 
-                <div>
+                <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Keterangan Peran / Sub-Caption</label>
                     <input type="text" name="role_caption" value="{{ old('role_caption', 'Sebagai Peserta') }}"
                            placeholder="Contoh: Sebagai Peserta / Sebagai Panitia"
@@ -226,9 +279,13 @@
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Teks Narasi Kegiatan / Deskripsi Sertifikat</label>
-                <textarea name="content_text" rows="4" placeholder="Contoh: In House Training (IHT) Pendidikan Karakter Pancawaluya... Bertempat di SMKN 1 Talaga pada tanggal 3 - 4 September 2026, selama 18 Jam."
-                          class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">{{ old('content_text') }}</textarea>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Teks Narasi Kegiatan / Deskripsi Sertifikat (Rich Text Editor)</label>
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div id="quill-editor" class="h-44 text-sm font-sans">
+                        {!! old('content_text', 'In House Training (IHT) Pendidikan Karakter Pancawaluya... Bertempat di SMKN 1 Talaga pada tanggal 3 - 4 September 2026, selama 18 Jam.') !!}
+                    </div>
+                </div>
+                <input type="hidden" name="content_text" id="content_text_hidden" value="{{ old('content_text') }}">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -342,9 +399,10 @@
 @endsection
 
 @section('scripts')
-    <!-- jQuery & Select2 JS -->
+    <!-- jQuery, Select2 & Quill JS -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script>
         $(document).ready(function() {
             $('.select2-search').select2({
@@ -355,6 +413,60 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Setup Quill Rich Text Editor
+            const Font = Quill.import('formats/font');
+            Font.whitelist = ['sans-serif', 'serif', 'monospace', 'great-vibes', 'dancing-script', 'alex-brush', 'sacramento', 'pacifico', 'playfair', 'cinzel', 'tahoma'];
+            Quill.register(Font, true);
+
+            const quill = new Quill('#quill-editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'font': Font.whitelist }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        ['clean']
+                    ]
+                }
+            });
+
+            // Update hidden input on submit
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function() {
+                document.getElementById('content_text_hidden').value = quill.root.innerHTML;
+            });
+
+            // Toggle Recipient Type (Peserta vs Narasumber)
+            const typePeserta = document.getElementById('type_peserta');
+            const typeNarasumber = document.getElementById('type_narasumber');
+            const containerPeserta = document.getElementById('peserta-container');
+            const containerNarasumber = document.getElementById('narasumber-container');
+
+            function toggleRecipientMode() {
+                if (typeNarasumber.checked) {
+                    containerNarasumber.classList.remove('hidden');
+                    containerPeserta.classList.add('hidden');
+                } else {
+                    containerPeserta.classList.remove('hidden');
+                    containerNarasumber.classList.add('hidden');
+                }
+            }
+
+            typePeserta.addEventListener('change', toggleRecipientMode);
+            typeNarasumber.addEventListener('change', toggleRecipientMode);
+
+            // Select All Roles Handler
+            const selectAllRoles = document.getElementById('select-all-roles');
+            if (selectAllRoles) {
+                selectAllRoles.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.role-checkbox');
+                    checkboxes.forEach(cb => cb.checked = selectAllRoles.checked);
+                });
+            }
+
+            // Table Repeater
             let rowCount = 1;
             const container = document.getElementById('materi-container');
             const btnAdd = document.getElementById('btn-add-materi');
@@ -375,7 +487,7 @@
                         <input type="text" name="materi[${rowCount}][name]" placeholder="Nama Materi Kegiatan" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white">
                     </td>
                     <td class="px-4 py-3">
-                        <input type="text" name="materi[${rowCount}][hours]" placeholder="Contoh: 2 JP" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white">
+                        <input type="text" name="materi[${rowCount}][hours]" placeholder="Contoh: 18 - Jam / 2 JP" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white">
                     </td>
                     <td class="px-4 py-3 text-center">
                         <button type="button" class="btn-remove-row text-rose-500 hover:text-rose-700 font-bold text-lg">&times;</button>

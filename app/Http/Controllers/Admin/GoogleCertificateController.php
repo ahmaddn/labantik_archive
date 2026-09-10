@@ -63,9 +63,12 @@ class GoogleCertificateController extends Controller
             'back_page_title'           => 'nullable|string|max:255',
             'signer_2_title'            => 'nullable|string|max:255',
             'signer_2_employee_id'      => 'nullable|exists:core_employees,id',
-            'roles'                     => 'required|array',
+            'roles'                     => 'nullable|array',
             'roles.*'                   => 'exists:core_roles,id',
             'status'                    => 'required|in:active,draft',
+            'recipient_type'            => 'required|in:peserta,narasumber',
+            'custom_recipient_name'     => 'nullable|string|max:255',
+            'word_art_style'            => 'nullable|string|max:100',
             'materi'                    => 'nullable|array',
             'materi.*.name'             => 'required_with:materi|string|max:255',
             'materi.*.hours'            => 'nullable|string|max:100',
@@ -92,6 +95,9 @@ class GoogleCertificateController extends Controller
             'signer_2_title'            => $validated['signer_2_title'] ?? 'Ketua Pelaksana',
             'signer_2_employee_id'      => $validated['signer_2_employee_id'] ?? null,
             'status'                    => $validated['status'],
+            'recipient_type'            => $validated['recipient_type'] ?? 'peserta',
+            'custom_recipient_name'     => $validated['custom_recipient_name'] ?? null,
+            'word_art_style'            => $validated['word_art_style'] ?? 'none',
         ];
 
         // Handle File Uploads
@@ -176,9 +182,12 @@ class GoogleCertificateController extends Controller
             'back_page_title'           => 'nullable|string|max:255',
             'signer_2_title'            => 'nullable|string|max:255',
             'signer_2_employee_id'      => 'nullable|exists:core_employees,id',
-            'roles'                     => 'required|array',
+            'roles'                     => 'nullable|array',
             'roles.*'                   => 'exists:core_roles,id',
             'status'                    => 'required|in:active,draft',
+            'recipient_type'            => 'required|in:peserta,narasumber',
+            'custom_recipient_name'     => 'nullable|string|max:255',
+            'word_art_style'            => 'nullable|string|max:100',
             'materi'                    => 'nullable|array',
             'materi.*.name'             => 'required_with:materi|string|max:255',
             'materi.*.hours'            => 'nullable|string|max:100',
@@ -204,6 +213,9 @@ class GoogleCertificateController extends Controller
             'signer_2_title'            => $validated['signer_2_title'] ?? 'Ketua Pelaksana',
             'signer_2_employee_id'      => $validated['signer_2_employee_id'] ?? null,
             'status'                    => $validated['status'],
+            'recipient_type'            => $validated['recipient_type'] ?? 'peserta',
+            'custom_recipient_name'     => $validated['custom_recipient_name'] ?? null,
+            'word_art_style'            => $validated['word_art_style'] ?? 'none',
         ];
 
         // Upload updates

@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('google_graduation_letters', function (Blueprint $table) {
-            if (!Schema::hasColumn('google_graduation_letters', 'stamp_image')) {
-                $table->string('stamp_image')->nullable()->after('transcript_letter_number');
-            }
-            if (!Schema::hasColumn('google_graduation_letters', 'signature_image')) {
-                $table->string('signature_image')->nullable()->after('stamp_image');
-            }
-        });
+        if (Schema::hasTable('google_graduation_letters')) {
+            Schema::table('google_graduation_letters', function (Blueprint $table) {
+                if (!Schema::hasColumn('google_graduation_letters', 'stamp_image')) {
+                    $table->string('stamp_image')->nullable()->after('transcript_letter_number');
+                }
+                if (!Schema::hasColumn('google_graduation_letters', 'signature_image')) {
+                    $table->string('signature_image')->nullable()->after('stamp_image');
+                }
+            });
+        }
     }
 
     /**

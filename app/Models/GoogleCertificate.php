@@ -40,6 +40,9 @@ class GoogleCertificate extends Model
         'signer_2_title',
         'signer_2_employee_id',
         'status',
+        'recipient_type',
+        'custom_recipient_name',
+        'word_art_style',
     ];
 
     protected $casts = [
