@@ -371,16 +371,33 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Judul Utama</label>
-                    <input type="text" name="main_title" value="{{ old('main_title', $certificate->main_title) }}" required
+                    <input type="text" name="main_title" id="input-main-title" value="{{ old('main_title', $certificate->main_title) }}" required
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Gaya WordArt Judul Utama</label>
-                    <select name="word_art_style" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
-                        <option value="none" {{ old('word_art_style', $certificate->word_art_style) == 'none' ? 'selected' : '' }}>Standar Modern Blue</option>
-                        <option value="gold-gradient" {{ old('word_art_style', $certificate->word_art_style) == 'gold-gradient' ? 'selected' : '' }}>WordArt Gold Metallic (Emas Lux)</option>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Font WordArt Judul Utama</label>
+                    <select name="word_art_font" id="select-word-art-font" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                        <option value="cinzel" {{ old('word_art_font', $certificate->word_art_font) == 'cinzel' ? 'selected' : '' }}>Cinzel (Serif Classic / Default)</option>
+                        <option value="great-vibes" {{ old('word_art_font', $certificate->word_art_font) == 'great-vibes' ? 'selected' : '' }}>Great Vibes (Calligraphy / Cursive)</option>
+                        <option value="dancing-script" {{ old('word_art_font', $certificate->word_art_font) == 'dancing-script' ? 'selected' : '' }}>Dancing Script (Handwriting)</option>
+                        <option value="alex-brush" {{ old('word_art_font', $certificate->word_art_font) == 'alex-brush' ? 'selected' : '' }}>Alex Brush (Elegant Cursive)</option>
+                        <option value="sacramento" {{ old('word_art_font', $certificate->word_art_font) == 'sacramento' ? 'selected' : '' }}>Sacramento (Script)</option>
+                        <option value="pacifico" {{ old('word_art_font', $certificate->word_art_font) == 'pacifico' ? 'selected' : '' }}>Pacifico (Fun Bold Script)</option>
+                        <option value="playfair" {{ old('word_art_font', $certificate->word_art_font) == 'playfair' ? 'selected' : '' }}>Playfair Display (Luxury Serif)</option>
+                        <option value="montserrat" {{ old('word_art_font', $certificate->word_art_font) == 'montserrat' ? 'selected' : '' }}>Montserrat (Modern Bold Sans)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Gaya Efek / Gradien WordArt</label>
+                    <select name="word_art_style" id="select-word-art-style" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
+                        <option value="none" {{ old('word_art_style', $certificate->word_art_style) == 'none' ? 'selected' : '' }}>Standar Flat Blue</option>
+                        <option value="gold-gradient" {{ old('word_art_style', $certificate->word_art_style) == 'gold-gradient' ? 'selected' : '' }}>WordArt Gold Metallic (Emas Lux 3D)</option>
                         <option value="blue-royal" {{ old('word_art_style', $certificate->word_art_style) == 'blue-royal' ? 'selected' : '' }}>WordArt Royal Gradient (Biru Kerajaan)</option>
+                        <option value="emerald-lux" {{ old('word_art_style', $certificate->word_art_style) == 'emerald-lux' ? 'selected' : '' }}>WordArt Emerald Emerald (Zamrud Metallic)</option>
+                        <option value="ruby-crimson" {{ old('word_art_style', $certificate->word_art_style) == 'ruby-crimson' ? 'selected' : '' }}>WordArt Ruby Crimson (Merah Delima)</option>
+                        <option value="silver-metallic" {{ old('word_art_style', $certificate->word_art_style) == 'silver-metallic' ? 'selected' : '' }}>WordArt Silver Chrome (Perak Metallic)</option>
                         <option value="emboss-classic" {{ old('word_art_style', $certificate->word_art_style) == 'emboss-classic' ? 'selected' : '' }}>WordArt Emboss 3D Classic</option>
                     </select>
                 </div>
@@ -391,13 +408,20 @@
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
                 </div>
 
-                <div>
+                <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Format Nomor Sertifikat</label>
                     <input type="text" name="certificate_number_format" value="{{ old('certificate_number_format', $certificate->certificate_number_format) }}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 font-mono">
                 </div>
+            </div>
 
-                <div class="md:col-span-2">
+            {{-- Live WordArt Preview Card --}}
+            <div class="p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center space-y-2 shadow-inner">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Live Preview WordArt Judul Utama</span>
+                <div id="wordart-live-preview" class="text-3xl font-extrabold py-3 transition-all duration-300 tracking-wider">
+                    {{ old('main_title', $certificate->main_title) }}
+                </div>
+            </div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Keterangan Peran / Sub-Caption</label>
                     <input type="text" name="role_caption" value="{{ old('role_caption', $certificate->role_caption) }}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500">
@@ -607,6 +631,31 @@
             $('.role-checkbox, #select-all-roles').on('change', function() {
                 syncUserSelectionWithRoles();
             });
+
+            // Live WordArt Preview Handler
+            const inputMainTitle = document.getElementById('input-main-title');
+            const selectWordArtStyle = document.getElementById('select-word-art-style');
+            const selectWordArtFont = document.getElementById('select-word-art-font');
+            const wordartPreview = document.getElementById('wordart-live-preview');
+
+            function updateWordArtPreview() {
+                if (!wordartPreview) return;
+                const text = inputMainTitle.value || 'SERTIFIKAT';
+                const style = selectWordArtStyle.value || 'none';
+                const font = selectWordArtFont.value || 'cinzel';
+
+                wordartPreview.textContent = text;
+                wordartPreview.className = 'text-3xl font-extrabold py-3 transition-all duration-300 tracking-wider ' +
+                    (style !== 'none' ? 'wordart-' + style : 'text-blue-400') + ' ' +
+                    ('font-' + font);
+            }
+
+            if (inputMainTitle && selectWordArtStyle && selectWordArtFont) {
+                inputMainTitle.addEventListener('input', updateWordArtPreview);
+                selectWordArtStyle.addEventListener('change', updateWordArtPreview);
+                selectWordArtFont.addEventListener('change', updateWordArtPreview);
+                updateWordArtPreview();
+            }
         });
 
         document.addEventListener('DOMContentLoaded', function() {

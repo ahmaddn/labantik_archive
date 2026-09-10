@@ -43,6 +43,7 @@ class GoogleCertificate extends Model
         'recipient_type',
         'custom_recipient_name',
         'word_art_style',
+        'word_art_font',
     ];
 
     protected $casts = [

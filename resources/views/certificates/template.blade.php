@@ -232,12 +232,23 @@
             margin-bottom: 4px;
         }
 
-        /* WordArt Variants */
+        /* WordArt Font Family Variants */
+        .font-cinzel { font-family: 'Cinzel', serif !important; }
+        .font-great-vibes { font-family: 'Great Vibes', cursive !important; }
+        .font-dancing-script { font-family: 'Dancing Script', cursive !important; }
+        .font-alex-brush { font-family: 'Alex Brush', cursive !important; }
+        .font-sacramento { font-family: 'Sacramento', cursive !important; }
+        .font-pacifico { font-family: 'Pacifico', cursive !important; }
+        .font-playfair { font-family: 'Playfair Display', serif !important; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif !important; }
+        .font-times { font-family: 'Times New Roman', Times, serif !important; }
+
+        /* WordArt Style Variants */
         .main-title.wordart-gold-gradient {
             background: linear-gradient(180deg, #ffe57f 0%, #d4af37 40%, #aa7c11 75%, #593e00 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
+            filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.35));
             font-weight: 900;
         }
 
@@ -252,6 +263,30 @@
         .main-title.wordart-emboss-classic {
             color: #1e293b;
             text-shadow: -1px -1px 1px #ffffff, 1px 1px 2px rgba(0,0,0,0.5);
+            font-weight: 900;
+        }
+
+        .main-title.wordart-emerald-lux {
+            background: linear-gradient(180deg, #6ee7b7 0%, #059669 50%, #064e3b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(1px 2px 3px rgba(6, 78, 59, 0.35));
+            font-weight: 900;
+        }
+
+        .main-title.wordart-ruby-crimson {
+            background: linear-gradient(180deg, #fca5a5 0%, #dc2626 50%, #7f1d1d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(1px 2px 3px rgba(127, 29, 29, 0.35));
+            font-weight: 900;
+        }
+
+        .main-title.wordart-silver-metallic {
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 40%, #64748b 75%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.4));
             font-weight: 900;
         }
 
@@ -454,7 +489,7 @@
 
             <!-- Body Sertifikat -->
             <div class="cert-body">
-                <div class="main-title {{ $certificate->word_art_style && $certificate->word_art_style != 'none' ? 'wordart-' . $certificate->word_art_style : '' }}">
+                <div class="main-title {{ $certificate->word_art_style && $certificate->word_art_style != 'none' ? 'wordart-' . $certificate->word_art_style : '' }} {{ $certificate->word_art_font ? 'font-' . $certificate->word_art_font : 'font-cinzel' }}">
                     {{ $certificate->main_title }}
                 </div>
                 

@@ -74,6 +74,7 @@ class GoogleCertificateController extends Controller
             'recipient_type'            => 'required|in:peserta,narasumber',
             'custom_recipient_name'     => 'nullable|string|max:255',
             'word_art_style'            => 'nullable|string|max:100',
+            'word_art_font'             => 'nullable|string|max:100',
             'materi'                    => 'nullable|array',
             'materi.*.name'             => 'nullable|string|max:255',
             'materi.*.hours'            => 'nullable|string|max:100',
@@ -121,6 +122,7 @@ class GoogleCertificateController extends Controller
             'recipient_type'            => $validated['recipient_type'] ?? 'peserta',
             'custom_recipient_name'     => $validated['custom_recipient_name'] ?? null,
             'word_art_style'            => $validated['word_art_style'] ?? 'none',
+            'word_art_font'             => $validated['word_art_font'] ?? 'cinzel',
         ];
 
         // Handle File Uploads & Check Background Orientation / Resolution
@@ -241,6 +243,7 @@ class GoogleCertificateController extends Controller
             'recipient_type'            => 'required|in:peserta,narasumber',
             'custom_recipient_name'     => 'nullable|string|max:255',
             'word_art_style'            => 'nullable|string|max:100',
+            'word_art_font'             => 'nullable|string|max:100',
             'materi'                    => 'nullable|array',
             'materi.*.name'             => 'nullable|string|max:255',
             'materi.*.hours'            => 'nullable|string|max:100',
@@ -287,6 +290,7 @@ class GoogleCertificateController extends Controller
             'recipient_type'            => $validated['recipient_type'] ?? 'peserta',
             'custom_recipient_name'     => $validated['custom_recipient_name'] ?? null,
             'word_art_style'            => $validated['word_art_style'] ?? 'none',
+            'word_art_font'             => $validated['word_art_font'] ?? 'cinzel',
         ];
 
         // Upload updates
