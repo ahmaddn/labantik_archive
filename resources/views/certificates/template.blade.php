@@ -591,8 +591,8 @@
 
             <div class="cert-inner">
                 <div class="cert-body" style="margin-top: 10px;">
-                    <h3 style="font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px;">
-                        {{ $certificate->back_page_title ?? 'STRUKTUR PROGRAM / DAFTAR MATERI' }}
+                    <h3 style="font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px; line-height: 1.3;">
+                        {!! nl2br(e($certificate->back_page_title ?? 'STRUKTUR PROGRAM / DAFTAR MATERI')) !!}
                     </h3>
 
                     <!-- Tabel Struktur Program -->
