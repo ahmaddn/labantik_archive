@@ -337,17 +337,42 @@
             max-width: 88%;
             margin: 0 auto 16px auto;
             color: #000000;
+            white-space: normal;
+            word-wrap: break-word;
         }
 
-        /* Quill font classes mapping */
-        .ql-font-great-vibes { font-family: 'Great Vibes', cursive !important; }
-        .ql-font-dancing-script { font-family: 'Dancing Script', cursive !important; }
-        .ql-font-alex-brush { font-family: 'Alex Brush', cursive !important; }
-        .ql-font-sacramento { font-family: 'Sacramento', cursive !important; }
-        .ql-font-pacifico { font-family: 'Pacifico', cursive !important; }
-        .ql-font-playfair { font-family: 'Playfair Display', serif !important; }
-        .ql-font-cinzel { font-family: 'Cinzel', serif !important; }
-        .ql-font-tahoma { font-family: 'Tahoma', sans-serif !important; }
+        .content-narration p {
+            margin-bottom: 0.35em;
+            min-height: 1.2em;
+        }
+
+        .content-narration p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Quill font classes mapping with deep inheritance */
+        .ql-font-great-vibes, .content-narration .ql-font-great-vibes, .content-narration .ql-font-great-vibes * { font-family: 'Great Vibes', cursive !important; }
+        .ql-font-dancing-script, .content-narration .ql-font-dancing-script, .content-narration .ql-font-dancing-script * { font-family: 'Dancing Script', cursive !important; }
+        .ql-font-alex-brush, .content-narration .ql-font-alex-brush, .content-narration .ql-font-alex-brush * { font-family: 'Alex Brush', cursive !important; }
+        .ql-font-sacramento, .content-narration .ql-font-sacramento, .content-narration .ql-font-sacramento * { font-family: 'Sacramento', cursive !important; }
+        .ql-font-pacifico, .content-narration .ql-font-pacifico, .content-narration .ql-font-pacifico * { font-family: 'Pacifico', cursive !important; }
+        .ql-font-playfair, .content-narration .ql-font-playfair, .content-narration .ql-font-playfair * { font-family: 'Playfair Display', serif !important; }
+        .ql-font-cinzel, .content-narration .ql-font-cinzel, .content-narration .ql-font-cinzel * { font-family: 'Cinzel', serif !important; }
+        .ql-font-tahoma, .content-narration .ql-font-tahoma, .content-narration .ql-font-tahoma * { font-family: 'Tahoma', sans-serif !important; }
+        .ql-font-sans-serif, .content-narration .ql-font-sans-serif, .content-narration .ql-font-sans-serif * { font-family: sans-serif !important; }
+        .ql-font-serif, .content-narration .ql-font-serif, .content-narration .ql-font-serif * { font-family: serif !important; }
+        .ql-font-monospace, .content-narration .ql-font-monospace, .content-narration .ql-font-monospace * { font-family: monospace !important; }
+
+        /* Quill text alignment mapping */
+        .ql-align-center, .content-narration .ql-align-center { text-align: center !important; }
+        .ql-align-right, .content-narration .ql-align-right { text-align: right !important; }
+        .ql-align-justify, .content-narration .ql-align-justify { text-align: justify !important; }
+        .ql-align-left, .content-narration .ql-align-left { text-align: left !important; }
+
+        /* Quill font sizing mapping */
+        .ql-size-small, .content-narration .ql-size-small { font-size: 0.75em !important; }
+        .ql-size-large, .content-narration .ql-size-large { font-size: 1.5em !important; }
+        .ql-size-huge, .content-narration .ql-size-huge { font-size: 2.5em !important; }
 
         /* ── SIGNATURE SECTION ── */
         .cert-footer {
@@ -524,8 +549,14 @@
                 @endif
 
                 @if($certificate->content_text)
+                    @php
+                        $parsedNarration = $certificate->parsePlaceholder($certificate->content_text, $user);
+                        if (strpos($parsedNarration, '<p>') === false && strpos($parsedNarration, '<br') === false) {
+                            $parsedNarration = nl2br($parsedNarration);
+                        }
+                    @endphp
                     <div class="content-narration">
-                        {!! $certificate->parsePlaceholder($certificate->content_text, $user) !!}
+                        {!! $parsedNarration !!}
                     </div>
                 @endif
             </div>

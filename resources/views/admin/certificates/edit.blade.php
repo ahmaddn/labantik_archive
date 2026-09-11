@@ -728,11 +728,13 @@
                 }
             });
 
-            // Update hidden input on submit
-            const form = document.querySelector('form');
-            form.addEventListener('submit', function() {
+            // Update hidden input on submit and text-change
+            function syncQuillContent() {
                 document.getElementById('content_text_hidden').value = quill.root.innerHTML;
-            });
+            }
+            quill.on('text-change', syncQuillContent);
+            const form = document.querySelector('form');
+            form.addEventListener('submit', syncQuillContent);
 
             // Toggle Recipient Type (Peserta vs Narasumber)
             const typePeserta = document.getElementById('type_peserta');

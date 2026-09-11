@@ -356,6 +356,16 @@
                 Upload Dokumen
             </a>
 
+            <a href="{{ route('user.certificates.index') }}"
+                class="sidebar-link {{ request()->routeIs('user.certificates.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600"
+                onclick="closeSidebar()">
+                <svg class="icon h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                </svg>
+                Sertifikat Saya
+            </a>
+
             @auth
                 @if (auth()->user()->isSuperAdmin())
                     <div x-data="{ open: {{ request()->routeIs('admin.students.*', 'admin.teachers.*', 'admin.piket.*') ? 'true' : 'false' }} }">
@@ -417,6 +427,14 @@
                     <div class="pt-4">
                         <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gray-400">Admin</p>
                     </div>
+                    <a href="{{ route('admin.certificates.index') }}"
+                        class="sidebar-link {{ request()->routeIs('admin.certificates.*') ? 'active' : '' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600"
+                        onclick="closeSidebar()">
+                        <svg class="icon h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
+                        Sertifikat Dinamis
+                    </a>
                     <a href="{{ route('admin.google.connect') }}"
                         class="sidebar-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-600"
                         onclick="closeSidebar()">
