@@ -374,28 +374,72 @@
         .ql-size-large, .content-narration .ql-size-large { font-size: 1.5em !important; }
         .ql-size-huge, .content-narration .ql-size-huge { font-size: 2.5em !important; }
 
-        /* ── SIGNATURE SECTION ── */
+        /* ── SIGNATURE & VERIFICATION FOOTER ── */
         .cert-footer {
-            margin-top: 25px;
+            margin-top: 15px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0 10px;
+        }
+
+        .cert-verify-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-width: 160px;
+            max-width: 180px;
+        }
+
+        .cert-qr-img {
+            width: 95px !important;
+            height: 95px !important;
+            object-fit: contain !important;
+            flex-shrink: 0 !important;
+            border: 1px solid #d1d5db !important;
+            padding: 3px !important;
+            background: #ffffff !important;
+            border-radius: 6px !important;
+            box-sizing: border-box !important;
+            margin: 4px 0 !important;
+        }
+
+        .cert-verify-text {
+            font-size: 6.5pt;
+            font-family: Arial, sans-serif;
+            color: #4b5563;
+            line-height: 1.25;
             text-align: center;
         }
 
+        .cert-verify-text strong {
+            color: #111827;
+            display: block;
+            margin-bottom: 1px;
+            font-size: 7pt;
+            font-weight: bold;
+        }
+
         .signature-box {
-            display: inline-block;
-            min-width: 240px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-width: 220px;
         }
 
         .signature-box .place-date {
             font-size: 11pt;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            line-height: 1.2;
         }
 
         .signature-box .signer-title {
             font-size: 11pt;
             font-weight: bold;
-            margin-bottom: 55px;
+            margin-bottom: 2px;
+            line-height: 1.2;
         }
 
         .signature-box .signer-name {
@@ -562,15 +606,51 @@
             </div>
 
             <!-- Tanda Tangan Halaman 1 -->
+            @php
+                $recipientName = ($certificate->recipient_type == 'narasumber' && !empty($certificate->custom_recipient_name))
+                    ? $certificate->custom_recipient_name
+                    : $certificate->parsePlaceholder('{nama}', $user);
+
+                $certVerifyUrl = route('certificates.verify', $certificate->id);
+                $certVerifyQrUrl = 'https://quickchart.io/qr?text=' . urlencode($certVerifyUrl) .
+                                   '&size=250&ecLevel=M&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png') .
+                                   '&centerImageWidth=28&centerImageHeight=28';
+
+                $signer1Name = $certificate->signer1Employee ? $certificate->signer1Employee->full_name : '-----------------------';
+                $signer1Nip = $certificate->signer1Employee && $certificate->signer1Employee->nip ? $certificate->signer1Employee->nip : '-';
+                $signer1QrText = "TTD SAH: " . $signer1Name . " | NIP: " . $signer1Nip . " | SMKN 1 TALAGA";
+                $signer1QrUrl = 'https://quickchart.io/qr?text=' . urlencode($signer1QrText) .
+                                '&size=250&ecLevel=M&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png') .
+                                '&centerImageWidth=28&centerImageHeight=28';
+            @endphp
+
             <div class="cert-footer">
+                <!-- Sebelah Kiri: Barcode QR Verifikasi Keaslian Dokumen -->
+                <div class="cert-verify-box">
+                    @if($certificate->place_date)
+                        <div class="place-date" style="visibility: hidden;">Spacer</div>
+                    @endif
+                    <div class="signer-title" style="visibility: hidden;">Spacer</div>
+
+                    <img src="{{ $certVerifyQrUrl }}" class="cert-qr-img" alt="QR Verifikasi Dokumen">
+
+                    <div class="cert-verify-text">
+                        <strong>Verifikasi Dokumen</strong>
+                        Scan QR Code ini untuk verifikasi keabsahan sertifikat.
+                    </div>
+                </div>
+
+                <!-- Sebelah Kanan: TTD QR User Penandatangan 1 -->
                 <div class="signature-box">
                     @if($certificate->place_date)
                         <div class="place-date">{{ $certificate->parsePlaceholder($certificate->place_date, $user) }}</div>
                     @endif
                     <div class="signer-title">{{ $certificate->signer_1_title }}</div>
 
+                    <img src="{{ $signer1QrUrl }}" class="cert-qr-img" alt="QR TTD {{ $signer1Name }}">
+
                     <div class="signer-name">
-                        {{ $certificate->signer1Employee ? $certificate->signer1Employee->full_name : '-----------------------' }}
+                        {{ $signer1Name }}
                     </div>
                     @if($certificate->signer1Employee && $certificate->signer1Employee->nip)
                         <div class="signer-nip">NIP. {{ $certificate->signer1Employee->nip }}</div>
@@ -648,12 +728,36 @@
                 </div>
 
                 <!-- Tanda Tangan Halaman 2 -->
+                @php
+                    $signer2Name = $certificate->signer2Employee ? $certificate->signer2Employee->full_name : '-----------------------';
+                    $signer2Nip = $certificate->signer2Employee && $certificate->signer2Employee->nip ? $certificate->signer2Employee->nip : '-';
+                    $signer2QrText = "TTD SAH: " . $signer2Name . " | NIP: " . $signer2Nip . " | SMKN 1 TALAGA";
+                    $signer2QrUrl = 'https://quickchart.io/qr?text=' . urlencode($signer2QrText) .
+                                    '&size=250&ecLevel=M&margin=1&centerImageUrl=' . urlencode('https://smkn1talaga.sch.id/assets/images/logosmk.png') .
+                                    '&centerImageWidth=28&centerImageHeight=28';
+                @endphp
+
                 <div class="cert-footer">
+                    <!-- Sebelah Kiri: Barcode QR Verifikasi Keaslian Dokumen -->
+                    <div class="cert-verify-box">
+                        <div class="signer-title" style="visibility: hidden;">Spacer</div>
+
+                        <img src="{{ $certVerifyQrUrl }}" class="cert-qr-img" alt="QR Verifikasi Dokumen">
+
+                        <div class="cert-verify-text">
+                            <strong>Verifikasi Dokumen</strong>
+                            Scan QR Code ini untuk verifikasi keabsahan dokumen.
+                        </div>
+                    </div>
+
+                    <!-- Sebelah Kanan: TTD QR User Penandatangan 2 -->
                     <div class="signature-box">
                         <div class="signer-title">{{ $certificate->signer_2_title }}</div>
 
+                        <img src="{{ $signer2QrUrl }}" class="cert-qr-img" alt="QR TTD {{ $signer2Name }}">
+
                         <div class="signer-name">
-                            {{ $certificate->signer2Employee ? $certificate->signer2Employee->full_name : '-----------------------' }}
+                            {{ $signer2Name }}
                         </div>
                         @if($certificate->signer2Employee && $certificate->signer2Employee->nip)
                             <div class="signer-nip">NIP. {{ $certificate->signer2Employee->nip }}</div>

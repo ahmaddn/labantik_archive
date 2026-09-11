@@ -405,6 +405,17 @@ class GoogleCertificateController extends Controller
     }
 
     /**
+     * Verifikasi Sertifikat oleh Publik (tanpa login)
+     */
+    public function verify($id)
+    {
+        $certificate = GoogleCertificate::with(['signer1Employee', 'signer2Employee', 'structures'])->findOrFail($id);
+        $user        = auth()->user() ?? (object)['name' => $certificate->custom_recipient_name ?? 'Penerima Sertifikat'];
+
+        return view('certificates.verify', compact('certificate', 'user'));
+    }
+
+    /**
      * Helper PHP GD untuk menghapus latar belakang putih (menjadi transparan)
      */
     private function removeWhiteBackground(string $relativeStoragePath): void

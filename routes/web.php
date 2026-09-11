@@ -19,8 +19,9 @@ use App\Http\Controllers\Admin\GraduationIjazahController;
 use App\Http\Controllers\Admin\GoogleCertificateController;
 use App\Http\Controllers\UserCertificateController;
 
-// ── Verifikasi Dokumen Kelulusan (PUBLIK — tanpa login) ───────
+// ── Verifikasi Dokumen (PUBLIK — tanpa login) ───────
 Route::get('/verify/{uuid}', [GraduationVerifyController::class, 'show'])->name('graduation.verify');
+Route::get('/verify-certificate/{id}', [GoogleCertificateController::class, 'verify'])->name('certificates.verify');
 
 
 // ── Root redirect ─────────────────────────────────
