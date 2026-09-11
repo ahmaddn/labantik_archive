@@ -91,7 +91,7 @@
 
             {{-- Action Button --}}
             <div class="pt-2">
-                <a href="{{ route('admin.certificates.preview', $certificate->id) }}" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-blue-500/25">
+                <a href="{{ route('certificates.public_preview', $certificate->id) }}" target="_blank" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-blue-500/25">
                     <i class="fa-solid fa-file-invoice"></i> Lihat / Cetak Dokumen Sertifikat
                 </a>
             </div>

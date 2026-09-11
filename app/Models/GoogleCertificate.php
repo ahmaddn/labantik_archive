@@ -95,7 +95,7 @@ class GoogleCertificate extends Model
     /**
      * Parse placeholder {nama}, {nip}, {nis}, {nisn}, {kelas}, {email}, {year} secara dinamis untuk user tertentu
      */
-    public function parsePlaceholder(?string $text, ?User $user = null): string
+    public function parsePlaceholder(?string $text, mixed $user = null): string
     {
         if (!$text) {
             return '';
@@ -105,13 +105,20 @@ class GoogleCertificate extends Model
             return $text;
         }
 
+        $nama  = is_object($user) ? ($user->name ?? $user->full_name ?? '') : '';
+        $nip   = is_object($user) ? ($user->nip ?? (isset($user->employee) ? $user->employee?->nip : null) ?? '-') : '-';
+        $nis   = is_object($user) ? ($user->nis ?? '-') : '-';
+        $nisn  = is_object($user) ? ($user->nisn ?? '-') : '-';
+        $kelas = is_object($user) ? ($user->class_name ?? '-') : '-';
+        $email = is_object($user) ? ($user->email ?? '') : '';
+
         $replacements = [
-            '{nama}'  => $user->name ?? $user->full_name ?? '',
-            '{nip}'   => $user->nip ?? $user->employee?->nip ?? '-',
-            '{nis}'   => $user->nis ?? '-',
-            '{nisn}'  => $user->nisn ?? '-',
-            '{kelas}' => $user->class_name ?? '-',
-            '{email}' => $user->email ?? '',
+            '{nama}'  => $nama,
+            '{nip}'   => $nip,
+            '{nis}'   => $nis,
+            '{nisn}'  => $nisn,
+            '{kelas}' => $kelas,
+            '{email}' => $email,
             '{year}'  => date('Y'),
         ];
 
